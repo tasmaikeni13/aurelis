@@ -1,0 +1,587 @@
+# Memory as Inference: Conjugate State Machines and the Dissolution of the Expressivity–Efficiency Frontier in Linear-Time Sequence Modeling
+
+*A theoretical monograph. June 2026.*
+
+---
+
+## Abstract
+
+Recurrent and state-space sequence models buy linear-time training and constant-cost inference by compressing history into a fixed-size state, and they pay for it in expressivity: associative recall degrades, multi-hop reasoning collapses, and in-context learning becomes an accident of training rather than a property of the architecture. Attention buys exact retrieval by refusing to compress at all, and pays in quadratic training cost and per-token inference cost that grows with context. This paper argues that the dichotomy is an artifact of a mistaken compression target. Both families compress (or refuse to compress) the *signal*; the correct object of compression is the *posterior belief over the latent operator that generated the context*.
+
+We develop this reframing into a complete architecture class, the **Conjugate State Machine (CSM)**, from four bedrock results. First, an information-theoretic lower bound showing that exact recall of $K$ arbitrary associations requires $\Omega(K)$ state — no architecture escapes this, so the meaningful design goal is *selectable* exactness at a state budget, with optimal degradation beyond it. Second, a hardness result: parallel-in-time evaluation of general nonlinear recurrences is P-complete, so any architecture with parallelizable training must restrict its state transition to an (essentially) linearizable class — expressive nonlinearity must migrate out of the transition. Third, a structure theorem: state transitions whose composites span a finite-dimensional function space are exactly the linearly realizable ones, identifying the full design space of scannable recurrences. Fourth, a classical canonicity result: families admitting fixed-dimensional sufficient statistics are exactly the exponential families — hence the *only* states that losslessly summarize history relative to a hypothesis class are conjugate posterior parameters, and conjugacy makes their update *linear*, hence scannable. The conclusion is forced rather than designed: the state must be the natural parameter of a conjugate posterior; the update must be Bayes' rule, which is an associative linear scan; the read must be the posterior predictive, where all nonlinearity lives.
+
+We instantiate the class with a matrix-Gaussian flagship whose state is the pair of second-moment sufficient statistics of an online ridge regression. We prove: exact associative recall up to the information-theoretically optimal capacity (with a matching converse, tight to the constant); strict per-access fidelity advantages over softmax attention (interpolation versus smoothing, linear-span versus convex-hull reads, optimal averaging of noisy duplicates); calibrated retrieval confidence as a free architectural output; multi-hop retrieval within a single layer; derivations of forgetting and input gates as exact Bayesian drift and evidence-precision updates rather than heuristics; $\Theta(Nd^2)$ training work at $O(\log N)$ span; $O(d^2)$ per-token decoding via rank-one Cholesky maintenance with a provable conditioning floor; and a dyadic cascade extension achieving $\Theta(d\log N)$ exactly retrievable associations with $O(d^2 \log N)$ state, scale-uniformly within a constant factor of the Shannon limit. States of independent streams merge by addition, giving order-free parallel context ingestion unavailable to either attention or nonlinear RNNs. We map the boundaries honestly: what remains impossible is impossible for everyone, and we prove exactly where the architecture meets those walls.
+
+---
+
+## 1. Introduction: The Frontier and Its Three Walls
+
+### 1.1 The tension, stated precisely
+
+A causal sequence model consumes tokens $x_1, x_2, \ldots, x_N$ and emits outputs $y_t$ that may depend on the entire prefix $x_{1:t}$. The two dominant families resolve the dependence on the past in opposite ways.
+
+The recurrent family — classical RNNs and modern state-space models — maintains a state $z_t$ of *fixed size* and updates it causally, $z_t = U(z_{t-1}, x_t)$. Inference is $O(1)$ per token in both time and memory; training, for the linear-transition subfamily, parallelizes over the sequence via prefix scans. The cost is a permanent epistemic injury: the state is a lossy funnel, and everything the model will ever know about token $x_s$ at time $t > s$ must have survived $t - s$ compressions, each of which was performed *before the query was known*. Associative recall over many items, pointer-chasing across the context, and faithful in-context regression all degrade in ways practitioners observe and theoreticians can prove.
+
+The attention family refuses to compress. It stores every key–value pair and answers queries by softmax-weighted averaging over the entire past. Recall is excellent for stored keys; the price is $\Theta(N^2)$ training cost, $\Theta(N)$ state, and per-token decode cost and memory traffic that grow with the context — the engineering pathology of every long-context system deployed today.
+
+The received wisdom treats this as a Pareto frontier: pick efficiency or expressivity. This paper's thesis is that the frontier, as usually drawn, conflates two distinct impossibilities — one real and universal, one self-inflicted. The real one is information-theoretic: *no* fixed-size state can exactly recall an unbounded number of adversarially chosen associations (Theorem 3.1; the bound applies to attention too, which evades it only by letting its state grow linearly). The self-inflicted one is architectural: existing recurrent models compress the *wrong object*, with the *wrong update*, and read with the *wrong estimator*. Removing the self-inflicted impossibility — while meeting the real one at its exact boundary — is what this paper does.
+
+### 1.2 The reframing: states are posteriors, not sketches
+
+Ask first what a state is *for*. It is not for reconstructing the past; no downstream computation ever demands the prefix back. It is for answering *future queries about what the past implies*. The right formal object is therefore not a compression of $x_{1:t}$ but a compression of the *belief* about whatever latent structure of $x_{1:t}$ future queries will probe. This shift — from signal compression to posterior maintenance — changes every component of the architecture, and each change is forced by a theorem rather than chosen by taste:
+
+(i) *What the state is.* If queries probe a latent object $W$ (for concreteness: the associative map relating keys to values in the context), the minimal lossless summary of the history relative to those queries is the sufficient statistic of the posterior over $W$. A classical theorem of Koopman, Pitman, and Darmois says fixed-dimensional sufficient statistics exist *only* for exponential families. So the hypothesis class must be an exponential family, and the state must be its conjugate posterior's natural parameters. There is no other choice; every alternative state either wastes capacity or loses task-relevant information.
+
+(ii) *What the update is.* Conjugate Bayesian updating is *additive in natural parameters*: the posterior parameter is a (possibly discounted) sum of per-token sufficient statistics. Additivity is associativity, and associativity is parallelizability: the update is a linear prefix scan, trainable in $O(\log N)$ span. The notorious tension between nonlinear recurrent expressivity and parallel training is resolved by a hardness theorem (Theorem 3.2): general nonlinear recurrences are P-complete to parallelize, so *every* parallel-trainable architecture must have an (essentially) linear transition — the only question is whether the linearity is an arbitrary engineering surrender or the exact algebra of Bayes' rule. In a CSM it is the latter.
+
+(iii) *What the read is.* The read is the posterior predictive at a query — for the Gaussian instance, the solution of a regularized linear system, $\hat v = C_t (S_t + \varepsilon I)^{-1} q$. All of the architecture's nonlinearity lives here, at read time, where it does not obstruct the scan. This single design decision is what restores expressivity: the solve *inverts the interference between overlapping keys* instead of averaging over it. Softmax attention is a kernel *smoother*; the CSM read is a kernel *interpolant*. Smoothers cannot separate correlated keys, cannot leave the convex hull of stored values, and cannot average noisy duplicates at the statistically optimal rate. The solve does all three, provably.
+
+(iv) *What the gates are.* Forgetting and input gating stop being heuristics. Discounting natural parameters by $\lambda_t$ is *exactly* Bayesian filtering under a maximum-entropy drift model on the latent (Proposition 4.6), and the write strength $\beta_t$ is *exactly* the precision of the token's evidence. The gates of recurrent folklore are derived quantities of a filter.
+
+One sentence of intellectual honesty before the formal development. Finite sufficiency is only possible *relative to a hypothesis class*; no finite state is sufficient for everything (Theorem 3.1 again). Choosing the class is choosing what the model can remember losslessly. The architecture's job — and this paper's central technical contribution — is to make that choice *computationally free* (conjugacy ⇒ scan), *statistically optimal* (posterior ⇒ minimal sufficient state, Bayes-optimal reads), *capacity-optimal* (matching converse), and *scale-uniform* (the dyadic cascade of Section 8). What remains beyond the boundary is provably beyond every architecture's boundary.
+
+### 1.3 Results at a glance
+
+The paper's contributions are: (i) the impossibility frontier, consisting of a state lower bound for exact recall (Theorem 3.1, with a randomized strengthening), a P-completeness theorem for parallel-in-time nonlinear recurrence evaluation (Theorem 3.2), and a tight capacity converse for value-linear memories (Theorem 3.3); (ii) a structure theorem identifying linearizable transitions with finite-dimensional precomposition-invariant function spaces (Lemma 3.5), which together with the classical sufficiency canonicity theorem (Theorem 4.4) *derives* the conjugate-state-machine class as the unique resolution of the frontier (Theorem 4.1, Theorem 4.3); (iii) the matrix-Gaussian instance with exact-recall guarantees and explicit finite-$\varepsilon$ error bounds (Theorem 5.2), Bayes/Gauss–Markov optimality (Theorem 5.4), three strict per-access separations from softmax reads (Proposition 5.5), native in-context regression with risk bounds whose variance term *is* the architecture's confidence output (Theorem 5.7, Proposition 5.6), single-layer multi-hop retrieval with error-propagation control (Theorem 5.8), and capacity exactly matching the converse (Theorem 5.9); (iv) the complete computational story — associative scan training at $\Theta(Nd^2)$ work and $O(c + \log N)$ span (Theorem 6.2), $O(d^2)$ per-token decode by scaled rank-one Cholesky maintenance with a provable regularization floor (Theorem 6.3, Lemma 6.4), backward passes as adjoint scans (Lemma 6.5), and conditioning/stability bounds (Theorem 6.6); (v) a hardware mapping with arithmetic-intensity and memory-residency analyses showing decode traffic independent of context length (Section 7); (vi) the dyadic conjugate cascade: $O(d^2\log N)$ state, $O(1)$ amortized maintenance, $\Theta(d\log N)$ online-selectable exact recalls with scale-uniform Shannon efficiency, a fidelity-horizon law with power-law (not exponential) forgetting, and order-free mergeability of independently computed states (Theorems 8.2–8.5); and (vii) an adversarial self-assessment that locates every wall the architecture still faces and proves which of them are walls for all architectures (Section 9).
+
+### 1.4 How to read this paper
+
+Section 2 fixes the computational model and the task definitions. Section 3 proves what cannot be done; its three impossibility results triangulate the unique feasible region. Section 4 walks through the only door the impossibilities leave open and derives the CSM class in full generality. Section 5 develops the Gaussian flagship and its expressivity theorems. Sections 6 and 7 give algorithms, complexity, and the hardware mapping. Section 8 scales the construction to unbounded context. Section 9 red-teams the entire edifice; Section 10 maps the adjacent possible. Proofs longer than a few lines are deferred to Appendices A–G. A note on provenance: in keeping with the work's derivational character, the paper is self-contained and builds only on classical mathematics — Shannon-type counting arguments, Fano's inequality, the parallel-prefix theorem, the Gauss–Markov theorem, matrix-normal conjugacy, the Koopman–Pitman–Darmois theorem, P-completeness of the circuit value problem, and standard numerical linear algebra. No claim of relation to, or priority over, any contemporary architecture literature is made or implied; reconciliation with that literature is deliberately out of scope.
+
+---
+
+## 2. Formal Preliminaries
+
+### 2.1 Notation
+
+Scalars are lowercase italic ($\lambda, \beta, \varepsilon$), vectors lowercase ($x, k, q, v$), matrices uppercase ($S, C, A, W$). $\|\cdot\|$ is the Euclidean norm on vectors and the spectral norm on matrices; $\sigma_{\min}(\cdot), \sigma_{\max}(\cdot)$ are extreme singular values; $\lambda_{\min}(\cdot)$ the smallest eigenvalue of a symmetric matrix; $\kappa(\cdot)$ the spectral condition number. $I_d$ is the $d\times d$ identity (subscript dropped when clear). For a sequence of scalars $\lambda_s$, write $\Lambda_{s:t} = \prod_{r=s}^{t} \lambda_r$ with the convention $\Lambda_{t+1:t}=1$. Key dimension is $d_k$, value dimension $d_v$; when they coincide we write $d$. $[n] = \{1,\ldots,n\}$. All claims about floating-point behavior use unit roundoff $u$.
+
+### 2.2 Machines
+
+**Definition 2.1 (Streaming machine).** A *streaming machine* with state space $\mathcal{Z}$ is a pair of maps $(U, R)$: a transition $U : \mathcal{Z} \times \mathcal{X} \to \mathcal{Z}$ and a readout $R : \mathcal{Z} \times \mathcal{Q} \to \mathcal{Y}$. On input stream $x_1, \ldots, x_N$ it computes $z_t = U(z_{t-1}, x_t)$ from a fixed $z_0$ and answers a query $q$ posed at time $t$ with $R(z_t, q)$. Its *state size* is the number of bits (in the bit model) or machine words (in the real model) needed to represent elements of $\mathcal{Z}$; its *per-token cost* is the cost of one application of $U$; its *read cost* is the cost of one application of $R$.
+
+The bit model is used for lower bounds (so that they are unconditional), the real-arithmetic model with stability analysis for upper bounds (so that they are honest in finite precision). Remark 6.7 bridges the two for our constructions.
+
+**Definition 2.2 (Scan realization).** A streaming machine is *scan-realizable* if there exists a monoid $(\mathcal{M}, \bullet, e_\mathcal{M})$, an encoding $\iota : \mathcal{X} \to \mathcal{M}$, and an action $\alpha : \mathcal{M} \times \mathcal{Z} \to \mathcal{Z}$ compatible with composition ($\alpha(m_2, \alpha(m_1, z)) = \alpha(m_2 \bullet m_1, z)$) such that
+$$z_t = \alpha\big(\iota(x_t) \bullet \iota(x_{t-1}) \bullet \cdots \bullet \iota(x_1),\; z_0\big),$$
+with monoid elements representable in $p_\mathcal{M}$ words and $\bullet$ computable in $\tau_\bullet$ operations. Note that $\iota$ may be an arbitrary (nonlinear, learned) function of the token: scan-realizability constrains how the state *composes across time*, not how tokens are encoded.
+
+**Proposition 2.3 (Parallel prefix; classical).** For a scan-realizable machine, all prefix states $z_1, \ldots, z_N$ are computable with $\Theta(N)$ monoid products ($\Theta(N\tau_\bullet)$ work) at $O(\tau_\bullet \log N)$ span, by the standard two-phase balanced-tree (up-sweep/down-sweep) prefix computation. ∎
+
+This is the entire content of "parallelizable training" for recurrent models: the existence of an associative, bounded-size composition. Everything in this paper that touches efficiency reduces to exhibiting such a composition; everything that touches expressivity reduces to what survives inside one.
+
+### 2.3 Tasks
+
+**Definition 2.4 (Exact associative recall, $\mathrm{EAR}(K, b)$).** An adversary streams $K$ pairs $(k_i, v_i)$, with keys $k_i$ drawn from a fixed $\delta$-separated key alphabet and values $v_i \in \{0,1\}^b$ arbitrary. After the stream, an arbitrary stored key $k_j$ is presented as a query; the machine must output $v_j$ exactly. In the real model, "exactly" means: with error at most $\epsilon_{\mathrm{tol}}$ in norm, for every $\epsilon_{\mathrm{tol}} > 0$, under a stated limit of an architectural regularization parameter, with explicit finite-parameter error bounds.
+
+**Definition 2.5 (Linear-functional recall).** As in Definition 2.4, but the query is $q = \sum_j \alpha_j k_j$ for arbitrary known-to-nobody coefficients $\alpha \in \mathbb{R}^K$, and the target output is $\sum_j \alpha_j v_j$. This captures compositional probing of memory — negation ("everything except"), superposition, and analogical offsets — and will strictly separate solver-type reads from normalized-smoothing reads (Proposition 5.5).
+
+**Definition 2.6 ($H$-hop chase).** The stream encodes a functional graph: pairs $(k_{u}, v_{u})$ where $v_u$ is the key-code of the successor of node $u$. Given a start code, the machine must output the code of the node $H$ hops downstream. This is the canonical multi-hop reasoning primitive: each hop's query is computable only from the previous hop's answer.
+
+**Definition 2.7 (Adaptive memory rounds).** Within one layer of a sequence architecture, an *adaptive memory round* is a context access whose addressing input depends on the output of a previous access in the same layer. A standard attention layer performs one round (its queries are computed from the layer input before any retrieval occurs). The number of rounds per layer, times depth, upper-bounds the length of retrieval-composition chains an architecture can realize; Theorem 5.8 makes the CSM's rounds-per-layer a tunable constant $H$.
+
+**Definition 2.8 (Query class and task-sufficiency).** Let $\mathcal{Q}$ be a set of queries, each a functional $\phi_q$ applicable to histories. A state map $\tau(x_{1:t})$ is *$\mathcal{Q}$-sufficient under a generative model* $P$ if for every $q \in \mathcal{Q}$ the conditional law $P(\phi_q \mid x_{1:t})$ depends on $x_{1:t}$ only through $\tau(x_{1:t})$. It is *minimal* if it is a measurable function of every other $\mathcal{Q}$-sufficient statistic.
+
+### 2.4 The generative lens
+
+Optimality statements need a model. We will use, for the flagship instance, the *latent linear-map model*: context tokens carry (through learned encoders) key–value–precision triples $(k_t, v_t, \beta_t)$ with
+$$v_t = W k_t + \beta_t^{-1/2}\,\xi_t, \qquad \xi_t \sim \mathcal{N}(0, I_{d_v}) \text{ i.i.d.}, \qquad W \sim \mathcal{MN}\big(0,\; I_{d_v},\; \varepsilon^{-1} I_{d_k}\big),$$
+that is, a matrix-normal prior with i.i.d. $\mathcal{N}(0, \varepsilon^{-1})$ entries, optionally with a drift process on $W$ specified in Section 4.5. The epistemic status of this model must be stated plainly, because it governs which theorems mean what. The model plays the role that linear-Gaussian assumptions play in filtering theory: *inside* the model we obtain optimality certificates (Bayes-optimal reads, calibrated confidence, minimal sufficiency); *outside* the model the architecture still obeys all of its algebraic and computational guarantees (exact recall, capacity, complexity, stability, mergeability), which are theorems of linear algebra, not of probability. The architecture does not need the model to be true in order to function; it needs it only to be *named* in order to be optimal against it. Section 9.6 discusses what happens when queries probe structure outside the class, and Section 10.1 how to widen the class.
+
+### 2.5 Two degenerate corners, for orientation
+
+Two familiar mechanisms are degenerate members of the framework about to be built, and it is clarifying to place them before deriving the general object. A *Hebbian fast-weight memory* stores $C_t = \sum_s v_s k_s^\top$ and reads $C_t q$ — it will turn out to be the CSM read with the key-covariance statistic $S_t$ replaced by the identity, i.e., a posterior that never updates its uncertainty about key geometry; its crosstalk failure (relative error $\Theta(\sqrt{K/d})$ for random keys; Section 5.3) is precisely the price of that omission. *Softmax attention* reads by normalized kernel smoothing over the uncompressed history — a Nadaraya–Watson estimator; it will turn out to be the infinite-state, zero-compression corner whose statistical estimator is nonetheless *weaker per access* than the posterior-predictive read, in three provable senses (Proposition 5.5). Both corners are instructive: the first compresses with the right cost and the wrong statistics; the second uses no compression and still leaves estimation quality on the table.
+
+---
+
+## 3. The Shape of the Feasible: Three Walls and One Door
+
+Research on efficient sequence models is haunted by a vague sense that "something" prevents fixed-state models from matching attention. This section replaces the vague sense with three exact theorems. The first says what *no* machine can do. The second says what no *parallel-trainable* machine can do. The third says what no machine *of a given state budget* can do. Their intersection leaves exactly one open door, and Lemma 3.5 describes its shape. The architecture of Sections 4–8 then simply walks through it; the reader should experience the rest of the paper as forced moves.
+
+### 3.1 The information wall
+
+**Theorem 3.1 (Exact recall requires linear state).**
+*(a) (Deterministic.) Any deterministic streaming machine that solves $\mathrm{EAR}(K, b)$ — exact recall of every one of $K$ stored values of $b$ bits each, for every value assignment — must have state size $m \geq Kb$ bits at the write/query cut.*
+*(b) (Randomized.) Any randomized streaming machine that answers correctly with probability $\geq 1 - \delta$ (over its internal randomness, for every value assignment and query) requires $m \geq (1 - H_2(\delta))\,Kb - 1$ bits, where $H_2$ is the binary entropy.*
+
+*Proof of (a).* Fix the keys. The state $z$ after the write phase is a deterministic function of the value assignment $V = (v_1, \ldots, v_K) \in \{0,1\}^{Kb}$. If $m < Kb$ there are two assignments $V \neq V'$ with the same state $z$. They differ in some index $j$; on query $k_j$ the machine's output is a function of $(z, k_j)$ alone, hence identical for both, hence wrong for at least one. ∎ (Part (b) is Fano's inequality applied to the Markov chain $V \to Z \to \hat V$; Appendix A.)
+
+Theorem 3.1 is brutal and universal: it binds attention (whose "state" — the KV cache — grows as $\Theta(N)$ precisely because it must), it binds every recurrent model, and it binds everything proposed in this paper. Three consequences calibrate the entire design space. First, *the marketing version of the goal — "lossless unbounded context in O(1) state" — is mathematically void*, and any architecture claiming it is misdescribing itself. Second, the meaningful goal is the one the theorem leaves open: a state budget $m$ buys $\Theta(m/b)$ exact associations, and the architecture's obligations are (i) to *achieve* that budget (most recurrent designs do not come close; Section 5.3), (ii) to let the model *choose online* which associations occupy it (selection, Theorem 8.3), and (iii) to degrade *optimally* — in a precise estimation-theoretic sense — for everything beyond it (Theorem 5.4). Third, since the bound is linear in $K$, an architecture whose exact capacity per state-bit is within a constant of $1/b$ has no information-theoretic headroom above it: optimality claims of this type are closable, and we will close ours (Theorem 5.9 against Theorem 3.3).
+
+### 3.2 The parallelism wall
+
+The second wall explains a tension every designer of recurrent models has felt: nonlinear state transitions are expressive but serial; linear ones are parallel but feel impoverished. This is not an engineering accident.
+
+**Theorem 3.2 (No free parallelism).** *Define the prefix-recurrence problem: given a transition family $f$ computable by a uniform polynomial-size circuit, an initial state $z_0 \in \{0,1\}^p$ with $p = \mathrm{poly}(N)$, and tokens $x_1, \ldots, x_N$, output $z_N$ where $z_t = f(z_{t-1}, x_t)$. This problem is P-complete under logspace reductions. Consequently, unless $\mathrm{NC} = \mathrm{P}$, there is no general parallel-in-time algorithm of polylogarithmic span for nonlinear recurrences — in particular, no scan, chunking, or divide-and-conquer scheme trains a general nonlinear recurrent layer in sublinear span.*
+
+*Proof sketch.* Membership in P is immediate. For hardness, reduce from the circuit value problem (CVP), the canonical P-complete problem: topologically order the gates $g_1, \ldots, g_N$ of a CVP instance; let the state hold the vector of already-evaluated gate values; let token $x_t$ encode gate $t$'s type and input wire indices; let $f$ evaluate gate $t$ (a constant-depth multiplexer over the state) and write the result into position $t$. Then $z_N$ contains the circuit's output. Full details in Appendix B. ∎
+
+Two honest qualifications, and then the consequence. First, the construction uses state width polynomial in $N$; for *constant*-width nonlinear recurrences the completeness argument does not apply, and indeed isolated nonlinear families do parallelize — e.g. $z \mapsto z^2$ on $\mathbb{R}_{>0}$, whose iterates are computed in parallel via $\log z$. But that example proves the rule: it parallelizes *because* the coordinate change $\varphi = \log$ linearizes it, which is exactly the mechanism Lemma 3.5 identifies as the general one. Second, the theorem concerns exact prefix evaluation; approximate or restricted-input parallelization is not excluded, but an architecture is its worst case. The consequence is the design law this paper obeys and which, we contend, every parallel-trainable sequence model implicitly obeys: **the state transition must compose within a bounded-size algebraic structure — and therefore the architecture's irreducible nonlinearity must live outside the transition: in the token encoders that feed it and in the readout that queries it.** The question that separates architectures is not *whether* their transitions are (essentially) linear — Theorem 3.2 forces that — but *whether the linear structure is the right one*. Sections 4–5 exhibit the linear structure that is provably right for memory.
+
+### 3.3 The capacity wall
+
+The third wall sharpens Theorem 3.1 from bits to dimensions, in the form actually binding for fast-weight-style architectures, and it will be matched exactly in Section 5.
+
+**Theorem 3.3 (Capacity converse for value-linear memories).** *Consider any streaming memory whose state decomposes as $z = (z_{\mathrm{val}}, z_{\mathrm{aux}})$ such that (i) for fixed keys, the value-dependent part is linear in the values: $z_{\mathrm{val}} = \sum_{i=1}^{K} L(k_i)\, v_i$ for some fixed key-indexed linear maps $L(k_i) : \mathbb{R}^{d_v} \to \mathbb{R}^{p_v}$, and $z_{\mathrm{aux}}$ does not depend on the values; and (ii) the read is linear in $z_{\mathrm{val}}$ for each fixed query and auxiliary state: $\hat v(q) = \rho(z_{\mathrm{aux}}, q)\, z_{\mathrm{val}}$ for some matrix-valued $\rho$. If the memory achieves exact recall on some set of $K$ keys for* every *value assignment, then $K d_v \leq p_v$, i.e.*
+$$K \;\leq\; \frac{p_v}{d_v}.$$
+
+*Proof.* Fix the keys, hence $z_{\mathrm{aux}}$ and the maps $L(k_i)$, $\rho(\cdot, k_j)$. The composite map $(v_1, \ldots, v_K) \mapsto (\hat v(k_1), \ldots, \hat v(k_K))$ is linear and factors through $\mathbb{R}^{p_v}$, so its rank is at most $p_v$. Exactness for every assignment makes it the identity on $\mathbb{R}^{K d_v}$, of rank $K d_v$. ∎
+
+The class covers every memory we know how to build with additive writes — Hebbian outer-product stores, gated and discounted variants, random-feature sketches, and the architecture of this paper (whose read, crucially, *is* linear in its value-dependent statistic $C_t$ for fixed query and key-statistic $S_t$; the matrix inverse touches only $z_{\mathrm{aux}} = S_t$). It says that with a value-carrying state of $p_v$ numbers, at most $p_v / d_v$ associations are exactly recallable, no matter how clever the read. Our flagship carries $p_v = d_k d_v$ and will achieve $K = d_k$ exactly (Theorem 5.9): the converse is met with equality. Nothing in the class does better; most members do far worse.
+
+**Remark 3.4 (The price of addressability).** Counting bits rather than dimensions: the flagship's full state holds $d_k d_v + d_k^2$ words while exactly storing $d_k$ values of $d_v$ words — a storage efficiency of $d_v / (d_k + d_v)$ relative to the absolute Shannon floor of Theorem 3.1 (one half, when $d_k = d_v$). The $d_k^2$ overhead is not waste; it is the price of *content-addressability under arbitrary key geometry* — it stores the key second-moment structure that the read must invert. A plain dictionary pays the analogous price by storing the keys themselves. Architectures that decline to pay it (the Hebbian corner, $z_{\mathrm{aux}} = \varnothing$) forfeit exactness at *any* capacity for non-orthogonal keys.
+
+### 3.4 The door: which transitions can scan
+
+The walls force linear-in-state transitions. The door is the precise characterization of *which nonlinear-looking* recurrences are secretly linear, because that is the entire space in which a designer may search.
+
+**Lemma 3.5 (Linearization of composition-closed transitions).** *Let $\mathcal{F} = \{f_x : \mathcal{Z} \to \mathcal{Z}\}_{x \in \mathcal{X}}$ be a family of state transitions. Suppose there exists a finite-dimensional vector space $V$ of functions $\mathcal{Z} \to \mathbb{R}$, $\dim V = m$, such that (i) $V$ is invariant under precomposition with every $f_x$ (i.e. $v \in V \Rightarrow v \circ f_x \in V$), and (ii) some tuple of functions in $V$ separates the points of $\mathcal{Z}$ reachable by the dynamics. Then the embedding $\varphi : \mathcal{Z} \to \mathbb{R}^m$ whose coordinates are a basis of $V$ linearizes the family: for every $x$ there is a matrix $A_x \in \mathbb{R}^{m \times m}$ with*
+$$\varphi(f_x(z)) = A_x\, \varphi(z) \quad \text{for all reachable } z,$$
+*and the recurrence $z_t = f_{x_t}(z_{t-1})$ becomes the linear scan $\varphi(z_t) = A_{x_t} \varphi(z_{t-1})$, scan-realizable with $p_\mathcal{M} = m^2$ and $\tau_\bullet = O(m^\omega)$ (matrix multiplication). Conversely, if no such finite-dimensional invariant space exists, the family generates an infinite-dimensional function algebra under composition, and no embedding of any fixed dimension realizes the transition linearly.*
+
+*Proof.* For a basis $v_1, \ldots, v_m$ of $V$, invariance gives $v_i \circ f_x = \sum_j (A_x)_{ij} v_j$ for unique coefficients (uniqueness by linear independence); stack these rows to get $A_x$. Separation makes $\varphi$ injective on reachable states, so the linear dynamics faithfully represents the original. The converse is by definition of linearizability: a linearizing $\varphi$ of dimension $m$ exhibits the invariant space $V = \mathrm{span}\{\varphi_1, \ldots, \varphi_m\}$. ∎
+
+The lemma is elementary, but it is the correct organizing principle, and its two directions carry the paper's two design messages. Forward direction: *nonlinearity in appearance is free; nonlinearity in the composition algebra is fatal.* Rational recurrences of Riccati type, multiplicative dynamics, projective maps — all linearize on lifted coordinates and therefore scan. Generic MLP transitions do not: the iterates of $z \mapsto \mathrm{MLP}(z)$ generate, for generic weights, an infinite-dimensional function space — this is the structural face of Theorem 3.2. Backward direction: the search for expressive scannable recurrences is exactly the search for *useful finite-dimensional precomposition-invariant function spaces*. Section 4 now exhibits the canonical such space — canonical in the strict sense that a classical theorem says it is the only kind that can summarize data losslessly for inference: the natural-parameter space of a conjugate exponential family, on which Bayes' rule itself acts linearly.
+
+---
+
+## 4. The Bridge: Bayesian Conjugacy Is the Algebra of Scannable Memory
+
+### 4.1 The central identity
+
+Let observations $o$ (in our setting: encoded token content, e.g. key–value pairs) be modeled by an exponential-family likelihood with natural parameter $\eta$ and sufficient statistic $T(o)$:
+$$\ell(o \mid \eta) = h(o)\, \exp\!\big(\langle T(o), \eta\rangle - A(\eta)\big),$$
+and equip $\eta$ with the conjugate prior $\pi(\eta \mid \chi_0, \nu_0) \propto \exp(\langle \chi_0, \eta\rangle - \nu_0 A(\eta))$. Conjugacy means the posterior after observing $o_1, \ldots, o_t$ stays in the prior's family, with parameters
+$$\chi_t = \chi_0 + \sum_{s \leq t} T(o_s), \qquad \nu_t = \nu_0 + t.$$
+This textbook fact, read with Section 3's eyes, is an architecture. The posterior — the *entire belief state* about the latent — evolves by **addition of per-token statistics in natural-parameter coordinates.** Addition is associative and commutative; the update is the most parallelizable object in mathematics. Generalizing slightly to weighted evidence (each observation carried with precision/weight $\beta_t \geq 0$, a power of the likelihood) and per-step tempering (each step first raises the current posterior to a power $\lambda_t \in (0,1]$; Section 4.5 derives why), the recursion becomes
+$$\boxed{\;\chi_t = \lambda_t\, \chi_{t-1} + \beta_t\, T(o_t), \qquad \nu_t = \lambda_t\, \nu_{t-1} + \beta_t.\;}$$
+
+**Theorem 4.1 (Conjugate updates are associative scans).** *The maps $u_t : (\chi, \nu) \mapsto (\lambda_t \chi + \beta_t T(o_t),\; \lambda_t \nu + \beta_t)$ form a family closed under composition: the composite of any contiguous block $s..t$ is again of the same form, with block multiplier $\Lambda_{s:t} = \prod_{r=s}^t \lambda_r$ and block increment $(\mathrm{X}_{s:t}, \mathrm{n}_{s:t}) = \sum_{r=s}^{t} \Lambda_{r+1:t}\,\beta_r\, (T(o_r), 1)$. The combine*
+$$(\Lambda_2, X_2) \bullet (\Lambda_1, X_1) = (\Lambda_2 \Lambda_1,\; X_2 + \Lambda_2 X_1)$$
+*is associative, with identity $(1, 0)$; hence (Proposition 2.3) all prefix posteriors $\{(\chi_t, \nu_t)\}_{t \leq N}$ are computable in $\Theta(N)$ work and $O(\dim(T) \cdot \log N)$ span. In the undiscounted case $\lambda \equiv 1$ the monoid is commutative, and the posterior is invariant under arbitrary permutation and partitioning of the evidence.*
+
+*Proof.* Compose two steps: $u_2(u_1(\chi)) = \lambda_2(\lambda_1 \chi + b_1) + b_2 = (\lambda_2\lambda_1)\chi + (b_2 + \lambda_2 b_1)$ — same form. Associativity of $\bullet$: both bracketings of $(\Lambda_3, X_3) \bullet (\Lambda_2, X_2) \bullet (\Lambda_1, X_1)$ evaluate to $(\Lambda_3\Lambda_2\Lambda_1,\; X_3 + \Lambda_3 X_2 + \Lambda_3 \Lambda_2 X_1)$. Commutativity at $\lambda \equiv 1$ is commutativity of addition. ∎
+
+This is the bridge the paper is named for, and it deserves to be stated as a slogan before it is used: **conjugacy is linearity of Bayes' rule in natural coordinates, and linearity in natural coordinates is scannability.** The function space $V = \mathrm{span}\{\text{coordinates of } (\chi, \nu), \mathbf{1}\}$ is precisely a finite-dimensional precomposition-invariant space in the sense of Lemma 3.5 — exhibited not by search but by probability theory. The classical state-space models of engineering are the *known-variance scalar-location* instance of this identity (their state: a discounted first moment). The instance that unlocks associative memory is richer — it must track second moments — but it obeys the same algebra and therefore inherits the same hardware story.
+
+### 4.2 The architecture class
+
+**Definition 4.2 (Conjugate State Machine).** A *Conjugate State Machine layer* over an exponential family $(T, A)$ consists of: (i) learned *encoders* mapping the layer input $x_t$ to an observation $o_t$, an evidence weight $\beta_t \geq 0$, and a drift rate $\lambda_t \in (0,1]$; (ii) the *state* $(\chi_t, \nu_t)$, the natural parameters of the running conjugate posterior, updated by the scan of Theorem 4.1; (iii) learned *query maps* producing $q_t$ from $x_t$ (and, for multi-hop, from previous read outputs); and (iv) the *read*, the posterior-predictive functional of the current posterior at $q_t$ — in general a nonlinear function of $(\chi_t, \nu_t)$ — optionally accompanied by its predictive uncertainty. Outputs of the reads, concatenated across heads and hops, pass through a learned mixer to form the layer output.
+
+The division of labor is the resolution of Section 3's tension and should be read against Theorem 3.2: *between* tokens, the model is as linear as Bayes' rule (and therefore scans); *at* each token, the encoders and the read are arbitrarily nonlinear (and therefore expressive); *across* layers, reads feed encoders, composing inference steps. Nonlinearity is not removed from the architecture — it is relocated to the two places where it costs nothing.
+
+### 4.3 Why this state and no other
+
+Two theorems make the choice of state canonical rather than convenient.
+
+**Theorem 4.3 (Sufficiency and minimality).** *Under the model of Definition 2.8 with likelihood in the exponential family $(T, A)$ and conjugate prior, the pair $(\chi_t, \nu_t)$ is a sufficient statistic for $\eta$ given the history: the posterior over $\eta$ — and hence the Bayes answer to every query in any class $\mathcal{Q}$ whose answers are functionals of the posterior — depends on $x_{1:t}$ only through $(\chi_t, \nu_t)$. If the family is minimal (the coordinates of $T$ are affinely independent), the statistic is minimal sufficient: any other sufficient statistic determines it. (Proof: Fisher–Neyman factorization plus exponential-family minimality; Appendix C.)*
+
+**Theorem 4.4 (Canonicity; Koopman–Pitman–Darmois, classical).** *Among families of positive, smooth densities with parameter-independent support, the only ones admitting sufficient statistics of dimension bounded in the sample size are exponential families.*
+
+Read jointly, the two theorems close the design space from both sides. Theorem 4.3 says a conjugate natural-parameter state wastes nothing: it carries every bit of the history that bears on the query class, in the smallest possible container. Theorem 4.4 says nothing else achieves this: any architecture whose fixed-size state purports to summarize unbounded history losslessly *for some inference task* is — whether its designers know it or not — maintaining the natural parameters of an exponential family, exactly or approximately. The CSM class is therefore not one architecture among many; it is the closure of the only mechanism that can work, made explicit. (Scope honesty: Theorem 4.4's regularity conditions exclude finite-support corner cases, and "losslessly" is doing real work — fixed-size states summarizing history *lossily* are unconstrained by it. The claim is canonicity of the lossless-relative-to-a-class regime, which is the regime the recall theorems of Section 5 inhabit.)
+
+### 4.4 Mergeability: a new closure property
+
+**Corollary 4.5 (Context fusion).** *With $\lambda \equiv 1$ (or blockwise-undiscounted states; Section 8), the CSM state of the concatenation, in any interleaving order, of two evidence streams is the sum of the states computed independently on each stream: $(\chi^{(1\cup 2)}, \nu^{(1\cup 2)}) = (\chi^{(1)} + \chi^{(2)},\, \nu^{(1)} + \nu^{(2)})$. (Immediate from commutativity in Theorem 4.1.)*
+
+This innocuous corollary is, to our knowledge, a genuinely new *capability axis* for sequence models, so we flag it now and develop it in Sections 8.3 and 10.3. Attention cannot do this except by concatenating caches that grow linearly; nonlinear RNNs cannot do it at all (their states do not compose); a CSM can read two corpora on two machines and *add the resulting beliefs* — constant-size messages, exact result, order-free. Parallel ingestion, federated context, and model-to-model knowledge handoff all fall out of the additivity of natural parameters, i.e. out of Bayes' rule itself.
+
+### 4.5 Gates derived, not designed
+
+Recurrent practice decorates state updates with input gates and forget gates, tuned because they help. In a CSM both arise as exact Bayesian operations, and their data-dependence acquires semantics.
+
+**Proposition 4.6 (Discounting is maximum-entropy drift; evidence weight is precision).** *(a) Let $\pi$ be the current posterior and $\pi_0$ the prior (reference) member of the family, with natural parameters $\chi$ and $\chi_{\mathrm{ref}}$. Among all distributions $q$, the geometric interpolation minimizing $\lambda\, \mathrm{KL}(q \,\|\, \pi) + (1-\lambda)\, \mathrm{KL}(q \,\|\, \pi_0)$ is the tempered posterior with natural parameter $\lambda \chi + (1-\lambda)\chi_{\mathrm{ref}}$: the unique belief that hedges the current posterior toward the prior under a relative-entropy budget — the maximum-entropy model of "the latent may have drifted." With $\chi_{\mathrm{ref}} = 0$ this is exactly the update $\chi \mapsto \lambda \chi$ of Theorem 4.1; for Gaussian families it is exactly Kalman-type covariance inflation with process noise proportional to current uncertainty. (b) Raising the likelihood of observation $o_t$ to the power $\beta_t$ multiplies its sufficient statistic by $\beta_t$; for Gaussian observation models this is identical to asserting observation noise of precision proportional to $\beta_t$. (Proofs: variational calculus on densities and direct computation; Appendix C.)*
+
+The reading for architecture design: $\lambda_t$ — emitted per token by a learned map — is the model's *declared rate of environmental drift* ("how stale is older evidence?"), and $\beta_t$ is its *declared confidence in the current token as evidence* ("how much should this be remembered?"). The pair $(\lambda_t, \beta_t)$ spans, as exact special cases, the behaviors that gated recurrences obtain heuristically: $\lambda \equiv 1$ is a permanent archive; $\lambda < 1$ with $\beta$ spikes is salience-gated working memory; $\beta = 0$ skips writing entirely. Section 5.3's error bounds and Section 6's stability bounds will depend on $(\lambda, \beta)$ explicitly, so the gates' values carry provable consequences rather than vibes.
+
+### 4.6 The compression target, restated
+
+It is worth pausing on what has and has not happened so far. Nothing has been *designed* yet. We asked what a state must be for queries to be answerable (a posterior; Theorems 4.3–4.4), what an update must be for training to parallelize (an associative composition; Theorems 3.2, 4.1, Lemma 3.5), and where nonlinearity must live (the read; Theorem 3.2). The classical SSM compresses the *signal* under a fixed measure and hopes the result serves future queries; attention declines to compress and pays per token for the refusal; the CSM compresses the *posterior over the query-relevant latent*, which is the unique object that is simultaneously (i) finite-dimensional without loss (conjugacy), (ii) updatable in parallel (linearity in natural parameters), and (iii) optimal to read from (posterior predictive). What remains is to choose the exponential family rich enough to make "query-relevant latent" mean *associative memory* — and that choice has a canonical first answer.
+
+---
+
+## 5. The Gaussian Instance: An Exact, Optimal, Introspective Associative Memory
+
+### 5.1 The operator
+
+Memory for reasoning is associative: the context defines a map from cues to contents, and queries probe the map. The minimal latent rich enough to carry this is a linear operator $W \in \mathbb{R}^{d_v \times d_k}$ between learned feature spaces — minimal, but not weak: with nonlinear learned encoders writing into it and nonlinear layers composed around it, the linear-map class plays the role that linear regression plays in statistics, the universal local element out of which nonparametric power is built (Theorem 5.7 makes this exact). The conjugate structure for $W$ under Gaussian noise is the matrix-normal family, whose sufficient statistics are second moments. Instantiating Definition 4.2:
+
+**Definition 5.1 (Gauss–Markov memory).** Per head, the encoders emit per token a key $k_t \in \mathbb{R}^{d_k}$ (normalized, $\|k_t\| = 1$), a value $v_t \in \mathbb{R}^{d_v}$, a query $q_t \in \mathbb{R}^{d_k}$, an evidence precision $\beta_t \geq 0$, and a drift rate $\lambda_t \in (0,1]$, all learned functions of $x_t$. The state is $(S_t, C_t) \in \mathbb{R}^{d_k \times d_k} \times \mathbb{R}^{d_v \times d_k}$:
+$$S_t = \lambda_t S_{t-1} + \beta_t\, k_t k_t^\top, \qquad C_t = \lambda_t C_{t-1} + \beta_t\, v_t k_t^\top, \qquad S_0 = 0,\; C_0 = 0. \tag{W}$$
+With $A_t := S_t + \varepsilon I$ ($\varepsilon > 0$ the prior precision), the read and its confidence are
+$$\mathrm{read}_t(q) = C_t\, A_t^{-1} q \;\in \mathbb{R}^{d_v}, \qquad c_t(q) = q^\top A_t^{-1} q \;\in \mathbb{R}_{> 0}. \tag{R}$$
+
+Under the generative lens of Section 2.4, $(S_t, C_t)$ are exactly the natural-parameter increments of the matrix-normal posterior over $W$: the posterior is $\mathcal{MN}(M_t, I_{d_v}, A_t^{-1})$ with mean $M_t = C_t A_t^{-1}$, the read is the posterior predictive mean $\mathbb{E}[W q \mid x_{1:t}] = M_t q$, and $c_t(q)$ is the per-coordinate posterior predictive variance of $W q$. Equivalently and model-free: $M_t$ is the solution of the discounted ridge regression $\min_M \sum_{s \leq t} \Lambda_{s+1:t}\,\beta_s \|M k_s - v_s\|^2 + \varepsilon \|M\|_F^2$, and the read evaluates it at $q$. The update (W) is the scan of Theorem 4.1 verbatim; the solve in (R) is the relocated nonlinearity demanded by Theorem 3.2. We emphasize what is *not* in the recurrence: no inverse, no normalization, no nonlinearity — those appear only at read time, which is why the whole construction trains as a linear scan (Section 6) yet reads like an estimator.
+
+A full layer uses $h$ heads of small dimension (e.g. $d_k = d_v = 64$) in parallel, $H \geq 1$ chained reads per head per token ("hops": $q^{(1)}_t$ from $x_t$, then $q^{(j+1)}_t = g_j(x_t, \mathrm{read}_t(q^{(j)}_t))$ with learned $g_j$; Theorem 5.8), a write-then-read order within the token, concatenation of all read vectors and confidences into a learned output projection, a residual connection, and a following MLP. Positional information is intrinsic — the recurrence is causal and the discounts encode time — so no positional encoding is required. The state per head is $d_k^2 + d_k d_v$ numbers; for the example sizes, 8K numbers per head, i.e. the memory of a 48-layer, 16-head model fits in a few tens of megabytes regardless of context length (Section 7).
+
+### 5.2 A three-token worked example
+
+Let $d_k = d_v = 2$, $\beta \equiv 1$, $\lambda \equiv 1$. Store two associations: $k_1 = (1, 0)^\top \mapsto v_1 = (1, 0)^\top$ and $k_2 = (0.8, 0.6)^\top \mapsto v_2 = (0, 1)^\top$. The keys overlap: $\langle k_1, k_2\rangle = 0.8$.
+
+A Hebbian fast-weight memory holds $C = v_1 k_1^\top + v_2 k_2^\top$ and reads $C k_1 = v_1 + 0.8\, v_2 = (1, 0.8)^\top$: an 80% contamination of the recalled value by its neighbor, *at any state size*, because the read never consults key geometry. The Gauss–Markov memory additionally holds $S = k_1 k_1^\top + k_2 k_2^\top$ and reads $C(S + \varepsilon I)^{-1} k_1$; at $\varepsilon = 10^{-3}$ this equals $(0.9972, 0.0022)^\top$ — error $3.5 \times 10^{-3}$, within the bound of Theorem 5.2 below ($\leq 5.0 \times 10^{-3}$ at $\sigma_{\min}(G) = 0.2$), and $\to v_1$ exactly as $\varepsilon \to 0$. Now pose the compositional query $q = 2k_1 - k_2$, whose correct linear-functional answer (Definition 2.5) is $2v_1 - v_2 = (2, -1)^\top$. The Gauss–Markov read returns it to within $10^{-8}$ at small $\varepsilon$, *because the read is linear in $q$*. A softmax read over the stored pairs returns a convex combination $w_1 v_1 + w_2 v_2$, $w \geq 0$, $w_1 + w_2 = 1$ — a point on the segment from $(1,0)$ to $(0,1)$ — whose distance to the target is at least $\sqrt 2$ *at every temperature*. No tuning rescues it; the failure is geometric (Proposition 5.5).
+
+### 5.3 Exact recall with explicit finite-$\varepsilon$ error
+
+**Theorem 5.2 (Interpolation).** *Let $\lambda \equiv 1$ and let $K \leq d_k$ pairs be stored with weights $\beta_i > 0$, keys $k_1, \ldots, k_K$ linearly independent with Gram matrix $G = K^\top K$ (columns $k_i$). Then for every $\varepsilon > 0$ and every $i$,*
+$$\big\|\mathrm{read}(k_i) - v_i\big\| \;\leq\; \varepsilon\, \sqrt{\tfrac{\beta_{\max}}{\beta_i}}\; \frac{\|V\|_2}{\beta_{\min}\, \sigma_{\min}(G) + \varepsilon},$$
+*where $V$ is the matrix of stored values and $\beta_{\min}, \beta_{\max}$ extreme weights. In particular $\mathrm{read}(k_i) \to v_i$ as $\varepsilon \to 0$: recall is exact, with no crosstalk, for arbitrary (not merely orthogonal) independent keys. More generally, for any query $q$, $\mathrm{read}(q) \to V\, B^{1/2} (\tilde G)^{+} B^{1/2} K^\top q$, the least-squares-optimal linear-functional answer, where $\tilde G = B^{1/2} G B^{1/2}$.*
+
+*Proof.* Write $\tilde K = K B^{1/2}$, $\tilde V = V B^{1/2}$, so $S = \tilde K \tilde K^\top$ and $C = \tilde V \tilde K^\top$. The push-through identity $\tilde K^\top (\tilde K \tilde K^\top + \varepsilon I)^{-1} = (\tilde K^\top \tilde K + \varepsilon I)^{-1} \tilde K^\top$ gives $\mathrm{read}(q) = \tilde V (\tilde G + \varepsilon I)^{-1} \tilde K^\top q$ with $\tilde G = \tilde K^\top \tilde K$. At $q = k_i = \beta_i^{-1/2} \tilde K e_i$: $\mathrm{read}(k_i) = \beta_i^{-1/2} \tilde V (\tilde G + \varepsilon I)^{-1} \tilde G\, e_i$ and $v_i = \beta_i^{-1/2} \tilde V e_i$, so the error is $-\varepsilon\, \beta_i^{-1/2} \tilde V (\tilde G + \varepsilon I)^{-1} e_i$; bound $\|\tilde V\| \leq \sqrt{\beta_{\max}} \|V\|$ and $\lambda_{\min}(\tilde G) \geq \beta_{\min} \sigma_{\min}(G)$. ∎
+
+Contrast with the Hebbian corner: reading $C q$ directly incurs error $\sum_{j \neq i} \langle k_j, k_i \rangle v_j$, of relative size concentrating around $\sqrt{K/d_k}$ for random unit keys (each overlap has variance $1/d_k$); recall is *never* exact off orthogonality, and degrades with load even below capacity. The whitening solve $A_t^{-1}$ performs exact *deconvolution of key collisions* — it is the difference between asking memory "what co-occurred with things like $q$?" and asking "what, jointly with everything else stored, *explains* $q$?" The second question is inference; the first is association. This is the precise sense in which the architecture's expressivity gain is not "more attention-like" but *more statistical*.
+
+### 5.4 The read as whitened attention
+
+**Proposition 5.3 (Representation).** *For any state reachable by (W), $\mathrm{read}(q) = \sum_{s} w_s(q)\, v_s$ with weights $w_s(q) = \Lambda_{s+1:t} \beta_s\, k_s^\top A_t^{-1} q$: the read is an attention-form aggregation whose scores are computed in the Mahalanobis geometry of the stored keys. The weights need not be positive and need not sum to one. (Immediate from (W)–(R) by expanding $C_t$.)*
+
+This representation locates the architecture on the attention designer's own map: the read *is* attention with three deviations, each a theorem rather than a preference. The score matrix is $A_t^{-1}$ (inverse second moment) rather than identity-with-softmax — that buys interpolation (Theorem 5.2). The weights live in all of $\mathbb{R}$ — that buys the linear span rather than the convex hull (Proposition 5.5(b)). And the normalization is statistical (through $A_t^{-1}$'s spectrum) rather than simplex projection — that buys correct inverse-variance averaging (Proposition 5.5(c)). Softmax attention is recovered exactly by replacing $A_t^{-1}$ with a temperature and exponentiating-normalizing scores; the Hebbian memory by replacing $A_t^{-1}$ with $I$. Both substitutions discard the only matrix in the architecture that knows how the keys interfere.
+
+### 5.5 Optimality of the read
+
+**Theorem 5.4 (The read is the optimal estimator).** *(a) (Bayes.) Under the latent linear-map model (Section 2.4, drift-free or with the drift of Proposition 4.6), $\mathrm{read}_t(q)$ is the posterior mean of $W q$ and hence minimizes expected squared retrieval error among* all *measurable functions of the history — recurrent, attentional, or otherwise. By Theorem 4.3 no architecture, of any family, achieves strictly lower expected retrieval risk on this task class; architectures carrying the whole prefix (attention) included. (b) (Gauss–Markov / BLUE.) Fix arbitrary independent keys and let values be $v_i = W^* k_i + \beta_i^{-1/2}\xi_i$ with uncorrelated standardized noise and $W^*$ unknown and arbitrary. As $\varepsilon \to 0$, for any $q$ in the key span, $\mathrm{read}(q)$ is the minimum-variance unbiased estimator of $W^* q$ among all estimators linear in the values. (c) (Optimal averaging.) If one association is written $n$ times with independent noise (same key, noisy values), the read returns the precision-weighted mean with $\mathbb{E}\|\mathrm{read}(k) - W^*k\|^2 = \sigma^2 d_v / n$ — the statistically optimal $1/n$ rate. (Proofs: (a) posterior-mean optimality plus sufficiency; (b) classical Gauss–Markov argument; (c) direct computation; Appendix D.)*
+
+Part (a) should be read as the paper's strongest single sentence and with its scope visible: *within the named task class, the fixed-size CSM state is not an approximation to attention — it is the optimum that attention itself can at best match.* Attention's advantage is not statistical quality; it is that its task class is "whatever the heads learn to smooth," unconstrained by a declared latent. The CSM converts that vague generality into a declared class plus optimality inside it — and Sections 5.7, 9.6 and 10.1 take up what lies outside.
+
+### 5.6 Three strict separations from smoothing reads
+
+**Proposition 5.5 (Smoothing versus solving).** *Let a "normalized smoothing read" be any $\hat v(q) = \sum_s w_s(q) v_s$ with $w_s \geq 0$, $\sum_s w_s = 1$ (softmax attention at any temperature, with any score function, included). (a) (Collision blindness.) There are stores with linearly independent keys (e.g. Section 5.2) on which every normalized smoothing read errs by a constant on some stored-key query, while the Gauss–Markov read is exact as $\varepsilon \to 0$. Formally: exact recall at all stored keys under key overlap requires weights $w(k_i) = e_i$, which smoothing weights of the form $w_s \propto \phi(\langle k_s, q\rangle)$ with $\phi > 0$ cannot realize for $\langle k_1, k_2 \rangle$ sufficiently large at any temperature; the limiting nearest-neighbor read is exact only at exactly-stored keys and is discontinuous in $q$. (b) (Convex-hull confinement.) Smoothing reads lie in $\mathrm{conv}\{v_s\}$; linear-functional recall (Definition 2.5) with coefficients outside the simplex — negation, extrapolation, superposition with weights $\neq$ probability vectors — is unrealizable by any single smoothing read, with error bounded below by the distance from the target to the hull ($\sqrt 2$ in Section 5.2's instance), while the Gauss–Markov read, linear in $q$, realizes all of them exactly within capacity. (c) (Suboptimal averaging.) On the repeated-noisy-write task of Theorem 5.4(c), similarity-weighted smoothing cannot implement inverse-variance weighting across keys of unequal multiplicity and incurs strictly larger risk except in degenerate symmetric cases. (Proofs: Appendix D.)*
+
+Three honest qualifications keep the comparison fair. Multi-head attention with output projections can leave the hull by *combining* heads, attention can emulate sharpening by temperature, and depth can compose smoothing into richer maps — the proposition concerns what a *single access* can express, which is the correct unit of comparison for per-layer capability and parameter efficiency (Definition 2.7). Second, smoothing has its own virtues — bounded outputs and locality — which Section 9 revisits as robustness considerations. Third, attention's nonparametric freedom (no declared latent class) remains genuinely broader than any one conjugate family; the claim is per-access fidelity on associative tasks, not blanket dominance.
+
+### 5.7 Native in-context regression, with the confidence as the variance
+
+**Proposition 5.6 (Calibrated introspection).** *Under the model, the read's per-coordinate predictive variance is exactly $c_t(q) + \beta_q^{-1}$ (posterior plus observation noise): the architecture's confidence output is not a proxy but the exact expected squared error of its own retrieval, conditional on the history. Model-free, $c_t(q)$ is monotone in the evidence: it decreases as $q$ enters directions where keys have accumulated, and equals $\varepsilon^{-1}$ on never-written directions. (Proof: Gaussian conditioning; Appendix D.)*
+
+**Theorem 5.7 (Single-layer in-context learning with risk bounds).** *Let the context carry samples $v_i = W^* k_i + \sigma \xi_i$, $i \leq n$, with $\beta \equiv 1$, $\lambda \equiv 1$. For any query $q$, the read's risk decomposes as*
+$$\mathbb{E}\,\big\|\mathrm{read}(q) - W^* q\big\|^2 \;=\; \underbrace{\varepsilon^2 \|W^* A^{-1} q\|^2}_{\text{shrinkage bias } \leq\, \varepsilon^2 \|W^*\|^2 \|q\|^2 / (\sigma_{\min}(S) + \varepsilon)^2} \;+\; \underbrace{\sigma^2 d_v\; q^\top A^{-1} S A^{-1} q}_{\leq\; \sigma^2 d_v\, c_t(q)},$$
+*so each head performs ridge regression in context — and, through the learned feature maps $k = \psi(\cdot)$, kernel ridge regression with kernel $\langle \psi(\cdot), \psi(\cdot)\rangle$ — with the variance term reported to the network as $c_t(q)$. In-context learning is thus not an emergent behavior to be hoped for but the layer's defining computation, with classical generalization guarantees inherited verbatim. (Proof: bias–variance expansion of the ridge estimator; Appendix D.)*
+
+The introspection deserves emphasis as an architectural novum: downstream layers receive, with every retrieved value, a correct (in-model) and monotone (model-free) measure of how much the memory actually knew. Abstention, fallback, hop-deepening (Section 8.4), and mixture-of-memories routing become trainable behaviors conditioned on a signal with semantics. Softmax attention exposes no analogue: its weight entropy conflates "many relevant items" with "no relevant items."
+
+### 5.8 Multi-hop retrieval inside one layer
+
+**Theorem 5.8 (Ricochet reads).** *Consider the $H$-hop chase (Definition 2.6) with node codes orthonormal, edges stored as (code, successor-code) pairs, at most $d_k$ edges, $\lambda \equiv 1$. With $H$ chained reads $q^{(j+1)} = \mathrm{read}(q^{(j)})$, the layer outputs the $H$-th successor exactly as $\varepsilon \to 0$. For $\varepsilon > 0$, with per-hop read error $\epsilon_1$ (Theorem 5.2) and per-hop operator norm $L = \|C A^{-1}\| \leq \|\tilde V\| \,\sigma_{\max}(\tilde K) / (\sigma_{\min}(\tilde K)^2 + \varepsilon)$, the end-to-end error is at most $\epsilon_1 \sum_{j < H} L^j$ — controlled, e.g., $\leq H\epsilon_1$ whenever $L \leq 1$, which holds under the normalization of Definition 5.1 with well-conditioned stored keys. Hence a single CSM layer realizes $H$ adaptive memory rounds (Definition 2.7), whereas a softmax attention layer realizes one: retrieval-composition chains of length $H$ cost depth $\lceil H' / H \rceil$ in CSM stacks versus depth $H'$ in attention stacks. (Proof: induction with the perturbation bound; Appendix D.)*
+
+The comparison is definitional rather than a lower bound on attention — attention *defines* its queries before retrieving, so its rounds-per-layer is one by construction; any architecture chaining reads within a layer gains the same factor. The substantive content is that CSM reads are cheap enough ($O(d^2)$, no length-$N$ pass) to make $H > 1$ *affordable*, turning "hops per layer" into a budget knob rather than an architectural impossibility. Pointer chasing, variable binding and dereference, and join-like operations compress from depth into width.
+
+### 5.9 Capacity, exactly
+
+**Theorem 5.9 (The operator is capacity-optimal).** *The Gauss–Markov memory with key dimension $d_k$ achieves exact recall of $K = d_k$ associations with arbitrary independent keys (Theorem 5.2). No memory in the value-linear class of Theorem 3.3 with value-state dimension $p_v = d_k d_v$ exceeds $K = d_k$. The capacity bound is therefore met with equality, and by Remark 3.4 the total state is within the factor $1 + d_k/d_v$ of the unconditional Shannon floor for its recall content. (Proof: juxtaposition of Theorems 5.2 and 3.3.)*
+
+This is the paper's claim of "breaking the frontier" stated in its only defensible form: not unbounded lossless memory (Theorem 3.1 forbids it for everyone) but *every bit of state converted into recall at the optimal exchange rate, with the model choosing online what to store* ($\beta$), *what to age out* ($\lambda$), *and receiving a calibrated receipt* ($c_t$) *for every retrieval*. The remaining gap to attention is no longer fidelity per access (we win those comparisons: Proposition 5.5), nor optimality per state bit (Theorem 5.9), but raw state volume — and Section 8 attacks exactly that, with the only growth schedule that preserves the scan.
+
+---
+
+## 6. Parallel Forms, Algorithms, and Complexity
+
+This section converts the algebra into executable schedules with proven costs: a chunked scan for training, a rank-one-update loop for decoding, an adjoint scan for backpropagation, and conditioning bounds that make every claim honest in finite precision.
+
+### 6.1 The scan element
+
+**Proposition 6.1 (Gaussian scan).** *For the recurrence (W), the per-token monoid element is $(\lambda_t,\, \beta_t k_t k_t^\top,\, \beta_t v_t k_t^\top)$ and the combine is $(\Lambda_2, S_2, C_2) \bullet (\Lambda_1, S_1, C_1) = (\Lambda_2\Lambda_1,\; S_2 + \Lambda_2 S_1,\; C_2 + \Lambda_2 C_1)$: associative with identity $(1, 0, 0)$, element size $p_\mathcal{M} = d_k^2 + d_k d_v + 1$ words, combine cost $\tau_\bullet = O(d_k^2 + d_k d_v)$ additions and scalar multiplies. (Theorem 4.1 specialized; associativity re-verified by direct expansion.)*
+
+Because the combine is *addition after scaling* — no matrix products — the scan's combine is bandwidth-bound but cheap, and (unlike general linear-SSM scans, whose elements are $m \times m$ transition matrices composed by $O(m^\omega)$ multiplication) it costs the same as the element size. This is a quiet but important consequence of conjugacy: the natural-parameter monoid is *abelian-affine*, the cheapest nontrivial monoid there is.
+
+### 6.2 Training: chunked scan
+
+**Algorithm 1 (Chunked forward pass).** Partition the sequence into $N/c$ chunks of length $c$. *Phase A (parallel over chunks):* for each chunk, compute its aggregate $(\Lambda, S, C)$ by the in-chunk weighted sums of Proposition 6.1 — realizable as dense matrix products over the chunk's stacked, decay-scaled keys and values. *Phase B (inter-chunk):* run the parallel prefix scan over the $N/c$ aggregates to obtain every chunk's incoming boundary state. *Phase C (parallel over chunks):* within each chunk, starting from its boundary state, advance the recurrence token-by-token in fast memory, maintaining the Cholesky factor of $A_t$ by the update of Theorem 6.3, and emit reads and confidences for each token. Checkpoint only boundary states; recompute Phase C in the backward pass.
+
+**Theorem 6.2 (Training cost).** *Algorithm 1 computes all $N$ reads exactly with total work $\Theta\!\big(N (d_k^2 + d_k d_v)\big)$, span $O\big(c\, +\, \log(N/c)\big)$ matrix-block steps, and activation memory $O\big((N/c)(d_k^2 + d_k d_v) + N(d_k + d_v)\big)$ — linear in $N$, with the state-checkpoint term dominated by token activations whenever $c \geq d_k$. (Proof: Phase A is $O(c(d_k^2 + d_kd_v))$ per chunk; Phase B is Proposition 2.3 over $N/c$ elements of size $p_\mathcal{M}$; Phase C is $c$ steps of $O(d_k^2 + d_k d_v)$ each (Theorem 6.3); correctness is associativity (Proposition 6.1). Appendix E.)*
+
+The constants matter as much as the orders. Phases A and C are dense GEMM-and-triangular-kernel work over $(c \times d)$ blocks — the shape accelerators are built for — and parallelism across (batch × heads × chunks) saturates a device long before the in-chunk serial dependence of Phase C binds; Section 7 quantifies this. Setting $c = \Theta(d)$ equalizes the three phases' traffic; $c \in [64, 256]$ is the natural regime.
+
+### 6.3 Decoding: constant-time, constant-memory, with a conditioning floor
+
+At generation time the model holds $(C_t, R_t)$ per head, where $R_t$ is an upper-triangular Cholesky factor maintaining $R_t^\top R_t = S_t + E_t \approx A_t$, with the diagonal floor $E_t$ tracking $\varepsilon I$ to within a few percent (Lemma 6.4).
+
+**Algorithm 2 (Decode step).** Given $(k_t, v_t, q_t, \beta_t, \lambda_t)$: (1) scale: $R \leftarrow \sqrt{\lambda_t}\, R$, $C \leftarrow \lambda_t C$; (2) write: rank-one Cholesky update of $R$ with $\sqrt{\beta_t}\, k_t$, and $C \leftarrow C + \beta_t v_t k_t^\top$; (3) floor maintenance: rank-one Cholesky update of $R$ with $\sqrt{(1-\lambda_t)\,\varepsilon\, d_k}\; e_{t \bmod d_k}$; (4) read: two triangular solves for $A_t^{-1} q_t$, then $\mathrm{read} = C (A_t^{-1} q_t)$ and $c_t = q_t^\top (A_t^{-1} q_t)$.
+
+**Theorem 6.3 (Decode cost and exactness).** *Algorithm 2 maintains, exactly in real arithmetic, $R_t^\top R_t = S_t + E_t$ where $E_t$ is the diagonal floor accumulated by step (3), at per-token cost $O(d_k^2 + d_k d_v)$ operations and state $d_k^2/2 + d_k d_v + O(d_k)$ words, independent of $t$ and $N$. All operations are rank-one triangular updates and triangular solves (numerically backward-stable primitives); no inverse is ever formed and positive-definiteness is preserved unconditionally since only positive-weight updates occur.*
+
+**Lemma 6.4 (Regularization floor).** *With constant $\lambda$ and the cycling phantom writes of step (3), the floor matrix $E_t$ is diagonal with every entry in the interval $\Big[\varepsilon\, \tfrac{d_k(1-\lambda)\,\lambda^{d_k-1}}{1-\lambda^{d_k}}, \;\varepsilon\, \tfrac{d_k(1-\lambda)}{1-\lambda^{d_k}}\Big]$ after burn-in; for $(1-\lambda)d_k \leq 0.1$ this interval lies within $[\,0.9\,\varepsilon,\; 1.06\,\varepsilon\,]$, and within $[\,0.5\,\varepsilon,\; 1.6\,\varepsilon\,]$ throughout the regime $(1-\lambda)d_k \leq 1$ — i.e. the decode-time system matrix tracks $S_t + \varepsilon I$ to within a few percent of $\varepsilon$, uniformly forever, with no refactorization. (Proof: geometric series per coordinate; Appendix E.)*
+
+The design lesson generalizes: the prior is not an initialization but a *maintained physical object* — a trickle of isotropic pseudo-evidence whose stationary level is the prior precision. That it doubles as the numerical conditioning floor (Theorem 6.6) is the kind of coincidence one earns by deriving the architecture from inference: the statistically correct object and the numerically necessary one are the same object.
+
+### 6.4 Backpropagation: the adjoint is also a scan
+
+**Lemma 6.5 (Adjoint scan).** *For the linear recurrence $z_t = \lambda_t z_{t-1} + u_t$ with loss $\mathcal{L}(z_1, \ldots, z_N)$, the gradients satisfy the reverse recurrence $g_t = \partial \mathcal{L}/\partial z_t + \lambda_{t+1}\, g_{t+1}$, so $\partial \mathcal{L}/\partial u_t = g_t$ and $\partial \mathcal{L}/\partial \lambda_t = \langle g_t, z_{t-1}\rangle$ — a scan of the identical algebraic form run backward, with the same work, span, and chunking as the forward pass. Gradients through the read solve use $\partial (A^{-1} q) = -A^{-1} (\partial A) A^{-1} q + A^{-1} \partial q$, computable with the already-maintained factor $R_t$ at $O(d_k^2)$ per token. (Proof: differentiate the recurrence; Appendix E.)*
+
+Training therefore inherits the forward pass's entire efficiency profile; there is no asymmetric backward bottleneck of the kind that afflicts architectures whose forward pass is cheap only because of data-dependent control flow.
+
+### 6.5 Stability and finite precision
+
+**Theorem 6.6 (Conditioning and gradient bounds).** *With $\|k_t\| = 1$, $\beta_t \leq \beta_{\max}$, $\lambda_t \leq \lambda < 1$: (a) $\|S_t\| \leq \beta_{\max}/(1-\lambda)$ always, so $\kappa(A_t) \leq 1 + \beta_{\max}/(\varepsilon(1-\lambda))$, uniformly in $t$ — the recurrence cannot explode and the read cannot blow up; (b) the read is Lipschitz in the state with constants polynomial in $\kappa(A_t)$, and backpropagated gradient norms through $T$ steps are bounded by $\max(1, \lambda)^T = 1$ times those constants — no exploding gradients structurally, and the vanishing rate is the learned, semantically meaningful $\lambda$ rather than an accident of spectra; (c) in floating point with unit roundoff $u$, the Cholesky-maintained read incurs relative error $O(\kappa(A_t)\, u)$ per token with no accumulation beyond the floor's drift (Lemma 6.4). Choosing $\varepsilon$ to cap $\kappa(A_t)$ at $10^3$–$10^4$ makes half-precision storage with single-precision accumulation safe throughout. (Proofs: geometric series, standard perturbation theory for triangular solves; Appendix E.)*
+
+It bears noting what is absent from the numerics story: there is no softmax, hence no overflowing logits, no max-subtraction, and no normalization-induced gradient pathologies; the only nonlinear primitive is a triangular solve, the best-understood operation in numerical linear algebra.
+
+**Remark 6.7 (Bit model versus real model).** The lower bounds of Section 3 count bits; the constructions run in finite-precision words. The bridge is Theorem 6.6(c) with Theorem 5.2: at word size $w$, recall error is $\varepsilon$-tunable down to the $O(\kappa u)$ floor, so the construction realizes $\mathrm{EAR}(d_k, b)$ for $b \approx w - \log_2 \kappa$ bits per value coordinate — i.e. the capacity claims survive quantization with the constants degraded only logarithmically in the conditioning. No claim in this paper relies on exact real arithmetic.
+
+### 6.6 The ledger
+
+The comparison the introduction promised can now be stated as a table; every CSM entry is a theorem proved above, with state and capacity counted per head and the cascade column anticipating Section 8.
+
+| | softmax attention | Hebbian fast weights | nonlinear RNN | **CSM (this work)** | **CSM cascade (§8)** |
+|---|---|---|---|---|---|
+| training work | $\Theta(N^2 d)$ | $\Theta(N d^2)$ | $\Theta(N d^2)$ | $\Theta(N d^2)$ | $\Theta(N d^2)$ |
+| training span | $O(\log N)$ | $O(c + \log N)$ | $\Theta(N)$ (Thm 3.2) | $O(c + \log N)$ | $O(c + \log N)$ |
+| decode, per token | $\Theta(N d)$ | $\Theta(d^2)$ | $\Theta(d^2)$ | $\Theta(d^2)$ | $\Theta(d^2)$ amortized |
+| state | $\Theta(N d)$ | $\Theta(d^2)$ | $\Theta(d)$–$\Theta(d^2)$ | $\Theta(d^2)$ | $\Theta(d^2 \log N)$ |
+| exact recall capacity | all stored keys | $0$ (non-orthogonal) | unprincipled | $d$ per head, optimal (Thm 5.9) | $\Theta(d \log N)$ selected (Thm 8.3) |
+| recall estimator | kernel smoothing | unwhitened product | — | interpolation / BLUE (Thms 5.2, 5.4) | same, per scale |
+| linear-functional queries | no (hull-bound) | inexact | — | exact (Prop 5.5b) | exact per scale |
+| hops per layer | 1 | 1 | $N$ (serial) | $H$ (Thm 5.8) | $H$ |
+| retrieval confidence | none | none | none | calibrated (Prop 5.6) | calibrated, per scale |
+| states mergeable | cache concat ($\Theta(N)$) | additive | no | additive, $O(d^2)$ msg (Cor 4.5) | additive (Thm 8.5) |
+
+The nonlinear RNN column is the unparallelizable ghost that Theorem 3.2 exorcises; the Hebbian column is the cautionary tale of linear scans with the wrong statistics; the attention column is the refusal to compress. The CSM columns are, by Sections 3–5, the unique simultaneous closure of the table's first four rows with the best achievable values of the rest.
+
+---
+
+## 7. Hardware-Optimal Execution
+
+Architectures live or die on accelerators, so we analyze the mapping explicitly. The analysis is parametric in machine constants — peak FLOP rate $F$, memory bandwidth $B$, machine balance $\rho = F/B$ (FLOPs per byte; order $10^2$ for current training accelerators in half precision), and on-chip fast-memory capacity — so the conclusions are statements about kernel structure, not about any one device.
+
+### 7.1 Training: compute-bound by construction
+
+**Proposition 7.1 (Arithmetic intensity of the chunked pass).** *Per chunk and head, Phase A+C of Algorithm 1 performs $\Theta(c(d_k^2 + d_kd_v))$ FLOPs against $\Theta(c(d_k + d_v) + d_k^2 + d_kd_v)$ words of traffic — arithmetic intensity $\Theta(\min(c, d))$ FLOPs/word. With $c \gtrsim \rho$ (chunk length at least the machine balance, e.g. $c \in [128, 256]$), the kernel is compute-bound: the scan stage (Phase B) moves $\Theta((N/c)(d_k^2 + d_kd_v))$ words while contributing $1/c$ of the FLOPs, i.e. the pipeline runs within a factor $c/(c+1)$ of the roofline.*
+
+Three structural properties do the work here. First, *all heavy operations are dense*: chunk aggregates are GEMMs over decay-scaled key/value blocks; in-chunk recurrences are rank-one triangular updates batched over (batch × heads × chunks), which map to tensor-core-amenable small-matrix kernels. Second, *shapes are static*: no data-dependent sparsity, no variable-length gather; the schedule is known at compile time and fuses into one kernel per phase. Third, *the serial dependence is short*: span $c + \log(N/c)$, so for $N = 10^6$, $c = 128$, the critical path is a few hundred block-steps regardless of model size — sequence length buys parallel work, not wall-clock depth.
+
+### 7.2 Decoding: context-free memory traffic
+
+**Proposition 7.2 (Decode residency).** *Per layer and head, decoding touches the resident state ($d_k^2/2 + d_kd_v$ words) and performs $O(d_k^2 + d_kd_v)$ FLOPs per token. For a representative configuration ($d_k = d_v = 64$, 16 heads, 48 layers, single-precision state), total memory state is $\approx 25$ MB — within the on-chip SRAM/L2 of contemporary accelerators — so steady-state decode traffic to off-chip memory consists of model weights only. Per-token latency is therefore $\Theta(\text{model size}/B)$, independent of context length $N$, versus the attention family's additional $\Theta(N d \cdot \text{layers})$ cache traffic per token.*
+
+The qualitative point outranks the constants: a CSM decodes like an MLP-only model with a small resident scratchpad. There is no growing cache to page, no length-dependent latency cliff, no batch-size collapse at long context. The number $25$ MB also explains the head-dimension choice: capacity scales as $d_k$ per head while state scales as $d_k^2$, so many small heads dominate few large ones whenever the workload's associative load is parallelizable across subspaces — the same economy that makes $d_{\text{head}} = 64$ attention standard, here with a theorem (5.9) attached.
+
+### 7.3 Distribution
+
+Sequence parallelism is the scan's native habitat: shard the sequence across devices; each device computes local chunk aggregates and one boundary element; a ring or tree all-prefix over $(\Lambda, S, C)$ elements — $O(d_k^2 + d_kd_v)$ words per hop, overlappable with Phase C compute — delivers global boundary states. Contrast the all-to-all that context-parallel attention requires. Tensor parallelism shards heads with zero cross-head communication in the memory path. Pipeline parallelism is unaffected. For training-time state checkpoints, the $O((N/c)d^2)$ term shards with the sequence. The communication-optimal layout is thus the obvious one, and its cost is independent of $N$ per device-boundary — the architecture is, in the distributed-systems sense, *embarrassingly causal*.
+
+### 7.4 Precision
+
+The state is a sum of positive-semidefinite rank-one terms plus a maintained diagonal floor: monotone, bounded (Theorem 6.6a), with condition number capped by design via $\varepsilon$. Safe regime: bf16/fp16 activations and keys; fp32 accumulation for $(S, C)$ and the Cholesky factor (rank-one updates are backward-stable; the floor prevents cancellation); reads in fp32 with bf16 outputs. No exponentials anywhere removes the classic overflow hazard of attention logits, and the absence of normalizing denominators removes the underflow hazard of long-context softmax. The only precision-critical operation, the triangular solve, has relative error $O(\kappa u)$ with $\kappa$ capped near $10^3$–$10^4$: three decimal digits of retrieval accuracy in half precision, ten in single — consistent with Remark 6.7's bit-model accounting.
+
+### 7.5 Kernel sketch
+
+For completeness, the fused training kernel per (batch, head, chunk):
+
+```
+load chunk K, V, q, beta, lambda into SRAM            # c x d tiles
+Lam   <- prod(lambda);  w_r <- beta_r * prod_{j>r} lambda_j
+S_agg <- (w .* K)^T K ;  C_agg <- (w .* V)^T K        # GEMMs (Phase A)
+--- device-wide associative scan over (Lam, S_agg, C_agg)  (Phase B)
+R <- chol(S_in + E_in)                                 # boundary factor
+for r = 1..c:                                          # Phase C, in SRAM
+    R <- cholupdate(sqrt(lambda_r) R, sqrt(beta_r) k_r)
+    R <- cholupdate(R, sqrt((1-lambda_r) eps d) e_{r mod d})
+    C <- lambda_r C + beta_r v_r k_r^T
+    y_r <- C \(R^T R)^{-1} q_r ; c_r <- q_r^T (R^T R)^{-1} q_r   # 2 triangular solves
+store y, c ; checkpoint (Lam, S, C) at boundary
+```
+
+Every line is a GEMM, a rank-one triangular update, or a triangular solve — the three best-served primitives on current hardware — and the loop body is $O(d^2)$ with all operands SRAM-resident. The backward kernel is the mirror image under Lemma 6.5.
+
+---
+
+## 8. Unbounded Context: The Dyadic Conjugate Cascade
+
+A single head exactly stores $d_k$ selected associations — optimal for its budget (Theorem 5.9), but a fixed budget. Theorem 3.1 says growth is the only road to more exactness; the engineering question is *what growth schedule preserves everything proved so far* — the scan, the constant-time decode, the mergeability, the optimality per budget. The answer is the slowest possible growth: logarithmic, organized by time-scale, and it falls out of Corollary 4.5: because CSM states *merge by addition*, memories of adjacent spans can be consolidated losslessly (with respect to their sufficient statistics) at any time. Memory can therefore be *telescoped*.
+
+### 8.1 Construction
+
+**Definition 8.1 (Dyadic conjugate cascade).** Fix a base span $c_0$ (e.g. $c_0 = 1024$ tokens) and per-level capacity as in Definition 5.1. The cascade maintains: (i) the *live memory*, a discounted CSM state over the current partial block, as in Section 5; and (ii) at each level $\ell = 0, 1, 2, \ldots, L$, at most one *frozen block* — an undiscounted ($\lambda = 1$ within block) sufficient-statistic pair $(S^{(\ell)}, C^{(\ell)})$ summarizing a contiguous span of $2^\ell c_0$ tokens. On completing a base block, its undiscounted statistics enter level $0$; whenever a level $\ell$ holds two blocks, they merge by addition into one level-$(\ell+1)$ block (binary-counter discipline, so spans at each level remain contiguous and aligned). Reads address the live memory and a subset of levels; per-level read outputs and confidences are combined by learned, recency-aware gates $\gamma_\ell(x_t)$. Recency across blocks is thus handled *at read time* by the gates, not by in-state decay — preserving exact intra-block statistics and hence mergeability.
+
+The structure is a positional binary counter over memory: $N$ tokens occupy $\mathrm{popcount}$-many frozen blocks, at most $L + 1 = \lceil \log_2(N/c_0)\rceil + 1$ of them, totalling state $O\big((d_k^2 + d_kd_v)\log(N/c_0)\big)$.
+
+**Theorem 8.2 (Maintenance is free).** *Over $N$ tokens the cascade performs at most $N/c_0$ block-freezes and at most $N/c_0 - 1$ merges (each a single $O(d_k^2 + d_kd_v)$ addition), i.e. amortized $O\big((d_k^2 + d_kd_v)/c_0\big) = O(d_k)$ work per token for $c_0 \geq d_k$ — asymptotically negligible against the live memory's own update. Training-time construction of all block statistics is the same chunked scan as Theorem 6.2 (blocks are chunk aggregates at dyadic granularities, computable inside the same pass at unchanged asymptotic cost). (Proof: each merge consumes one block, and only $N/c_0$ blocks are ever created — the binary-counter amortization; Appendix F.)*
+
+### 8.2 What the cascade buys: selectable exactness at every scale
+
+**Theorem 8.3 (Telescoped capacity, scale-uniformly Shannon-efficient).** *(a) Let the write policy (the learned $\beta$ gates) mark, online, any set $\mathcal{I}$ of associations such that within every dyadic block at most $d_k$ marked items occur with linearly independent keys. Then every item of $\mathcal{I}$ is exactly retrievable (in the $\varepsilon \to 0$ sense, with Theorem 5.2's finite-$\varepsilon$ bounds) from the block containing it, for as long as that block exists — i.e. the cascade exactly recalls up to $d_k$ per level, $\Theta(d_k \log(N/c_0))$ associations in total, chosen online by the model. (b) This is order-optimal for its state: by Theorem 3.1 any machine exactly recalling $K$ values of $b$ bits needs $Kb$ bits of state; the cascade's state of $\Theta(d_k(d_k + d_v)\log N)$ words delivers $\Theta(d_k d_v \log N)$ words of selected exact recall — the Shannon exchange rate up to the factor $1 + d_k/d_v$, simultaneously at every scale. (c) Per-block, the unmarked residue is not discarded but summarized as that block's ridge posterior — the Bayes-optimal lossy summary (Theorem 5.4a) of everything not selected. (Proof: (a) is Theorem 5.2 applied per block plus the counter discipline; (b) is arithmetic against Theorem 3.1; Appendix F.)*
+
+Theorem 8.3 is the paper's answer to "infinite context." It does not promise total recall — nothing can (Theorem 3.1) — but it converts the impossibility into a *contract*: the model may keep **anything** it deems salient, at optimal bit-efficiency, across **every** time scale simultaneously, and everything it does not keep degrades not to zero but to the best linear-Gaussian summary of itself. The adversary that defeats the contract must force more salient content per dyadic span than the budget — and Theorem 3.1 says that adversary defeats every architecture of that state size, attention at equal memory included.
+
+**Theorem 8.4 (Fidelity horizon; power-law forgetting).** *Suppose salient writes arrive at rate $r$ per token (after gating) with keys in general position. An association of age $A$ resides in a block of span at most $2A$, which holds $\approx 2rA$ competing salient writes. Hence: exact recall is guaranteed while $rA \lesssim d_k/2$ (the horizon $A^* = \Theta(d_k / r)$); beyond the horizon, the block read returns the ridge regression over $\Theta(rA)$ items in $d_k$ dimensions, whose per-query risk grows like the classical ridge excess risk — polynomially in $rA/d_k$, with exact constants from Theorem 5.7 — rather than the exponential $\lambda^{A}$ collapse of a discounted flat memory. Moreover the model can refresh: re-emitting an item re-writes it into the current base block, resetting its age — rehearsal is a first-class, learnable operation. (Proof: block-span arithmetic plus Theorem 5.7; Appendix F.)*
+
+The forgetting law deserves a remark. Discounted flat memories forget exponentially: beyond a few multiples of $1/(1-\lambda)$, the past is annihilated. The cascade forgets like a power law: old items lose fidelity only through *competition for their block's budget*, not through decay — and the gates choose the competition's winners. Graceful, salience-directed, rehearsal-repairable, power-law forgetting is also, for what the observation is worth, the empirical signature of biological long-term memory; here it emerges as the information-theoretically optimal schedule rather than as an imitation.
+
+### 8.3 Mergeability at scale: reading in parallel, remembering together
+
+**Theorem 8.5 (Parallel ingestion and federation).** *Let a corpus of $N$ tokens be partitioned into $P$ segments processed independently (different devices, different times, different parties), each producing its own cascade with aligned block boundaries. Then the blockwise sums of the $P$ cascades equal the cascade of the full corpus under any block-respecting interleaving — exactly, in $O(P \cdot d^2 \log N)$ communication total, after which any party reads the joint memory as if it had ingested everything itself. Wall-clock context ingestion thus parallelizes to $N/P$ per device plus a logarithmic merge — with constant-size messages — and "knowledge handoff" between models sharing encoders is state addition. (Proof: Corollary 4.5 applied per block; alignment by the counter discipline; Appendix F.)*
+
+We highlight this as the cascade's emergent capability rather than its design goal: a memory whose contents are *sufficient statistics* is a memory that composes. One may ingest a library in parallel shards and sum the shards; maintain per-topic memories and pool them per query; or ship a colleague the $O(d^2 \log N)$-word distillate of a million-token reading session, losslessly with respect to the model's own belief class. Attention's cache concatenation achieves the first at $\Theta(N)$ message size and the last not at all. (Privacy-adjacent note, scoped: the merged object is a second-moment summary, not the text; we make no formal privacy claim, but the additive linear structure is exactly the shape to which standard noise-addition analyses apply, and Section 10.3 returns to it.)
+
+### 8.4 Reads, routed by confidence
+
+**Proposition 8.6 (Routed reads).** *Reading all levels costs $O\big((d_k^2 + d_kd_v)\log N\big)$ per token (worst case, still polylogarithmic); a router that queries the live memory first and escalates level-by-level only while the returned confidence $c^{(\ell)}_t(q)$ indicates ignorance achieves expected cost $O(d_k^2 + d_kd_v) \cdot \mathbb{E}[\text{levels visited}]$, which is $O(d_k^2 + d_kd_v)$ — constant per token — whenever the query-age distribution has geometric or lighter tails over scales; a hard budget of $R$ levels per token restores a worst-case $O(R\, d^2)$ with the router choosing which $R$. (Proof: Wald-type stopping argument under the stated tail assumption; Appendix F.)*
+
+This is the architectural payoff of Proposition 5.6: *because* every read returns a calibrated "did I actually know that?", escalation through the telescope can be a learned policy over a meaningful signal, and the strict-$O(N)$ total-work guarantee survives with adversarial query distributions handled by the budgeted mode. The combination (cheap shallow reads, confident escalation, budgeted worst case) has no analogue in attention, where every read pays for the whole past unconditionally.
+
+### 8.5 The cascade in one sentence
+
+A CSM head is the optimal fixed-budget memory; the cascade is the statement that *optimal fixed budgets, plus the additivity of belief, generate the optimal growth schedule for free* — logarithmic state, constant amortized work, selectable exactness at every scale, power-law forgetting, and a memory you can add.
+
+---
+
+## 9. Adversarial Self-Assessment: Where the Walls Are
+
+A theory paper earns trust by attacking itself harder than its readers will. This section catalogs every structural vulnerability we could construct against the architecture, classifies each as *universal* (a wall for all architectures, met at its theoretical boundary), *mitigated* (a real cost with a proven control), or *open* (an honest limitation), and states what would falsify the design's premises.
+
+### 9.1 The adversarial-recall objection (universal)
+
+*"For $K \gg$ budget adversarial associations, recall fails."* True, by Theorem 3.1 — for everything of equal state, attention included once its cache is capped. The architecture meets the bound at the optimal exchange rate (Theorems 5.9, 8.3b) and converts the residue into the Bayes-optimal summary (Theorem 5.4a) plus a calibrated warning (Proposition 5.6). An architecture cannot owe more than the information bound permits; this one pays exactly that and itemizes the receipt. We regard this objection as fully discharged — onto mathematics itself.
+
+### 9.2 Key-geometry adversaries (mitigated)
+
+*"Make stored keys nearly dependent; the Gram matrix's $\sigma_{\min}$ collapses and Theorem 5.2's bound blows up."* Three controls. First, the blowup is capped: the read's amplification never exceeds $\|\tilde V\|/(2\sqrt{\varepsilon})$ (the maximum of $\sigma/(\sigma^2 + \varepsilon)$), so $\varepsilon$ is a hard ceiling on adversarial gain, chosen jointly with the conditioning target (Theorem 6.6). Second, the degradation is the *right* degradation: as keys merge, the read converges to the pseudo-inverse solution — the minimum-norm consistent answer — rather than to garbage; collisions degrade toward averaging, never toward amplification, once $\varepsilon$ binds. Third, the confidence flags it: near-dependent writes leave $c_t(q)$ large in the contested directions. What we cannot prove is that *learned* encoders will spread keys well on natural data; that is a statement about optimization, deliberately outside this paper's scope (Section 9.7), though the architecture at least makes well-spread keys the loss-minimizing configuration, since crosstalk is the read's only in-capacity error source.
+
+### 9.3 The abelian ceiling (open, shared, and priced)
+
+The scan monoid is commutative-affine; a single CSM layer's *state*, between reads, is an order-weighted sum and cannot, by itself, track inherently non-commutative structure (compositions of arbitrary group elements, deeply serial program states) within one pass. This is not a CSM defect but the price every parallel-trainable architecture pays — Theorem 3.2 is the receipt — and attention sits strictly inside the same cage (its layer, too, is one round of commutative aggregation; Definition 2.7). The honest comparison is rounds: serial chains of length $T$ need $\Theta(T)$ adaptive rounds from *any* round-limited architecture, which a CSM provides at $H$ per layer times depth, with $H$ a cheap knob (Theorem 5.8). What neither we nor anyone in the scannable class can offer is the nonlinear RNN's $N$ serial rounds per layer — the rounds that cost exactly the parallel training everyone abandoned them to get. We conjecture (and pose as an open problem in Section 10.4) that rounds-versus-span is a genuine conservation law: no architecture achieves both polylog training span and $\omega(\mathrm{depth} \times H)$ adaptive rounds.
+
+### 9.4 The $d^2$ state objection (mitigated)
+
+*"Quadratic state per head is heavy."* Per head, $d_k^2 + d_kd_v$ at $d_k = 64$ is 8K numbers — *smaller* than one attention head's cache beyond 128 tokens of context, and Remark 3.4 shows the $d_k^2$ term is the irreducible price of addressability at this capacity (it stores the key geometry the read must invert). The economical regime is many small heads (Section 7.2). For budget-constrained corners, the family degrades gracefully and *quantifiably*: sketching $S$ (diagonal, block-diagonal, or low-rank-plus-diagonal) interpolates continuously between the Hebbian corner and the full operator, with recall error governed by the sketch's spectral approximation error through Theorem 5.2's $\sigma_{\min}$ dependence — degradation by theorem rather than by surprise.
+
+### 9.5 Distributional fragility of optimality claims (scoped by design)
+
+Theorems 5.4(a), 5.7, and Proposition 5.6's calibration are *in-model* statements. Outside the linear-Gaussian lens — heteroscedastic values, heavy-tailed noise, adversarial value distributions — the read remains the regularized least-squares functional with all algebraic guarantees (Theorems 5.2, 5.9, 6.2–6.6) intact, but optimality and calibration transfer only approximately. The honest statement: the architecture is *exactly optimal for a declared class and exactly defined outside it*, which we contend is the correct epistemic posture for an architecture — its failure modes are the failure modes of ridge regression, the most thoroughly understood estimator in statistics, rather than the unanalyzed pathologies of ad hoc memories. Robustified reads (heavy-tailed observation families, Section 10.1) are the principled extension path.
+
+### 9.6 Queries outside the hypothesis class (universal, with a widening path)
+
+A CSM state is sufficient for queries about its declared latent (Theorem 4.3); a query probing structure orthogonal to the class — say, a higher-order interaction the feature maps never encoded — finds nothing, however large the budget. By Theorem 4.4 this is not escapable by cleverness: *some* class must be declared by any fixed-size-sufficient state; the only freedoms are the class's richness (learned features, wider conjugate families — Section 10.1) and depth's ability to compose classes. Attention faces the mirror constraint (its heads probe only what its projections encode) but hides the class inside learned weights rather than stating it. We prefer the stated version: it is auditable, extensible, and the theorems attach to it.
+
+### 9.7 What this paper does not claim
+
+No empirical claims are made: no benchmark numbers, no scaling-law conjectures, no assertions that gradient descent finds the encoders the theorems deserve. The training dynamics of solve-bearing layers, the inductive-bias interaction between $(\beta, \lambda)$ gates and language statistics, and the learned quality of key geometries are open empirical questions, flagged as such. The falsifiable architectural premises, for the record: (i) per-access fidelity (interpolation, hull-freedom, optimal averaging) is a binding constraint on real workloads — falsified if smoothing reads match solver reads at equal budget on associative-load tasks; (ii) calibrated confidence is exploitable by downstream computation — falsified if routing on $c_t(q)$ never beats uniform reads; (iii) salience-gated dyadic selection captures natural long-context query distributions — falsified if exactness budgets sit idle while queries hit unselected content. The mathematics is unconditional; the architecture's *worth* rests on (i)–(iii), and we state them so they can be attacked.
+
+---
+
+## 10. The Adjacent Possible
+
+The construction opens more doors than it closes. We map the nearest ones, ordered by how directly they inherit this paper's theorems.
+
+### 10.1 The conjugate family zoo
+
+Nothing in Sections 4 or 6 is Gaussian-specific: *any* exponential-family likelihood with conjugate prior yields a memory with additive natural-parameter writes (scannable, Theorem 4.1), minimal-sufficient state (Theorem 4.3), derived gates (Proposition 4.6), and a posterior-predictive read. The Gaussian instance owns associative recall; the family generalizes the *kind of thing a state can know*. Dirichlet–multinomial heads maintain calibrated empirical distributions over discrete structures (vocabulary usage, syntactic modes) with reads returning probability vectors and uncertainties; Gamma–Poisson heads maintain rate beliefs (event densities, count statistics); Wishart heads maintain covariance beliefs (style, register, second-order texture); von Mises–Fisher heads maintain directional beliefs. Each inherits the entire computational story — the scan, the chunking, the cascade, the mergeability — because all of it was derived from conjugacy alone. A heterogeneous stack of conjugate heads is a *belief-typed* memory system: the first architecture class, to our derivation's knowledge, in which "what does this layer remember?" has a formal answer per head.
+
+### 10.2 Learned conjugacy
+
+The deepest open extension: the feature maps defining keys live inside the sufficient statistic $T(\cdot)$, so representation learning *is* hypothesis-class learning — gradient descent over encoders is a search over exponential families for the one whose sufficient statistics make the data's future queries answerable. Formalizing this loop — when does end-to-end training recover the "right" family? what regularizers keep learned $T$ minimal (Theorem 4.3's premise)? — would weld statistical theory to representation learning at an unusually load-bearing joint, and is in our view the field this paper most wants to exist.
+
+### 10.3 Memory as a commodity: composable, shippable, consolidatable
+
+Corollary 4.5 and Theorem 8.5 make belief states *first-class objects* — addable, splittable (within blocks), transmissible at $O(d^2 \log N)$. The systems consequences are a research program: parallel-shard reading as the default long-document mode; communal memories pooled across agents with per-query gating; consolidation policies ("sleep") that re-fit a cascade's residue into refreshed exact slots offline — a mechanizable analogue of rehearsal, well-posed because the residue is itself a regression posterior; and noise-calibrated sharing, since additive second-moment summaries are precisely the objects for which classical perturbation analyses compose. Each application needs only engineering plus one new theorem, not a new architecture.
+
+### 10.4 Theory targets now in range
+
+Four problems this paper sharpens enough to attack. (1) *The rounds conservation law* (Section 9.3): prove or refute that polylog training span implies adaptive-round count $O(\mathrm{depth} \times H)$ — a clean bridge between parallel complexity and architectural reasoning power. (2) *Tight constants*: close the factor $1 + d_k/d_v$ of Remark 3.4 — is the addressing overhead information-theoretically necessary for streaming content-addressability, or can a cleverer auxiliary statistic shave it? (3) *Cascade optimality*: among all growth schedules maintaining scan-realizability and mergeability, prove the dyadic schedule's $\Theta(\log N)$ state is Pareto-optimal against the fidelity-horizon profile of Theorem 8.4. (4) *Beyond squared loss*: characterize the conjugate families whose posterior-predictive reads remain exactly computable in $O(d^2)$ — the algebraic boundary of the CSM class.
+
+### 10.5 The paradigm, restated as an instruction
+
+If one sentence of method should outlive the specific operator: **to design a recurrent architecture, do not design the state — declare what future computation must know, find the family for which that knowledge has fixed-size sufficient statistics, and let Bayes' rule write the update; the only remaining choices are the hypothesis class and the read, which is where all the learning belongs.** Every theorem in this paper is downstream of taking that instruction literally.
+
+---
+
+## 11. Conclusion
+
+The expressivity–efficiency frontier in sequence modeling was never a single wall. It was three walls and a door, and the walls do not move: exact memory costs linear state (Theorem 3.1) for every architecture ever to be designed; parallel training forbids nonlinear transitions (Theorem 3.2) for every architecture ever to be designed; fixed budgets cap exact capacity (Theorem 3.3) for every value-linear memory ever to be designed. What was contingent — what this paper set out to dissolve — was the assumption that a state must be a *vector being mixed* rather than a *belief being updated*. Replacing signal compression with posterior maintenance turned each wall into a boundary the architecture meets with equality: the state is the minimal sufficient statistic (nothing wasted), the update is Bayes' rule in natural coordinates (hence an associative scan, hence parallel), the read is the posterior predictive (hence interpolating, optimal, and self-aware), the gates are drift and evidence precision (hence derived, not designed), the capacity meets its converse with equality, the decode runs in constant time against a provable conditioning floor, and the whole construction telescopes to logarithmic state with selectable exactness at every time scale — while acquiring, almost as a side effect, a capability neither parent family possesses: memories that add.
+
+The Conjugate State Machine is offered not as a model but as a closure: of the gap between what recurrence could prove and what attention could do, and of the design question itself — since, by the canonicity theorems, any future architecture that summarizes unbounded history losslessly for inference will be a conjugate state machine, whether or not it is called one. What remains beyond it remains beyond everything; what lies within it now has theorems.
+
+---
+
+## Appendix A. Randomized Lower Bound (Theorem 3.1b)
+
+Let the value assignment $V$ be uniform on $\{0,1\}^{Kb}$ and let $Z$ be the (possibly random) state after the writes, taking values in $\{0,1\}^m$. For a uniformly chosen query index $J$, the machine outputs $\hat v = R(Z, k_J)$ with $\Pr[\hat v \neq v_J] \leq \delta$ for every assignment, hence on average. Consider the estimator that, given $Z$, outputs $(R(Z, k_1), \ldots, R(Z, k_K)) =: \hat V$. Coordinate-wise, $\Pr[\hat V_j \neq V_j] \leq \delta$, so by Fano's inequality applied per block and summed (values independent across $j$), $H(V \mid Z) \leq \sum_j H(V_j \mid Z) \leq K\big(H_2(\delta) + \delta b\big)$; for the standard form of the claim take $\delta$ as the *block* error rate, giving $H(V\mid Z) \le K(H_2(\delta) + \delta b)$, whence
+$$m \;\geq\; H(Z) \;\geq\; I(V; Z) \;=\; Kb - H(V \mid Z)\;\geq\; (1-\delta)Kb - K H_2(\delta),$$
+which is at least $(1 - H_2(\delta))Kb - 1$ in the regime $b \geq 1$, $\delta \leq 1/2$ stated. ∎
+
+## Appendix B. P-Completeness of Nonlinear Prefix Recurrence (Theorem 3.2)
+
+*Membership.* Iterating $f$ for $N$ steps with a poly-size circuit per step is polynomial time.
+
+*Hardness.* Reduce CVP. An instance is a Boolean circuit with gates $g_1, \ldots, g_N$ in topological order, each $g_t$ specified by an opcode and input indices $a_t, b_t < t$ (inputs of the circuit are gates with constant opcode). Define the state space $\{0,1\}^{N}$ (one bit per gate; $p = N$), initial state $0$, and token $x_t = (\mathrm{op}_t, a_t, b_t)$. Define $f(z, x_t)$ to copy $z$ and overwrite coordinate $t$ with $\mathrm{op}_t(z_{a_t}, z_{b_t})$. Each step is computable by a uniform circuit of size $O(N)$ (two multiplexers over the state plus one gate). After $N$ steps, $z_N$ holds all gate values; output the last. The map from CVP instance to recurrence instance is logspace. Since CVP is P-complete under logspace reductions (a classical result), so is prefix-recurrence evaluation; a polylog-span general scan for nonlinear recurrences would place CVP in NC. ∎
+
+*Remarks.* (i) The reduction uses one prefix only; computing all prefixes is at least as hard. (ii) Constant-width recurrences escape the reduction, and some parallelize after a linearizing change of coordinates — exactly the mechanism of Lemma 3.5; the generic obstruction for fixed width is the infinite-dimensionality of the composition algebra, which defeats the only known general parallelization route (bounded-size composite representations).
+
+## Appendix C. Conjugacy, Sufficiency, Minimality, Drift (Theorems 4.3, 4.4; Proposition 4.6)
+
+*Theorem 4.3.* With likelihood $\prod_s h(o_s)\exp(\langle T(o_s), \eta\rangle - A(\eta))^{\beta_s}$ (weights as likelihood powers) and conjugate prior $\exp(\langle \chi_0, \eta \rangle - \nu_0 A(\eta))$, the posterior density is proportional to $\exp(\langle \chi_t, \eta\rangle - \nu_t A(\eta))$ with $(\chi_t, \nu_t)$ as in Theorem 4.1; the joint density of (history, $\eta$) factorizes as $g\big((\chi_t, \nu_t), \eta\big) \cdot h(x_{1:t})$, so by Fisher–Neyman, $(\chi_t, \nu_t)$ is sufficient. Minimality: in a minimal family the map $\eta \mapsto$ (distribution) is injective and the coordinates of $T$ are affinely independent; the standard exponential-family argument (ratios of densities at distinct parameter values determine $\langle \chi, \eta - \eta'\rangle$ for all pairs, which by affine independence determine $\chi$, and $\nu$ from the normalizer) shows any sufficient statistic determines $(\chi_t, \nu_t)$ a.s. ∎
+
+*Theorem 4.4* is the classical Koopman–Pitman–Darmois theorem; we use it as stated, under its standard regularity conditions (smooth positive densities, fixed support, statistic dimension bounded in sample size), and do not reprove it.
+
+*Proposition 4.6(a).* Minimize $F(q) = \lambda \int q \log\frac{q}{\pi} + (1-\lambda)\int q \log\frac{q}{\pi_0}$ over densities. Stationarity of $F + \gamma(\int q - 1)$ gives $\log q = \lambda \log \pi + (1-\lambda)\log \pi_0 + \text{const}$, i.e. the geometric mixture; within an exponential family with natural parameters $\chi$ (for $\pi$) and $\chi_{\mathrm{ref}}$ (for $\pi_0$), $\log q$ has natural parameter $\lambda \chi + (1-\lambda)\chi_{\mathrm{ref}}$ (and pseudo-count $\lambda \nu + (1-\lambda)\nu_{\mathrm{ref}}$). For the Gaussian-location instance, tempering a $\mathcal{N}(\mu, \tau^{-1})$ posterior yields $\mathcal{N}(\mu, (\lambda\tau)^{-1})$: mean preserved, precision scaled — covariance inflation with process noise $Q = (\lambda^{-1} - 1)\,\mathrm{Cov}$, i.e. drift proportional to current uncertainty. (b) Raising the likelihood factor to the $\beta$ power multiplies $T(o)$ and the count increment by $\beta$; for $\mathcal{N}(v \mid Wk, \sigma^2 I)$, the $\beta$-power equals (up to normalization) a Gaussian likelihood with covariance $\sigma^2 I/\beta$. ∎
+
+## Appendix D. The Gaussian Instance (Theorems 5.4, 5.7, 5.8; Propositions 5.5, 5.6)
+
+*Theorem 5.4(a).* The posterior over $W$ given the history is determined by $(S_t, C_t)$ (Theorem 4.3 instantiated; the matrix-normal computation below), and the posterior mean of $Wq$ minimizes $\mathbb{E}[\|Wq - \hat v\|^2 \mid x_{1:t}]$ over all $\hat v$ measurable in the history. Matrix-normal computation: rows of $W$ are independent $\mathcal{N}(0, \varepsilon^{-1} I)$ a priori; row $r$'s posterior given data is Gaussian with precision $A_t = \varepsilon I + \sum \beta_s k_sk_s^\top$ and mean $A_t^{-1} \sum \beta_s v_s^{(r)} k_s$, i.e. $M_t = C_t A_t^{-1}$ rowwise. (b) With $\varepsilon \to 0$ and $q = \sum_i a_i k_i$ in the key span, the read converges (Theorem 5.2's limit) to $V B^{1/2}\tilde G^{+} B^{1/2} K^\top q$, the (weighted) least-squares estimator of $W^* q$, which is unbiased on the span; the Gauss–Markov theorem (classical; uncorrelated homoscedastic-after-weighting noise) gives minimal variance among value-linear unbiased estimators. (c) With $n$ writes of $(k, v + \sigma\xi_i)$: $S = n kk^\top$, $C = (nW^*k + \sigma\sum\xi_i)k^\top$ on the relevant subspace; $\mathrm{read}(k) \to W^*k + \frac{\sigma}{n}\sum \xi_i$, with risk $\sigma^2 d_v/n$. ∎
+
+*Proposition 5.5(a).* Take the Section 5.2 instance. A weight rule $w_s \propto \phi(\langle k_s, q\rangle)$, $\phi > 0$: at $q = k_1$, $w_2/w_1 = \phi(0.8)/\phi(1) > 0$ is a fixed positive constant for fixed $\phi$, so the read errs by $\frac{w_2}{w_1 + w_2}\|v_2 - v_1\|$-order terms; driving the ratio to $0$ requires a temperature limit in which the read becomes nearest-neighbor: exact *only at* stored keys, discontinuous across their Voronoi boundaries, and still hull-bound (part b). (b) Convexity: $\hat v = \sum w_s v_s$ with $w$ in the simplex lies in $\mathrm{conv}\{v_s\}$; the target $2v_1 - v_2$ has distance $\sqrt{2}$ from $\mathrm{conv}\{v_1, v_2\}$ in the instance (minimized at endpoint $v_1$); the Gauss–Markov read is linear in $q$, hence maps $2k_1 - k_2 \mapsto 2v_1 - v_2$ exactly in the $\varepsilon \to 0$ limit (Theorem 5.2's general-$q$ clause with invertible $\tilde G$). (c) With keys $k$ (multiplicity $n_1$, noise $\sigma^2$) and $k'$ (multiplicity $n_2$), inverse-variance weighting across the two stored centroids requires weights $\propto n_i$ for queries at the centroids' span — but smoothing weights depend only on similarities $\langle k_s, q\rangle$, not multiplicities, unless multiplicity is smuggled into scores; among similarity-only rules the risk exceeds the LS risk strictly when $n_1 \neq n_2$ (direct variance computation). ∎
+
+*Proposition 5.6.* Per coordinate $r$: $v^{(r)} \mid q, x_{1:t} \sim \mathcal{N}(m_r^\top q,\; q^\top A_t^{-1} q + \beta_q^{-1})$ by Gaussian conditioning (posterior row covariance $A_t^{-1}$, observation noise $\beta_q^{-1}$). Monotonicity: $A_t \succeq A_{t'}$ implies $c_t(q) \leq c_{t'}(q)$; writes only add PSD terms within a block; on never-written directions $c = \varepsilon^{-1}\|q\|^2$ at $\lambda \equiv 1$. ∎
+
+*Theorem 5.7.* $\mathrm{read}(q) - W^*q = (C A^{-1} - W^*)q$; with $C = W^* S + \sigma \Xi K^\top$ ($\Xi$ the noise matrix), $C A^{-1} - W^* = -\varepsilon W^* A^{-1} + \sigma \Xi K^\top A^{-1}$. The cross term vanishes in expectation; the squared bias is $\varepsilon^2 \|W^* A^{-1} q\|^2$; the variance is $\sigma^2 d_v\, \|K^\top A^{-1} q\|^2 = \sigma^2 d_v\, q^\top A^{-1} S A^{-1} q \leq \sigma^2 d_v\, q^\top A^{-1} q$ since $A^{-1/2} S A^{-1/2} \preceq I$. ∎
+
+*Theorem 5.8.* Orthonormal codes give $G = I$, so each in-capacity read at a true code returns the successor code with error $\epsilon_1 \leq \varepsilon\|V\|/(\beta(1) + \varepsilon)$ (Theorem 5.2). For perturbed queries $q = k_i + e$: $\mathrm{read}(q) = v_i + (\text{error at } k_i) + CA^{-1}e$, and $\|CA^{-1}\| \leq \|\tilde V\|\sigma_{\max}(\tilde K)/(\sigma_{\min}(\tilde K)^2 + \varepsilon) =: L$. Induction: $e_{j+1} \leq \epsilon_1 + L e_j$, so $e_H \leq \epsilon_1 \sum_{j<H} L^j$. With normalized codes and $\beta \equiv 1$, $\sigma(\tilde K) = 1$, so $L = \|\tilde V\|/(1+\varepsilon) \leq 1$ for normalized stored values. ∎
+
+## Appendix E. Algorithms (Theorems 6.2, 6.3; Lemmas 6.4, 6.5; Theorem 6.6)
+
+*Theorem 6.2.* Phase A: forming $\tilde K = \mathrm{diag}(w)^{1/2} K_{\mathrm{chunk}}$ and the products $\tilde K^\top \tilde K$, $\tilde V^\top \tilde K$ costs $O(c d_k^2 + c d_kd_v)$ per chunk; the per-token suffix products $\prod_{j > r}\lambda_j$ cost $O(c)$ by a reverse cumulative product. Phase B: Proposition 2.3 with $\tau_\bullet = O(d_k^2 + d_kd_v)$ over $N/c$ elements. Phase C: $c$ iterations of two rank-one triangular updates ($O(d_k^2)$ each; standard Givens-based cholupdate), one rank-one $C$ update ($O(d_kd_v)$), two triangular solves and two mat-vecs ($O(d_k^2 + d_kd_v)$). Totals as stated; correctness by associativity (Proposition 6.1) and the invariant of Theorem 6.3. Memory: boundary states $(N/c)(d_k^2 + d_kd_v)$ plus per-token I/O. ∎
+
+*Theorem 6.3.* Invariant: if $R^\top R = S_{t-1} + E_{t-1}$, then after step (1), $R^\top R = \lambda(S_{t-1} + E_{t-1})$; after (2), $\lambda S_{t-1} + \beta kk^\top + \lambda E_{t-1}$; after (3), $S_t + E_t$ with $E_t = \lambda E_{t-1} + (1-\lambda)\varepsilon d_k\, e_je_j^\top$. Updates add PSD rank-one terms to a PD matrix, so the factor exists at every step (no downdates occur — the scaling handles decay multiplicatively); costs as listed. ∎
+
+*Lemma 6.4.* Coordinate $j$ receives the phantom weight $(1-\lambda)\varepsilon d_k$ every $d_k$ steps, decayed by $\lambda$ per step: its stationary value is $(1-\lambda)\varepsilon d_k \cdot \lambda^{a}/(1 - \lambda^{d_k})$ for phase $a \in \{0, \ldots, d_k - 1\}$, giving the interval $\big[\varepsilon d_k(1-\lambda)\lambda^{d_k - 1}/(1-\lambda^{d_k}),\; \varepsilon d_k(1-\lambda)/(1-\lambda^{d_k})\big]$. With $x = (1-\lambda)d_k \leq 1$: $d_k(1-\lambda)/(1-\lambda^{d_k}) \to x/(1 - e^{-x}) \in [1, e/(e-1)] \approx [1, 1.582]$, and the lower endpoint differs by the factor $\lambda^{d_k - 1} \geq e^{-x}\lambda^{-1} \approx e^{-x}$; at $x \leq 0.1$ the interval is within a few percent of $\varepsilon$. ∎
+
+*Lemma 6.5.* $\partial \mathcal{L}/\partial u_t = \sum_{s \geq t} (\partial z_s/\partial u_t)^\top \partial\mathcal{L}/\partial z_s$ and $\partial z_s/\partial u_t = \Lambda_{t+1:s} I$; the stated reverse recurrence computes exactly these sums (verified by unrolling); $\partial\mathcal{L}/\partial\lambda_t$ by the product rule on $z_t = \lambda_t z_{t-1} + u_t$. Read-solve gradients: differentiate $A x = q$. ∎
+
+*Theorem 6.6.* (a) $\|S_t\| \leq \sum_j \Lambda \beta \cdot 1 \leq \beta_{\max}\sum_{j\ge0} \lambda^j$; $\kappa(A) \leq (\varepsilon + \|S\|)/\varepsilon$ with the floor of Lemma 6.4 absorbing constants. (b) The forward map's state-to-state Jacobian is $\lambda_t I$ (norm $\leq 1$); read derivatives involve $A^{-1}$ and $CA^{-1}$, bounded by $\kappa$-polynomials as in Theorem 5.8's $L$. (c) Rank-one Cholesky updates and triangular solves are backward-stable (classical results of numerical linear algebra); forward error per read is $O(\kappa(A)u)$; the floor prevents loss of positive definiteness in finite precision by keeping $\lambda_{\min}(A) \geq 0.9\varepsilon$. ∎
+
+## Appendix F. The Cascade (Theorems 8.2–8.5; Proposition 8.6)
+
+*Theorem 8.2.* Each base block is created once ($N/c_0$ creations); each merge destroys one block; blocks never split; so merges $\leq$ creations $- $ survivors $\leq N/c_0 - 1$. Each merge is one addition of statistics. Training-time: dyadic block aggregates are exactly the internal nodes of the Phase-B scan tree at granularities $\geq c_0$, available without extra asymptotic work. ∎
+
+*Theorem 8.3.* (a) A frozen block's statistics are undiscounted sums, so Theorem 5.2 applies within the block with $\lambda \equiv 1$; the counter discipline keeps blocks contiguous and at most one per level, so an item's enclosing block at any time has span $2^\ell c_0$ and (by the policy's premise) $\leq d_k$ marked, independent keys; exactness follows, and persists across merges *while* the merged block's marked count stays $\leq d_k$ — the policy's per-dyadic-span budget is exactly the condition that all ancestors respect the cap. (b) State words: $(L+1)(d_k^2 + d_kd_v)$; recalled words at full budget: $L d_k \cdot d_v$ (level 0..L−1, say); ratio $(d_k + d_v)/d_v$ per level, uniform in $\ell$ — each level is a Theorem 5.9-optimal memory for its own scale. (c) is Theorem 5.4(a) applied per block. ∎
+
+*Theorem 8.4.* An item of age $A$ lies in a frozen block whose span is between $A$ and $2A$ (the dyadic ancestor); with marked-write rate $r$, the block holds $\leq 2rA$ competitors; exactness holds while $2rA \leq d_k$ (Theorem 8.3a), and beyond it the block read is the ridge estimator over its contents with risk per Theorem 5.7 — the bias and variance terms grow with the block's effective load $rA/d_k$ polynomially. Refresh: a re-emitted item enters the live block with age zero. ∎
+
+*Theorem 8.5.* Within a block, statistics are sums of per-token terms; summing over parties equals the sum over the union of tokens, for any assignment of tokens to parties (commutativity, Corollary 4.5). Aligned boundaries make per-level objects comparable; the merged counter equals the counter of the concatenated stream because the dyadic merge of sums is the sum of dyadic merges. Message size: one $(S, C)$ pair per occupied level. ∎
+
+*Proposition 8.6.* Let $p_\ell$ be the probability the answer resides at level $\ell$, with $\sum_\ell p_\ell = 1$ and geometric tail $p_\ell \leq C\rho^\ell$, $\rho < 1$. The escalating reader stops at the answer's level (or earlier, on confident shallow hits); expected levels visited $\leq \sum_\ell (\ell + 1) p_\ell < \infty$, a constant independent of $N$. The budgeted variant is immediate. (The stopping rule's correctness uses Proposition 5.6's monotone-ignorance property: unwritten directions at shallow levels yield high $c(q)$, triggering escalation.) ∎
+
+---
+
+## Appendix G. Notation Table
+
+| Symbol | Meaning |
+|---|---|
+| $x_t, N$ | layer input at step $t$; sequence length |
+| $k_t, v_t, q_t$ | key, value, query encodings ($\|k_t\| = 1$) |
+| $\beta_t \geq 0$ | evidence precision (input gate, derived: Prop 4.6b) |
+| $\lambda_t \in (0,1]$ | drift/tempering rate (forget gate, derived: Prop 4.6a) |
+| $S_t, C_t$ | sufficient statistics $\sum \Lambda\beta\, kk^\top$, $\sum \Lambda\beta\, vk^\top$ |
+| $A_t = S_t + \varepsilon I$ | posterior precision; $\varepsilon$ = prior precision = conditioning floor |
+| $\mathrm{read}_t(q) = C_tA_t^{-1}q$ | posterior-predictive mean (the solve) |
+| $c_t(q) = q^\top A_t^{-1} q$ | calibrated retrieval variance (Prop 5.6) |
+| $R_t$ | Cholesky factor, $R_t^\top R_t = A_t$ (decode state) |
+| $G, \tilde G$ | key Gram matrix; weighted Gram $B^{1/2}GB^{1/2}$ |
+| $\Lambda_{s:t}$ | $\prod_{r=s}^t \lambda_r$ |
+| $(\chi_t, \nu_t)$ | natural parameters / pseudo-count of the conjugate posterior |
+| $T(o), A(\eta)$ | sufficient statistic; log-partition of the family |
+| $d_k, d_v, h, H$ | key/value dims; heads; hops (adaptive rounds) per layer |
+| $c, c_0$ | training chunk length; cascade base span |
+| $L$ | cascade levels, $\lceil \log_2(N/c_0)\rceil$ |
+| $m, p_v$ | state bits (lower bounds); value-state dimension (Thm 3.3) |
+| $\kappa, u$ | condition number; unit roundoff |
+
+*End of paper.*
+
+
+
+
+
+
+
+
+
