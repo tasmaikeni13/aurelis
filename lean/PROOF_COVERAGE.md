@@ -17,5 +17,9 @@
 | `oneKey_variance_positive` | the one-key posterior variance is positive | Proposition 5.6, one-key case | Scalar/one-key specialization |
 | `ridgeFactor_nonneg` / `ridgeFactor_le_one` | each positive-eigenvalue ridge error multiplier lies in `[0,1]` | Theorem 5.2 finite-epsilon bound | Scalar spectral certificate; not the matrix norm theorem |
 | `ridgeFactor_antitone_eigenvalue` | better Gram eigenvalues reduce the spectral shrinkage factor | Theorem 5.2 conditioning dependence | Scalar spectral certificate |
+| `softmaxWeight_nonneg` / `softmaxWeight_sum` | finite real softmax weights are nonnegative and normalized | Phase 3 smoothing baseline | Full finite-index weight theorem |
+| `negative_coordinate_not_normalized` | a simplex-valued read cannot reproduce a negative target coordinate | Phase 3 linear-functional separation | Full finite-index theorem |
+| `above_one_coordinate_not_normalized` | a simplex-valued read cannot reproduce a target coordinate above one | Phase 3 linear-functional separation | Full finite-index theorem |
+| `nonunit_sum_not_normalized` | normalized weights cannot reproduce a target with sum other than one | Phase 3 linear-functional separation | Full finite-index theorem |
 
 Not yet claimed as formally proved: the full matrix interpolation bound in Theorem 5.2, Gauss–Markov optimality, calibration under the stochastic model, ricochet error bounds, Cholesky backward stability, or any dyadic-cascade theorem. Those require substantially larger probability/numerical-analysis developments. Their absence is not a proof failure.

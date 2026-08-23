@@ -608,6 +608,32 @@ def aggregate_functional(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def aggregate_value_dimension(
+    rows: list[dict[str, Any]], epsilon: float
+) -> list[dict[str, Any]]:
+    groups: dict[tuple[int, str], list[float]] = defaultdict(list)
+    for row in rows:
+        if (
+            row["fairness"] == "equal_state_budget"
+            and row["key_regime"] == "correlated"
+            and row["load"] <= 1.0
+            and row["epsilon"] == epsilon
+        ):
+            groups[(row["d_value"], row["method"])].append(
+                row["relative_frobenius_error"]
+            )
+    return [
+        {
+            "d_value": key[0],
+            "method": key[1],
+            "median_relative_error": percentile(values, 0.5),
+            "p90_relative_error": percentile(values, 0.9),
+            "case_count": len(values),
+        }
+        for key, values in sorted(groups.items())
+    ]
+
+
 def gate_summary(
     recall: list[dict[str, Any]],
     functional: list[dict[str, Any]],
@@ -877,6 +903,7 @@ def render_report(record: dict[str, Any]) -> str:
     observed = record["observed"]
     recall_summary = record["recall_summary"]
     functional_summary = record["functional_summary"]
+    value_dimension_summary = record["value_dimension_summary"]
     selected_recall = [
         row
         for row in recall_summary
@@ -906,6 +933,18 @@ def render_report(record: dict[str, Any]) -> str:
             ]
             for row in functional_summary
             if row["method"] in ("csm", "softmax", "hebbian", "linear_attention")
+        ],
+    )
+    value_dimension_table = markdown_table(
+        ["d_value", "method", "median error", "p90 error"],
+        [
+            [
+                str(row["d_value"]),
+                row["method"],
+                f"{row['median_relative_error']:.3e}",
+                f"{row['p90_relative_error']:.3e}",
+            ]
+            for row in value_dimension_summary
         ],
     )
     representative = [
@@ -957,6 +996,12 @@ The table aggregates the minimum-epsilon, at-or-below-capacity cases under the e
 {recall_table}
 
 The solver has a reproducible fidelity advantage over the compressed Hebbian and positive-feature linear-attention states for correlated keys. It does **not** dominate explicit retrieval: for random independent stored-key recall, median errors are CSM `{random_no_win['csm']:.3e}`, oracle-tuned softmax `{random_no_win['softmax']:.3e}`, and least squares `{random_no_win['least_squares']:.3e}`. At `K <= d_key`, explicit softmax fits the equal budget and is often the better stored-key mechanism. Above capacity, arbitrary-value recall fails for CSM and the least-squares projection, while budgeted explicit methods also omit pairs; no broad winner is claimed there.
+
+### Value-dimension sweep
+
+The following isolates correlated keys at or below capacity, minimum epsilon, and the equal state-byte budget. All three committed value dimensions are reported rather than averaged away.
+
+{value_dimension_table}
 
 ## Linear-functional separation
 
@@ -1022,6 +1067,9 @@ def main() -> int:
     latency = latency_sweep(config, device)
     recall_summary = aggregate_recall(recall, min(config["epsilons"]))
     functional_summary = aggregate_functional(functional)
+    value_dimension_summary = aggregate_value_dimension(
+        recall, min(config["epsilons"])
+    )
     gate, observed = gate_summary(recall, functional, config)
     plots = make_plots(recall, functional, latency, config, args.plots)
     synchronize(device)
@@ -1053,6 +1101,7 @@ def main() -> int:
         },
         "recall_summary": recall_summary,
         "functional_summary": functional_summary,
+        "value_dimension_summary": value_dimension_summary,
         "latency": latency,
         "observed": observed,
         "plots": plots,
