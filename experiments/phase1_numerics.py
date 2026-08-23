@@ -340,10 +340,11 @@ def pathological_experiment(device: torch.device) -> list[dict[str, Any]]:
     record("beta_zero", state, memory, keys[0])
 
     # lambda below one and very large beta
+    large_keys = torch.eye(2, device=device, dtype=dtype)
     state = memory.initial_state(device=device)
-    state = memory.write(state, keys[0], values[0], 1e150, 1.0)
-    state = memory.write(state, keys[1], values[1], 1e149, 0.2)
-    record("lambda_below_one_large_beta", state, memory, keys[1])
+    state = memory.write(state, large_keys[0], values[0], 1e150, 1.0)
+    state = memory.write(state, large_keys[1], values[1], 1e149, 0.2)
+    record("lambda_below_one_large_beta", state, memory, large_keys[1])
 
     # zero values and single observation
     memory = FP64GaussMarkovMemory(2, 2)
@@ -603,4 +604,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
