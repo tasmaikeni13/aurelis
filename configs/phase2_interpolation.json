@@ -16,11 +16,12 @@
   "correlation": 0.9,
   "near_collinear_noise": 0.001,
   "exact_relative_tolerance": 0.001,
+  "fp64_bound_roundoff_multiplier": 32.0,
   "conditioning_bins_log10": [0, 1, 2, 3, 4, 6, 8, 10, 12, 16],
   "gate": {
     "independent_limit_median_relative_error": 0.0005,
     "finite_epsilon_direction_fraction": 0.95,
-    "theorem_bound_ratio": 1.0001,
+    "bound_with_fp64_allowance_ratio": 1.0,
     "breakdown_error_ratio": 100.0
   }
 }

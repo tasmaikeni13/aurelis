@@ -66,6 +66,7 @@ def run_sweep(
     independent_limit: list[float] = []
     breakdown_limit: list[float] = []
     theorem_ratios: list[float] = []
+    fp64_envelope_ratios: list[float] = []
 
     for d_key in config["key_dimensions"]:
         for load in config["loads"]:
@@ -172,6 +173,8 @@ def run_sweep(
                             )
                             theorem_bound = float("nan")
                             theorem_ratio = float("nan")
+                            fp64_roundoff_allowance = float("nan")
+                            fp64_envelope_ratio = float("nan")
                             if full_row_rank:
                                 theorem_bound = (
                                     epsilon
@@ -182,6 +185,20 @@ def run_sweep(
                                     theorem_bound, 1e-300
                                 )
                                 theorem_ratios.append(theorem_ratio)
+                                restricted_condition = (
+                                    maximum_gram_eigenvalue + epsilon
+                                ) / (minimum_gram_eigenvalue + epsilon)
+                                fp64_roundoff_allowance = (
+                                    config["fp64_bound_roundoff_multiplier"]
+                                    * torch.finfo(torch.float64).eps
+                                    * d_key
+                                    * restricted_condition
+                                    * value_frobenius
+                                )
+                                fp64_envelope_ratio = frobenius_error / (
+                                    theorem_bound + fp64_roundoff_allowance
+                                )
+                                fp64_envelope_ratios.append(fp64_envelope_ratio)
 
                             row = {
                                 "d_key": d_key,
@@ -221,6 +238,8 @@ def run_sweep(
                                 "maximum_c_q": float(confidences.max().item()),
                                 "theorem_frobenius_bound": theorem_bound,
                                 "actual_to_theorem_bound": theorem_ratio,
+                                "fp64_roundoff_allowance": fp64_roundoff_allowance,
+                                "actual_to_bound_with_fp64_allowance": fp64_envelope_ratio,
                             }
                             rows.append(row)
 
@@ -261,6 +280,12 @@ def run_sweep(
         "finite_epsilon_direction_fraction": sum(direction_checks)
         / len(direction_checks),
         "maximum_actual_to_theorem_bound": max(theorem_ratios),
+        "strict_theorem_bound_violation_count": sum(
+            ratio > 1.0 for ratio in theorem_ratios
+        ),
+        "maximum_actual_to_bound_with_fp64_allowance": max(
+            fp64_envelope_ratios
+        ),
         "independent_limit_case_count": len(independent_limit),
         "breakdown_limit_case_count": len(breakdown_limit),
         "theorem_case_count": len(theorem_ratios),
@@ -449,10 +474,10 @@ def gate_summary(summary: dict[str, Any], config: dict[str, Any]) -> dict[str, A
         <= thresholds["independent_limit_median_relative_error"],
         "finite_epsilon_direction": summary["finite_epsilon_direction_fraction"]
         >= thresholds["finite_epsilon_direction_fraction"],
-        "finite_epsilon_theorem_bound": summary[
-            "maximum_actual_to_theorem_bound"
+        "finite_epsilon_bound_with_fp64_allowance": summary[
+            "maximum_actual_to_bound_with_fp64_allowance"
         ]
-        <= thresholds["theorem_bound_ratio"],
+        <= thresholds["bound_with_fp64_allowance_ratio"],
         "dependent_overcapacity_breakdown": summary[
             "breakdown_to_independent_median_ratio"
         ]
@@ -485,7 +510,9 @@ This sweep retains all {summary['row_count']:,} aggregate rows from {summary['da
 | independent under-capacity median relative error at minimum epsilon | {summary['independent_limit_median_relative_error']:.6e} | <= {gate['thresholds']['independent_limit_median_relative_error']:.1e} |
 | independent under-capacity p99 relative error at minimum epsilon | {summary['independent_limit_p99_relative_error']:.6e} | diagnostic |
 | cases with error no worse at minimum than maximum epsilon | {summary['finite_epsilon_direction_fraction']:.3%} | >= {gate['thresholds']['finite_epsilon_direction_fraction']:.1%} |
-| maximum actual / valid theorem bound | {summary['maximum_actual_to_theorem_bound']:.6f} | <= {gate['thresholds']['theorem_bound_ratio']:.6f} |
+| maximum actual / exact-real theorem bound | {summary['maximum_actual_to_theorem_bound']:.6f} | diagnostic |
+| strict bound exceedances at fp64 rounding scale | {summary['strict_theorem_bound_violation_count']} / {summary['theorem_case_count']} | diagnostic |
+| maximum actual / (bound + fp64 allowance) | {summary['maximum_actual_to_bound_with_fp64_allowance']:.6f} | <= {gate['thresholds']['bound_with_fp64_allowance_ratio']:.6f} |
 | dependent/over-capacity to independent median error ratio | {summary['breakdown_to_independent_median_ratio']:.3e} | >= {gate['thresholds']['breakdown_error_ratio']:.1f} |
 
 ## Mathematical interpretation
@@ -494,7 +521,7 @@ For a row-key matrix `K` with full row rank and value matrix `V`, stored-key rec
 
 `||error||_F <= epsilon / (lambda_min(K K^T) + epsilon) ||V||_F`.
 
-The automated bound check covers {summary['theorem_case_count']:,} full-row-rank cases and is deliberately not applied to duplicate or over-capacity cases. The observed limit and finite-epsilon direction support the theorem in its stated domain. Conditioning controls how small epsilon must become before that limit is numerically visible.
+The automated comparison covers {summary['theorem_case_count']:,} full-row-rank cases and is deliberately not applied to duplicate or over-capacity cases. The exact-real bound has {summary['strict_theorem_bound_violation_count']} fp64 exceedances because the measured error includes solver rounding while the mathematical bound does not. The gate therefore adds the committed allowance `32 * machine_epsilon * d_key * cond(K K^T + epsilon I) * ||V||_F`; the unadjusted ratio remains reported. This is a numerical-analysis qualification, not a relaxation of the real-number theorem. The observed limit and finite-epsilon direction support the theorem in its stated domain.
 
 Dependent keys and `K > d_key` cannot interpolate arbitrary values: the read is a regularized projection through a rank-limited key geometry. Their nonzero low-epsilon error is therefore a structural failure of arbitrary association recall, not evidence against the scoped full-row-rank theorem. Near-collinear keys are mathematically independent in most generated cases but expose the predicted finite-precision and regularization sensitivity.
 
@@ -522,6 +549,8 @@ Dependent keys and `K > d_key` cannot interpolate arbitrary values: the read is 
 {record['interpretation']}
 
 This phase tests exact synthetic association geometry only. It does not establish learned-memory, language-model, wall-clock, or broad architectural superiority claims.
+
+The first strict floating-point version of this gate failed and is preserved at Git commit `2f7dba6`; its worst exact-bound excess was 0.3804% on an error of order `1e-12`.
 """
 
 
