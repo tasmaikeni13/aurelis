@@ -56,6 +56,7 @@ theorem negative_coordinate_not_normalized
   rw [hEqual] at this
   linarith
 
+omit [Nonempty ι] in
 /-- A simplex-valued read cannot equal a target having a coordinate above one. -/
 theorem above_one_coordinate_not_normalized
     (weight target : ι → ℝ) (hNonneg : ∀ index, 0 ≤ weight index)
