@@ -542,7 +542,7 @@ def main() -> int:
     device = select_device(config["device"])
     started = time.perf_counter()
     if device.type == "cuda":
-        torch.cuda.reset_peak_memory_stats(device)
+        torch.cuda.reset_peak_memory_stats()
     rows, summary = run_sweep(config, device)
     plots = make_plots(rows, config, args.plots)
     gate = gate_summary(summary, config)
@@ -566,7 +566,7 @@ def main() -> int:
         },
         "wall_clock_seconds": time.perf_counter() - started,
         "peak_vram_bytes": (
-            torch.cuda.max_memory_allocated(device) if device.type == "cuda" else 0
+            torch.cuda.max_memory_allocated() if device.type == "cuda" else 0
         ),
         "summary": summary,
         "plots": plots,
