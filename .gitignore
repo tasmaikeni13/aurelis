@@ -7,8 +7,6 @@ __pycache__/
 .lake/
 lake-packages/
 lean/.lake/
-lean/lake-manifest.json
 dist/
 build/
 *.egg-info/
-
