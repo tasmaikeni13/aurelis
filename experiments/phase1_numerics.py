@@ -476,7 +476,7 @@ def render_report(record: dict[str, Any]) -> str:
         f"| {item['case']} | {item['finite_state']} | {item['finite_read']} | {item['minimum_eigenvalue']:.3e} |"
         for item in metrics["pathologies"]
     )
-    plots = "\n".join(f"- [`{Path(path).name}`](../../{path})" for path in record["plots"])
+    plots = "\n".join(f"- [`{Path(path).name}`](../{path})" for path in record["plots"])
     return f"""# Phase 1 report
 
 ## Gate decision: {status}
@@ -517,13 +517,13 @@ The test suite additionally covers lambda=1, lambda<1, tiny epsilon with a well-
 
 - git commit tested: `{record['git_commit']}`
 - working tree dirty at run time: `{record['working_tree_dirty']}`
-- config: [`configs/phase1_reference.json`](../../configs/phase1_reference.json)
+- config: [`configs/phase1_reference.json`](../configs/phase1_reference.json)
 - seeds: `{record['config']['seeds']}` plus fixed per-experiment seeds recorded in source
 - hardware: `{record['hardware']}`
 - software: Python `{record['software']['python']}`, PyTorch `{record['software']['torch']}`, HIP `{record['software']['hip']}`
 - wall-clock time: `{record['wall_clock_seconds']:.3f}` seconds
 - peak allocated VRAM: `{record['peak_vram_bytes'] / 2**30:.6f}` GiB
-- machine-readable metrics: [`phase1_metrics.json`](../phase1_metrics.json)
+- machine-readable metrics: [`phase1_metrics.json`](phase1_metrics.json)
 
 ## Interpretation
 
@@ -545,6 +545,7 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_arguments()
+    source_working_tree_dirty = bool(git_output(["status", "--porcelain"]))
     config = json.loads(args.config.read_text())
     device = select_device(config["device"])
     started = time.perf_counter()
@@ -565,7 +566,7 @@ def main() -> int:
     record = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "git_commit": git_output(["rev-parse", "HEAD"]),
-        "working_tree_dirty": bool(git_output(["status", "--porcelain"])),
+        "working_tree_dirty": source_working_tree_dirty,
         "config_path": str(args.config),
         "config": config,
         "seed": config["seeds"],
