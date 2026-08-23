@@ -2,7 +2,7 @@
 
 ## Objective and scope
 
-The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. No language model, learned encoder, optimized scan, dyadic cascade, or approximate inverse belongs in these phases.
+The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. Phase 2 attacks interpolation, conditioning, and capacity; Phase 3 compares auditable baselines under dimension and byte fairness. No language model, learned encoder, optimized scan, dyadic cascade, or approximate inverse belongs in these phases.
 
 ## Dependency graph
 
@@ -19,9 +19,15 @@ P0-C record schema/risks ───┘                 │
                                              v
                                   P1 gate: equations agree
                                              │
+                                             v
+                              P2 interpolation/capacity gate
+                                             │
+                                             v
+                               P3 fair-baseline separation
+                                             │
                     ┌────────────────────────┴──────────────────────┐
                     v                                               v
-        future synthetic claim suite                    future learned-memory suite
+       remaining synthetic claim suite                  future learned-memory suite
                     └────────────────────────┬──────────────────────┘
                                              v
                              synthetic + learned gates both pass
@@ -30,7 +36,7 @@ P0-C record schema/risks ───┘                 │
                                   NLP-scale work may be proposed
 ```
 
-Only the graph through the Phase 1 gate is executed in the current scope. The downstream nodes are shown solely to make the hard dependency explicit.
+The graph through the Phase 3 gate is executed in the current scope. The remaining downstream nodes are shown solely to make the hard dependency explicit.
 
 ## Gates
 
@@ -53,9 +59,25 @@ Only the graph through the Phase 1 gate is executed in the current scope. The do
 - `results/phase1_report.md`, CSV metrics, JSON record, and plots are generated from one pinned config.
 - Lean build passes for its declared proof coverage. Lean-incomplete claims remain labeled unproved rather than failed.
 
+### Phase 2 pass gate
+
+- Full-row-rank recall visibly approaches interpolation as epsilon decreases.
+- The finite-epsilon bound is compared only in its valid domain, with exact-real and fp64 effects distinguished.
+- Dependent and over-capacity breakdown is retained, measurable, and explained through rank.
+- All dimensions, loads, seeds, key/value regimes, quantiles, worst cases, and required plots are recorded.
+
+### Phase 3 pass gate
+
+- Hebbian, explicit softmax, positive-feature linear attention, and least-squares oracle baselines are equation-tested.
+- Same-dimension and equal-state-byte regimes are both reported.
+- A fidelity separation survives equal-byte comparison in a clearly characterized regime.
+- Random, correlated, near-collision, capacity, epsilon, and value-dimension sweeps are retained.
+- Positive, negative, above-one, and nonunit-sum linear-functional queries are tested against convex-hull lower bounds.
+- FLOPs, state bytes, reasonable latency diagnostics, and regimes with no CSM win are reported.
+
 ### Non-negotiable NLP gate
 
-**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and a later learned-memory gate pass.** A Phase 1 pass is necessary but not sufficient.
+**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and a later learned-memory gate pass.** Phase 3 is still synthetic and unlearned, so its pass is not sufficient.
 
 ## Determinism policy
 
@@ -87,7 +109,8 @@ Only the graph through the Phase 1 gate is executed in the current scope. The do
 ```bash
 scripts/bootstrap.sh
 scripts/run_phase01.sh
+.venv/bin/python experiments/phase2_interpolation.py
+.venv/bin/python experiments/phase3_baseline_separation.py
 ```
 
-The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order.
-
+The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order. The final two commands reproduce the separately gated Phase 2 and Phase 3 records.

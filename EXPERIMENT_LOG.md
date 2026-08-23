@@ -85,3 +85,20 @@ Machine-readable record: [`results/phase1_metrics.json`](results/phase1_metrics.
 - interpretation: Phase 2 supports full-row-rank interpolation and the finite-epsilon direction in its scoped synthetic domain, and clearly exposes rank-limited failure for dependent/over-capacity associations. It does not establish baseline superiority or learned/NLP performance.
 
 Machine-readable record: [`results/phase2_metrics.json`](results/phase2_metrics.json). Human report: [`results/phase2_interpolation_report.md`](results/phase2_interpolation_report.md).
+
+### P3-BASELINE-SEPARATION-20260823 — PASS
+
+- timestamp UTC: `2026-08-23T16:33:24.974687+00:00`
+- git commit: `e1c592feb09dc769477b3e8fd566ac07a55e9e0e`; the preceding complete passing output set is also preserved at that checkpoint
+- working tree dirty: `false` at experiment start
+- config: `configs/phase3_baselines.json`, with all resolved values embedded in `results/phase3_metrics.json`
+- seeds: `[0,1,2]`, deterministically mixed with dimensions and regime indices
+- hardware: AMD Instinct MI300X VF
+- software versions: Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- wall-clock time: 23.320 seconds
+- peak VRAM: 135,595,008 bytes (0.126283 GiB allocated)
+- metrics: 17,010 recall rows, 900 linear-functional rows, and 15 latency rows; correlated compressed-baseline/CSM median error ratio `2.427e6`; equal-byte nonconvex CSM median absolute error `1.399e-7`; softmax/CSM median separation `4.496e6`; convex-hull checks exact within `2.220e-16`
+- plots: `plots/phase3/recall_vs_load_same_dimension.png`, `recall_vs_load_equal_state_budget.png`, `csm_epsilon_sweep.png`, `linear_functional_separation.png`, `prepared_read_latency.png`
+- interpretation: **PASS with important no-win regimes.** CSM separates from compressed Hebbian/linear memories on correlated keys and from normalized softmax on equal-byte nonconvex linear functionals. Oracle-tuned explicit softmax and least squares match or beat CSM on stored-key recall; the reference CSM read is also much slower in the recorded prepared-read latency diagnostic. No universal superiority is claimed.
+
+Machine-readable record: [`results/phase3_metrics.json`](results/phase3_metrics.json). Human report: [`results/phase3_baseline_separation.md`](results/phase3_baseline_separation.md).

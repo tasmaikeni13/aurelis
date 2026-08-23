@@ -1,6 +1,6 @@
 # Lean 4 formalization
 
-This directory certifies the algebraic core used by Phase 0/1. It is intentionally narrower than the manuscript: empirical claims, complexity claims, statistical model adequacy, and prose-level novelty claims are not converted into theorems merely by compiling this project.
+This directory certifies the algebraic core used by Phases 0–3, including the normalized-softmax obstruction used in Phase 3. It is intentionally narrower than the manuscript: empirical claims, complexity claims, statistical model adequacy, matrix-norm numerical bounds, and prose-level novelty claims are not converted into theorems merely by compiling this project.
 
 Pinned toolchain: Lean 4.19.0 and mathlib 4.19.0.
 
@@ -18,4 +18,3 @@ lake build
 - An incomplete formalization is labeled incomplete; it is never reported as a failed theorem.
 
 See [`PROOF_COVERAGE.md`](PROOF_COVERAGE.md) for the theorem-to-manuscript map and scope.
-

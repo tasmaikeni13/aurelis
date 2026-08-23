@@ -42,6 +42,28 @@ The table aggregates the minimum-epsilon, at-or-below-capacity cases under the e
 
 The solver has a reproducible fidelity advantage over the compressed Hebbian and positive-feature linear-attention states for correlated keys. It does **not** dominate explicit retrieval: for random independent stored-key recall, median errors are CSM `4.438e-08`, oracle-tuned softmax `0.000e+00`, and least squares `7.800e-16`. At `K <= d_key`, explicit softmax fits the equal budget and is often the better stored-key mechanism. Above capacity, arbitrary-value recall fails for CSM and the least-squares projection, while budgeted explicit methods also omit pairs; no broad winner is claimed there.
 
+### Value-dimension sweep
+
+The following isolates correlated keys at or below capacity, minimum epsilon, and the equal state-byte budget. All three committed value dimensions are reported rather than averaged away.
+
+| d_value | method | median error | p90 error |
+| --- | ---: | ---: | ---: |
+| 4 | csm | 4.591e-07 | 3.964e-05 |
+| 4 | hebbian | 3.697e+00 | 6.172e+00 |
+| 4 | least_squares | 1.010e-14 | 2.285e-13 |
+| 4 | linear_attention | 9.739e-01 | 9.947e-01 |
+| 4 | softmax | 0.000e+00 | 0.000e+00 |
+| 16 | csm | 3.829e-07 | 8.707e-05 |
+| 16 | hebbian | 3.805e+00 | 6.877e+00 |
+| 16 | least_squares | 1.115e-14 | 6.803e-13 |
+| 16 | linear_attention | 9.667e-01 | 9.895e-01 |
+| 16 | softmax | 0.000e+00 | 0.000e+00 |
+| 64 | csm | 4.018e-07 | 7.666e-05 |
+| 64 | hebbian | 3.519e+00 | 6.101e+00 |
+| 64 | least_squares | 1.087e-14 | 5.834e-13 |
+| 64 | linear_attention | 9.714e-01 | 9.904e-01 |
+| 64 | softmax | 0.000e+00 | 0.000e+00 |
+
 ## Linear-functional separation
 
 Values are the standard basis, so the target is exactly `alpha`. Every normalized softmax output is therefore a simplex point. Negative coefficients, coefficients above one, and sums other than one put the target outside that convex hull; their Euclidean simplex-projection distance is a method-independent lower bound on softmax error. CSM and least squares can instead produce signed linear-span coefficients.
@@ -77,11 +99,11 @@ The following is the `d_key=64`, `d_value=16`, `K=64` prepared-read measurement.
 
 | method | state bytes | estimated FLOPs/query | measured us/query |
 | --- | ---: | ---: | ---: |
-| csm | 40960 | 10240 | 3.445 |
-| hebbian | 8192 | 2048 | 0.085 |
-| softmax | 40960 | 10560 | 0.158 |
-| linear_attention | 8704 | 2256 | 0.186 |
-| least_squares | 40960 | 10240 | 0.112 |
+| csm | 40960 | 10240 | 3.399 |
+| hebbian | 8192 | 2048 | 0.088 |
+| softmax | 40960 | 10560 | 0.167 |
+| linear_attention | 8704 | 2256 | 0.196 |
+| least_squares | 40960 | 10240 | 0.117 |
 
 ## Plots
 
@@ -93,13 +115,13 @@ The following is the `d_key=64`, `d_value=16`, `K=64` prepared-read measurement.
 
 ## Reproducibility
 
-- git source checkpoint: `b9b13a39739700192c0055f11e5ff9eeed905b3b`
+- git source checkpoint: `e1c592feb09dc769477b3e8fd566ac07a55e9e0e`
 - working tree dirty at experiment start: `False`
 - config: [`configs/phase3_baselines.json`](../configs/phase3_baselines.json)
 - seeds: `[0, 1, 2]`; deterministic regime-specific mixing is in source
 - hardware: `AMD Instinct MI300X VF`
 - software: Python `3.12.3`, PyTorch `2.8.0+rocm7.0.2.git245bf6ed`, HIP `7.0.51831-7c9236b16`, NumPy `2.3.2`
-- wall-clock time: `23.553` seconds
+- wall-clock time: `23.320` seconds
 - peak allocated VRAM: `0.126283` GiB
 - complete recall rows: [`phase3/associative_recall.csv`](phase3/associative_recall.csv)
 - complete linear-functional rows: [`phase3/linear_functional.csv`](phase3/linear_functional.csv)

@@ -290,7 +290,7 @@
       "nonconvex_softmax_to_csm_error_ratio": 10000.0
     }
   },
-  "git_commit": "b9b13a39739700192c0055f11e5ff9eeed905b3b",
+  "git_commit": "e1c592feb09dc769477b3e8fd566ac07a55e9e0e",
   "hardware": "AMD Instinct MI300X VF",
   "interpretation": "A solver fidelity advantage survives the equal-state-byte comparison in the stated correlated compressed-memory and nonconvex linear-functional regimes. Explicit softmax and least squares match or beat CSM in important stored-key regimes, so the result is a separation, not universal superiority.",
   "latency": [
@@ -299,7 +299,7 @@
       "d_key": 16,
       "d_value": 16,
       "estimated_flops_per_query": 1024,
-      "median_microseconds_per_query": 3.062099609375,
+      "median_microseconds_per_query": 2.94517578125,
       "method": "csm",
       "state_bytes": 4096
     },
@@ -308,7 +308,7 @@
       "d_key": 16,
       "d_value": 16,
       "estimated_flops_per_query": 512,
-      "median_microseconds_per_query": 0.078466796875,
+      "median_microseconds_per_query": 0.083091796875,
       "method": "hebbian",
       "state_bytes": 2048
     },
@@ -317,7 +317,7 @@
       "d_key": 16,
       "d_value": 16,
       "estimated_flops_per_query": 1104,
-      "median_microseconds_per_query": 0.15213671875,
+      "median_microseconds_per_query": 0.16403125,
       "method": "softmax",
       "state_bytes": 4096
     },
@@ -326,7 +326,7 @@
       "d_key": 16,
       "d_value": 16,
       "estimated_flops_per_query": 576,
-      "median_microseconds_per_query": 0.2055,
+      "median_microseconds_per_query": 0.194994140625,
       "method": "linear_attention",
       "state_bytes": 2176
     },
@@ -335,7 +335,7 @@
       "d_key": 16,
       "d_value": 16,
       "estimated_flops_per_query": 1024,
-      "median_microseconds_per_query": 0.11325390625,
+      "median_microseconds_per_query": 0.105880859375,
       "method": "least_squares",
       "state_bytes": 4096
     },
@@ -344,7 +344,7 @@
       "d_key": 32,
       "d_value": 16,
       "estimated_flops_per_query": 3072,
-      "median_microseconds_per_query": 3.071326171875,
+      "median_microseconds_per_query": 3.050935546875,
       "method": "csm",
       "state_bytes": 12288
     },
@@ -353,7 +353,7 @@
       "d_key": 32,
       "d_value": 16,
       "estimated_flops_per_query": 1024,
-      "median_microseconds_per_query": 0.0846953125,
+      "median_microseconds_per_query": 0.085064453125,
       "method": "hebbian",
       "state_bytes": 4096
     },
@@ -362,7 +362,7 @@
       "d_key": 32,
       "d_value": 16,
       "estimated_flops_per_query": 3232,
-      "median_microseconds_per_query": 0.16633203125,
+      "median_microseconds_per_query": 0.16446484375,
       "method": "softmax",
       "state_bytes": 12288
     },
@@ -371,7 +371,7 @@
       "d_key": 32,
       "d_value": 16,
       "estimated_flops_per_query": 1136,
-      "median_microseconds_per_query": 0.20258984375,
+      "median_microseconds_per_query": 0.197498046875,
       "method": "linear_attention",
       "state_bytes": 4352
     },
@@ -380,7 +380,7 @@
       "d_key": 32,
       "d_value": 16,
       "estimated_flops_per_query": 3072,
-      "median_microseconds_per_query": 0.111033203125,
+      "median_microseconds_per_query": 0.111408203125,
       "method": "least_squares",
       "state_bytes": 12288
     },
@@ -389,7 +389,7 @@
       "d_key": 64,
       "d_value": 16,
       "estimated_flops_per_query": 10240,
-      "median_microseconds_per_query": 3.44499609375,
+      "median_microseconds_per_query": 3.39922265625,
       "method": "csm",
       "state_bytes": 40960
     },
@@ -398,7 +398,7 @@
       "d_key": 64,
       "d_value": 16,
       "estimated_flops_per_query": 2048,
-      "median_microseconds_per_query": 0.084771484375,
+      "median_microseconds_per_query": 0.087705078125,
       "method": "hebbian",
       "state_bytes": 8192
     },
@@ -407,7 +407,7 @@
       "d_key": 64,
       "d_value": 16,
       "estimated_flops_per_query": 10560,
-      "median_microseconds_per_query": 0.15831640625,
+      "median_microseconds_per_query": 0.166984375,
       "method": "softmax",
       "state_bytes": 40960
     },
@@ -416,7 +416,7 @@
       "d_key": 64,
       "d_value": 16,
       "estimated_flops_per_query": 2256,
-      "median_microseconds_per_query": 0.185841796875,
+      "median_microseconds_per_query": 0.19644921875,
       "method": "linear_attention",
       "state_bytes": 8704
     },
@@ -425,7 +425,7 @@
       "d_key": 64,
       "d_value": 16,
       "estimated_flops_per_query": 10240,
-      "median_microseconds_per_query": 0.112208984375,
+      "median_microseconds_per_query": 0.116580078125,
       "method": "least_squares",
       "state_bytes": 40960
     }
@@ -1001,7 +1001,114 @@
     "python": "3.12.3",
     "torch": "2.8.0+rocm7.0.2.git245bf6ed"
   },
-  "timestamp_utc": "2026-08-23T16:29:00.010369+00:00",
-  "wall_clock_seconds": 23.552574202999494,
+  "timestamp_utc": "2026-08-23T16:33:24.974687+00:00",
+  "value_dimension_summary": [
+    {
+      "case_count": 36,
+      "d_value": 4,
+      "median_relative_error": 4.5913067901212505e-07,
+      "method": "csm",
+      "p90_relative_error": 3.963759477523346e-05
+    },
+    {
+      "case_count": 36,
+      "d_value": 4,
+      "median_relative_error": 3.6966241847300476,
+      "method": "hebbian",
+      "p90_relative_error": 6.171687232357026
+    },
+    {
+      "case_count": 36,
+      "d_value": 4,
+      "median_relative_error": 1.0098011595016326e-14,
+      "method": "least_squares",
+      "p90_relative_error": 2.2851932303851564e-13
+    },
+    {
+      "case_count": 36,
+      "d_value": 4,
+      "median_relative_error": 0.9739178638260805,
+      "method": "linear_attention",
+      "p90_relative_error": 0.9947183916080945
+    },
+    {
+      "case_count": 36,
+      "d_value": 4,
+      "median_relative_error": 0.0,
+      "method": "softmax",
+      "p90_relative_error": 0.0
+    },
+    {
+      "case_count": 36,
+      "d_value": 16,
+      "median_relative_error": 3.8288141641896293e-07,
+      "method": "csm",
+      "p90_relative_error": 8.706629605167266e-05
+    },
+    {
+      "case_count": 36,
+      "d_value": 16,
+      "median_relative_error": 3.8045483494588437,
+      "method": "hebbian",
+      "p90_relative_error": 6.877480982190108
+    },
+    {
+      "case_count": 36,
+      "d_value": 16,
+      "median_relative_error": 1.1150031953373214e-14,
+      "method": "least_squares",
+      "p90_relative_error": 6.802905935425883e-13
+    },
+    {
+      "case_count": 36,
+      "d_value": 16,
+      "median_relative_error": 0.9666669385273539,
+      "method": "linear_attention",
+      "p90_relative_error": 0.9894595399911633
+    },
+    {
+      "case_count": 36,
+      "d_value": 16,
+      "median_relative_error": 0.0,
+      "method": "softmax",
+      "p90_relative_error": 0.0
+    },
+    {
+      "case_count": 36,
+      "d_value": 64,
+      "median_relative_error": 4.018481171211141e-07,
+      "method": "csm",
+      "p90_relative_error": 7.665754521168984e-05
+    },
+    {
+      "case_count": 36,
+      "d_value": 64,
+      "median_relative_error": 3.5189699540422303,
+      "method": "hebbian",
+      "p90_relative_error": 6.101379862498097
+    },
+    {
+      "case_count": 36,
+      "d_value": 64,
+      "median_relative_error": 1.0866604448023111e-14,
+      "method": "least_squares",
+      "p90_relative_error": 5.833564002378842e-13
+    },
+    {
+      "case_count": 36,
+      "d_value": 64,
+      "median_relative_error": 0.9713683000921218,
+      "method": "linear_attention",
+      "p90_relative_error": 0.990377649001162
+    },
+    {
+      "case_count": 36,
+      "d_value": 64,
+      "median_relative_error": 0.0,
+      "method": "softmax",
+      "p90_relative_error": 0.0
+    }
+  ],
+  "wall_clock_seconds": 23.32004583900016,
   "working_tree_dirty": false
 }
