@@ -88,6 +88,25 @@ def test_cholesky_and_general_solve_paths_agree() -> None:
     )
 
 
+def test_random_epsilon_values_preserve_recurrence_agreement() -> None:
+    for seed in range(5):
+        torch.manual_seed(10_000 + seed)
+        log10_epsilon = -8.0 + 7.0 * torch.rand((), dtype=DTYPE).item()
+        epsilon = 10.0**log10_epsilon
+        memory = FP64GaussMarkovMemory(8, 3, epsilon=epsilon)
+        keys, values, beta, decay, query = random_problem(8, 3, steps=9)
+        sequential = memory.run(keys, values, beta, decay)
+        recomputed = recompute_state(keys, values, beta, decay)
+        torch.testing.assert_close(sequential.S, recomputed.S, rtol=2e-14, atol=2e-14)
+        torch.testing.assert_close(sequential.C, recomputed.C, rtol=2e-14, atol=2e-14)
+        torch.testing.assert_close(
+            memory.read(sequential, query),
+            memory.read(recomputed, query),
+            rtol=2e-10,
+            atol=2e-10,
+        )
+
+
 @pytest.mark.parametrize("d_key", [2, 4, 8, 16, 32])
 def test_S_is_numerically_positive_semidefinite(d_key: int) -> None:
     memory = FP64GaussMarkovMemory(d_key, 4)
@@ -124,4 +143,3 @@ def test_generic_reference_can_run_fp32_for_precision_experiments() -> None:
     value = torch.ones(3, dtype=torch.float32)
     written = memory.write(state, key, value, 1.0, 1.0)
     assert memory.read(written, key).dtype is torch.float32
-

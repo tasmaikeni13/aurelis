@@ -1,0 +1,6 @@
+case,finite_state,finite_read,minimum_eigenvalue,read_norm
+repeated_keys,True,True,0.0,2.5769410127898613
+nearly_collinear_tiny_epsilon,True,True,4.999999999999963e-15,2.4975173931079455
+beta_zero,True,True,0.0,0.0
+lambda_below_one_large_beta,True,True,1e+149,3.1622776601683786
+zero_value_single_observation,True,True,0.0,0.0

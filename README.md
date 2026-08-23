@@ -2,6 +2,8 @@
 
 This repository turns the claims in [`conjugate-state-machines.md`](conjugate-state-machines.md) into reproducible tests. The current scope is **Phase 0 and Phase 1 only**: environment characterization and a mathematically transparent fp64 Gauss–Markov memory. It does not contain a language model, learned encoders, the dyadic cascade, or optimized kernels.
 
+Current status: **Phase 0 PASS; Phase 1 PASS** on the recorded MI300X environment. See [`results/phase0_report.md`](results/phase0_report.md) and [`results/phase1_report.md`](results/phase1_report.md). Later gates remain closed.
+
 > **Hard gate:** NO NLP SCALE EXPERIMENT is allowed until both the synthetic-memory gate and the learned-memory gate pass. Phase 1 only addresses the first part of the synthetic-memory program and does not unlock NLP experiments.
 
 ## Reproduce on the ROCm host
