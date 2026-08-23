@@ -53,3 +53,35 @@ interpretation: scoped conclusion, failures, and non-conclusions
 - interpretation: Phase 1 reference equations pass their configured fp64 gate. This does not validate learned memory, kernel performance, the cascade, NLP, or claims beyond the measured/formalized subset.
 
 Machine-readable record: [`results/phase1_metrics.json`](results/phase1_metrics.json). Human report: [`results/phase1_report.md`](results/phase1_report.md).
+
+### P2-INTERPOLATION-STRICT-20260823 — FAIL
+
+- timestamp UTC: `2026-08-23T16:08:25.972587+00:00`
+- git commit: `d35e29768dbe689fa427b5abc107860e7ff37100`; complete failed outputs preserved at commit `2f7dba6`
+- working tree dirty: `false` at experiment start
+- config: the initial committed `configs/phase2_interpolation.json`; same full grid as the corrected run
+- seeds: `[0,1,2]`, deterministically mixed with dimensions and regime indices
+- hardware: AMD Instinct MI300X VF
+- software versions: Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- wall-clock time: 151.392 seconds
+- peak VRAM: 135,920,128 bytes (0.126585 GiB allocated)
+- metrics: 12,600 rows / 1,800 datasets; three of four gates passed; maximum measured-error / exact-real-bound ratio `1.003804` exceeded the strict `1.000100` fp64 threshold
+- plots: the five Phase 2 plot paths at commit `2f7dba6`
+- interpretation: **FAIL retained.** The strict gate compared a floating-point Cholesky result with an exact-real theorem bound. Its worst excess was about `1.5e-14` absolute on an error of order `1e-12`; this diagnosed a missing numerical-roundoff qualification, not a counterexample to the inequality.
+
+### P2-INTERPOLATION-20260823 — PASS
+
+- timestamp UTC: `2026-08-23T16:13:29.098769+00:00`
+- git commit: `3862d607f306830db1f558fcc4d5738ace0253f7`
+- working tree dirty: `false` at experiment start
+- config: `configs/phase2_interpolation.json`, with all resolved values embedded in `results/phase2_metrics.json`
+- seeds: `[0,1,2]`, deterministically mixed with dimensions and regime indices
+- hardware: AMD Instinct MI300X VF
+- software versions: Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- wall-clock time: 150.704 seconds
+- peak VRAM: 135,920,128 bytes (0.126585 GiB allocated)
+- metrics: 12,600 rows / 1,800 datasets; under-capacity independent median low-epsilon error `2.214321e-12`; p99 `6.195306e-8`; epsilon direction `100%`; 672/6,363 exact-bound comparisons exceeded only at fp64 scale; maximum ratio after the committed conditioning-scaled allowance `0.9999999999998866`; dependent/over-capacity median error separation `3.034e11`
+- plots: `plots/phase2/error_vs_epsilon.png`, `error_vs_load.png`, `error_vs_min_gram_eigenvalue.png`, `confidence_vs_error.png`, `load_conditioning_heatmap.png`
+- interpretation: Phase 2 supports full-row-rank interpolation and the finite-epsilon direction in its scoped synthetic domain, and clearly exposes rank-limited failure for dependent/over-capacity associations. It does not establish baseline superiority or learned/NLP performance.
+
+Machine-readable record: [`results/phase2_metrics.json`](results/phase2_metrics.json). Human report: [`results/phase2_interpolation_report.md`](results/phase2_interpolation_report.md).

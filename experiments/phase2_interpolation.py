@@ -296,7 +296,9 @@ def run_sweep(
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(
+            handle, fieldnames=list(rows[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -601,7 +603,7 @@ def main() -> int:
         "plots": plots,
         "gate": gate,
         "interpretation": (
-            "Within the stated full-row-rank domain, recall approaches exact interpolation as epsilon decreases and respects the finite-epsilon bound. Dependent and over-capacity geometries show the expected measurable rank-limited breakdown."
+            "Within the stated full-row-rank domain, recall approaches exact interpolation as epsilon decreases and matches the finite-epsilon bound up to the declared fp64 allowance. Dependent and over-capacity geometries show the expected measurable rank-limited breakdown."
             if gate["passed"]
             else "At least one Phase 2 criterion failed. The raw record is retained; the affected mathematical or empirical claim must be narrowed or corrected before relying on it."
         ),
