@@ -149,6 +149,37 @@ class GaussMarkovMemory(nn.Module):
             )
         return state
 
+    def undiscounted_state(
+        self,
+        keys: Tensor,
+        values: Tensor,
+        beta: Tensor | None = None,
+    ) -> CSMState:
+        """Construct the exact ``lambda=1`` state with dense products.
+
+        This is the vectorized form of repeated :meth:`write` calls and is used
+        by the synthetic sweeps. It changes only evaluation order, not the
+        sufficient statistics.
+        """
+
+        if keys.ndim != 2 or keys.shape[1] != self.d_key:
+            raise ValueError(f"keys must have shape [K, {self.d_key}]")
+        associations = keys.shape[0]
+        if values.shape != (associations, self.d_value):
+            raise ValueError(
+                f"values must have shape [{associations}, {self.d_value}]"
+            )
+        if keys.dtype != self.dtype or values.dtype != self.dtype:
+            raise TypeError(f"keys and values must use {self.dtype}")
+        if beta is None:
+            beta = torch.ones(
+                associations, dtype=self.dtype, device=keys.device
+            )
+        if beta.shape != (associations,):
+            raise ValueError("beta must have shape [K]")
+        weighted_keys = beta.unsqueeze(-1) * keys
+        return CSMState(S=keys.mT @ weighted_keys, C=values.mT @ weighted_keys)
+
     def system_matrix(self, state: CSMState) -> Tensor:
         _validate_state(state, self.d_key, self.d_value)
         identity = torch.eye(self.d_key, dtype=state.S.dtype, device=state.S.device)
@@ -175,6 +206,28 @@ class GaussMarkovMemory(nn.Module):
     ) -> tuple[Tensor, Tensor]:
         solved = self.solve(state, query)
         return state.C @ solved, torch.dot(query, solved)
+
+    def read_many_with_confidence(
+        self, state: CSMState, queries: Tensor
+    ) -> tuple[Tensor, Tensor]:
+        """Read ``[Q,d_key]`` queries using one shared factorization."""
+
+        if queries.ndim != 2 or queries.shape[1] != self.d_key:
+            raise ValueError(f"queries must have shape [Q, {self.d_key}]")
+        A = self.system_matrix(state)
+        if self.solve_method == "cholesky":
+            factor = torch.linalg.cholesky(A)
+            solved = torch.cholesky_solve(queries.mT, factor).mT
+        elif self.solve_method == "solve":
+            solved = torch.linalg.solve(A, queries.mT).mT
+        else:  # constructor validation makes this defensive only
+            raise ValueError(f"unknown solve method: {self.solve_method}")
+        reads = solved @ state.C.mT
+        confidence = torch.einsum("qd,qd->q", queries, solved)
+        return reads, confidence
+
+    def read_many(self, state: CSMState, queries: Tensor) -> Tensor:
+        return self.read_many_with_confidence(state, queries)[0]
 
 
 class FP64GaussMarkovMemory(GaussMarkovMemory):
@@ -254,4 +307,3 @@ def direct_inverse_oracle(
     inverse = torch.linalg.inv(state.S + epsilon * identity)
     solved = inverse @ query
     return state.C @ solved, torch.dot(query, solved)
-

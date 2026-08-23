@@ -1,0 +1,26 @@
+{
+  "device": "auto",
+  "key_dimensions": [8, 16, 32, 64, 128],
+  "loads": [0.125, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0],
+  "epsilons": [1e-12, 1e-10, 1e-08, 1e-06, 0.0001, 0.01, 1.0],
+  "seeds": [0, 1, 2],
+  "key_regimes": [
+    "orthogonal",
+    "random_gaussian",
+    "correlated",
+    "near_collinear",
+    "duplicate"
+  ],
+  "value_regimes": ["gaussian", "one_hot", "binary"],
+  "value_dimension": 16,
+  "correlation": 0.9,
+  "near_collinear_noise": 0.001,
+  "exact_relative_tolerance": 0.001,
+  "conditioning_bins_log10": [0, 1, 2, 3, 4, 6, 8, 10, 12, 16],
+  "gate": {
+    "independent_limit_median_relative_error": 0.0005,
+    "finite_epsilon_direction_fraction": 0.95,
+    "theorem_bound_ratio": 1.0001,
+    "breakdown_error_ratio": 100.0
+  }
+}

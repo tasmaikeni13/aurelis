@@ -7,6 +7,7 @@ from .memory import (
     direct_inverse_oracle,
     recompute_state,
 )
+from .synthetic import KEY_REGIMES, VALUE_REGIMES, make_keys, make_values
 
 __all__ = [
     "CSMState",
@@ -14,5 +15,8 @@ __all__ = [
     "GaussMarkovMemory",
     "direct_inverse_oracle",
     "recompute_state",
+    "KEY_REGIMES",
+    "VALUE_REGIMES",
+    "make_keys",
+    "make_values",
 ]
-
