@@ -547,9 +547,10 @@ def main() -> int:
     args = parse_arguments()
     config = json.loads(args.config.read_text())
     device = select_device(config["device"])
+    device_index = device.index if device.index is not None else 0
     started = time.perf_counter()
     if device.type == "cuda":
-        torch.cuda.reset_peak_memory_stats(device)
+        torch.cuda.reset_peak_memory_stats(device_index)
 
     metrics = {
         "recurrence": recurrence_experiment(config, device),
@@ -577,7 +578,7 @@ def main() -> int:
             "numpy": np.__version__,
         },
         "wall_clock_seconds": time.perf_counter() - started,
-        "peak_vram_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else 0,
+        "peak_vram_bytes": torch.cuda.max_memory_allocated(device_index) if device.type == "cuda" else 0,
         "metrics": metrics,
         "plots": plots,
         "gate": gate,
