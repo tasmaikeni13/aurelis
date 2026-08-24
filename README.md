@@ -1,10 +1,10 @@
 # Conjugate State Machines: falsification repository
 
-This repository turns the claims in [`conjugate-state-machines.md`](conjugate-state-machines.md) into reproducible tests. The current completed scope is **Phase 0 through Phase 3**: environment characterization, a mathematically transparent fp64 Gauss–Markov memory, exhaustive finite-epsilon/capacity sweeps, and controlled baseline separation. It does not contain a language model, learned encoders, the dyadic cascade, or optimized kernels.
+This repository turns the claims in [`conjugate-state-machines.md`](conjugate-state-machines.md) into reproducible tests. The current completed scope is **Phase 0 through Phase 5**: environment characterization, a mathematically transparent fp64 Gauss–Markov memory, finite-epsilon/capacity sweeps, controlled baseline separation, noisy-evidence calibration, and multi-hop functional graphs. It does not contain a language model, learned encoders, the dyadic cascade, or optimized kernels.
 
-Current status: **Phase 0 PASS; Phase 1 PASS; Phase 2 PASS; Phase 3 PASS** on the recorded MI300X environment. See [`results/phase0_report.md`](results/phase0_report.md), [`results/phase1_report.md`](results/phase1_report.md), [`results/phase2_interpolation_report.md`](results/phase2_interpolation_report.md), and [`results/phase3_baseline_separation.md`](results/phase3_baseline_separation.md). Later gates remain closed.
+Current status: **Phase 0 PASS; Phase 1 PASS; Phase 2 PASS; Phase 3 PASS; Phase 4 PASS; Phase 5 PASS** on the recorded MI300X environment. See the phase reports under [`results/`](results/). The initial strict Phase 4 selective-risk failure is retained alongside the corrected passing run.
 
-> **Hard gate:** NO NLP SCALE EXPERIMENT is allowed until both the synthetic-memory gate and the learned-memory gate pass. Phases 1–3 remain synthetic and unlearned, so they do not unlock NLP experiments.
+> **Hard gate:** NO NLP SCALE EXPERIMENT is allowed until both the synthetic-memory gate and the learned-memory gate pass. Phases 1–5 remain synthetic and unlearned, so these results do not unlock NLP experiments.
 
 ## Reproduce on the ROCm host
 
@@ -25,6 +25,10 @@ python3 -m venv .venv
   --config configs/phase2_interpolation.json
 .venv/bin/python experiments/phase3_baseline_separation.py \
   --config configs/phase3_baselines.json
+.venv/bin/python experiments/phase4_uncertainty_and_noise.py \
+  --config configs/phase4_uncertainty.json
+.venv/bin/python experiments/phase5_multihop.py \
+  --config configs/phase5_multihop.json
 ```
 
 PyTorch uses the `torch.cuda` API namespace on ROCm. No CUDA toolkit, NVIDIA device, or CUDA-specific package is assumed.
@@ -39,10 +43,14 @@ PyTorch uses the `torch.cuda` API namespace on ROCm. No CUDA toolkit, NVIDIA dev
 - [`experiments/phase1_numerics.py`](experiments/phase1_numerics.py): quantitative Phase 1 experiment and plot generator.
 - [`experiments/phase2_interpolation.py`](experiments/phase2_interpolation.py): complete interpolation, conditioning, and capacity sweep.
 - [`experiments/phase3_baseline_separation.py`](experiments/phase3_baseline_separation.py): same-dimension/equal-byte baseline and linear-functional comparison.
+- [`experiments/phase4_uncertainty_and_noise.py`](experiments/phase4_uncertainty_and_noise.py): noisy duplicates, precision weighting, calibration, OOD queries, and misspecification.
+- [`experiments/phase5_multihop.py`](experiments/phase5_multihop.py): controlled/random functional graphs, adaptive-read baselines, propagation bounds, and systems diagnostics.
 - [`results/phase0_report.md`](results/phase0_report.md): Phase 0 decision report.
 - [`results/phase1_report.md`](results/phase1_report.md): Phase 1 gate evidence.
 - [`results/phase2_interpolation_report.md`](results/phase2_interpolation_report.md): Phase 2 gate evidence, including the retained initial numerical-bound failure.
 - [`results/phase3_baseline_separation.md`](results/phase3_baseline_separation.md): Phase 3 separation, resource, latency, and no-win evidence.
+- [`results/phase4_uncertainty_and_noise.md`](results/phase4_uncertainty_and_noise.md): Phase 4 in-model calibration and outside-model degradation evidence.
+- [`results/phase5_multihop.md`](results/phase5_multihop.md): Phase 5 chained-read accuracy, error attribution, FLOPs, and latency evidence.
 - [`lean/`](lean): Lean 4 proofs of scan/recurrence identities, matrix invariants, ridge-factor properties, and normalized-softmax separation.
 
 ## Interpretation discipline

@@ -2,7 +2,7 @@
 
 ## Objective and scope
 
-The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. Phase 2 attacks interpolation, conditioning, and capacity; Phase 3 compares auditable baselines under dimension and byte fairness. No language model, learned encoder, optimized scan, dyadic cascade, or approximate inverse belongs in these phases.
+The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. Phase 2 attacks interpolation, conditioning, and capacity; Phase 3 compares auditable baselines under dimension and byte fairness; Phase 4 tests noisy evidence and uncertainty; Phase 5 tests chained adaptive reads. No language model, learned encoder, optimized scan, dyadic cascade, or approximate inverse belongs in these phases.
 
 ## Dependency graph
 
@@ -25,6 +25,12 @@ P0-C record schema/risks ───┘                 │
                                              v
                                P3 fair-baseline separation
                                              │
+                                             v
+                              P4 uncertainty/noise calibration
+                                             │
+                                             v
+                              P5 multi-hop functional graphs
+                                             │
                     ┌────────────────────────┴──────────────────────┐
                     v                                               v
        remaining synthetic claim suite                  future learned-memory suite
@@ -36,7 +42,7 @@ P0-C record schema/risks ───┘                 │
                                   NLP-scale work may be proposed
 ```
 
-The graph through the Phase 3 gate is executed in the current scope. The remaining downstream nodes are shown solely to make the hard dependency explicit.
+The graph through the Phase 5 gate is executed in the current scope. The remaining downstream nodes are shown solely to make the hard dependency explicit.
 
 ## Gates
 
@@ -75,9 +81,25 @@ The graph through the Phase 3 gate is executed in the current scope. The remaini
 - Positive, negative, above-one, and nonunit-sum linear-functional queries are tested against convex-hull lower bounds.
 - FLOPs, state bytes, reasonable latency diagnostics, and regimes with no CSM win are reported.
 
+### Phase 4 pass gate
+
+- CSM agrees with independently assembled weighted ridge in the linear-Gaussian setting.
+- Repeated Gaussian observations follow inverse-count risk and known `beta` precision improves heteroscedastic risk.
+- `c(q)` has meaningful Spearman and high-error AUROC, is calibrated in-model, and supports lower-risk selective prediction.
+- Missing and progressively out-of-span directions increase uncertainty.
+- Laplace, Student-like, and nonlinear misspecification rows are retained and described as degradation, never Bayesian-optimality evidence.
+
+### Phase 5 pass gate
+
+- Controlled codes reproduce pointer chasing through `H in {1,2,4,8,16}` against one unchanged state.
+- Per-hop, accumulated, decoded, confidence, conditioning, capacity, epsilon, and operator-norm diagnostics are retained.
+- The full geometric propagation bound is checked; many-to-one amplification above norm one is visible.
+- One-read and equal-adaptive-read softmax comparisons distinguish round count from fidelity.
+- FLOPs and prepared latency are reported separately from the one-layer architectural claim.
+
 ### Non-negotiable NLP gate
 
-**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and a later learned-memory gate pass.** Phase 3 is still synthetic and unlearned, so its pass is not sufficient.
+**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and a later learned-memory gate pass.** Phases 1–5 are still synthetic and unlearned, so their pass is not sufficient.
 
 ## Determinism policy
 
@@ -103,6 +125,10 @@ The graph through the Phase 3 gate is executed in the current scope. The remaini
 | ROCm API is mistaken for CUDA dependency | Portability regression | Use PyTorch’s ROCm `torch.cuda` namespace only; no CUDA toolkit or NVIDIA package. |
 | Performance sanity is marketed as benchmark | Invalid conclusion | Environment GEMM values are health checks, not tuned or comparative results. |
 | Dirty worktree obscures provenance | Irreproducible report | Record tested commit and dirty flag; checkpoint implementation before generated results. |
+| Model-free confidence is called calibrated | Invalid statistical claim | Gate calibration only on prior-matched linear-Gaussian data; retain heavy-tailed and nonlinear degradation separately. |
+| Decoded hop success hides vector drift | False exactness claim | Record vector, accumulated, and nearest-code errors together at every configured hop. |
+| Unit successor codes are assumed contractive | Incorrect `H epsilon_1` bound | Measure the exact small reference operator norm and test many-to-one graphs with `L > 1`. |
+| Adaptive rounds are conflated with runtime | Architectural success marketed as efficiency | Record layer-depth semantics separately from FLOPs and synchronized prepared latency. |
 
 ## Automation
 
@@ -111,6 +137,8 @@ scripts/bootstrap.sh
 scripts/run_phase01.sh
 .venv/bin/python experiments/phase2_interpolation.py
 .venv/bin/python experiments/phase3_baseline_separation.py
+.venv/bin/python experiments/phase4_uncertainty_and_noise.py
+.venv/bin/python experiments/phase5_multihop.py
 ```
 
-The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order. The final two commands reproduce the separately gated Phase 2 and Phase 3 records.
+The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order. The remaining commands reproduce the separately gated Phase 2–5 records.

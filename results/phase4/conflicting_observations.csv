@@ -1,0 +1,4 @@
+method,distance_to_true,distance_to_precision_consensus,first_observation_precision,second_observation_precision
+precision_weighted_csm,1.846153845443787,7.305956436549076e-10,25.0,1.0
+uniform_csm,2.2360679142594682e-09,1.8461538461538463,25.0,1.0
+analytic_precision_consensus,1.8461538461538463,0.0,25.0,1.0

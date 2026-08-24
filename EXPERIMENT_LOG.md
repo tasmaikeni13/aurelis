@@ -102,3 +102,42 @@ Machine-readable record: [`results/phase2_metrics.json`](results/phase2_metrics.
 - interpretation: **PASS with important no-win regimes.** CSM separates from compressed Hebbian/linear memories on correlated keys and from normalized softmax on equal-byte nonconvex linear functionals. Oracle-tuned explicit softmax and least squares match or beat CSM on stored-key recall; the reference CSM read is also much slower in the recorded prepared-read latency diagnostic. No universal superiority is claimed.
 
 Machine-readable record: [`results/phase3_metrics.json`](results/phase3_metrics.json). Human report: [`results/phase3_baseline_separation.md`](results/phase3_baseline_separation.md).
+
+### P4-UNCERTAINTY-STRICT-20260824 — FAIL
+
+- timestamp UTC: initial complete run immediately preceding `2026-08-24T13:18:33.004071+00:00`
+- git commit: `a8ad6e59db43ee61adadf4888d69edcb9ac705c5`; working tree dirty because Phase 4 source and generated outputs were not checkpointed separately
+- config: initial `configs/phase4_uncertainty.json`; selective coverages omitted exact `0.5` and required a risk ratio no larger than `0.4`
+- seeds: `[0..15]` for duplicate/precision sweeps; 48 deterministic specialized confidence trials per model
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- metrics: seven of eight checks passed; the closest retained fraction to one half was `0.6`, with Gaussian selective/full risk ratio `0.4716538778`, above the initial `0.4` threshold
+- interpretation: **FAIL retained.** The mismatch was between the named half-coverage check and a grid that omitted one half. `results/phase4_initial_strict_gate_failure.md` preserves all initial gate measurements and the correction rationale.
+
+### P4-UNCERTAINTY-20260824 — PASS
+
+- timestamp UTC: `2026-08-24T13:25:02.626168+00:00` (final rerun with the ridge oracle assembled independently from raw observations)
+- git commit: `a8ad6e59db43ee61adadf4888d69edcb9ac705c5`; working tree dirty at experiment start
+- config: `configs/phase4_uncertainty.json`, including exact `0.5` selective coverage and all resolved values in `results/phase4_metrics.json`
+- seeds: `[0..15]` plus 48 deterministic confidence trials per data model
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- wall-clock time: 19.907 seconds; peak VRAM: 134,306,816 bytes (0.125083 GiB)
+- metrics: 4,800 duplicate rows, 432 precision rows, 3 conflict rows, 23,040 confidence-query rows; CSM/oracle difference `5.535e-16`; repeat-risk slope `-1.018`; uniform/precision risk `23.206x`; Gaussian Spearman `0.704`; high-error AUROC `0.875`; actual/predicted MSE `0.957`; half/full selective risk `0.404`
+- plots: five Phase 4 plots under `plots/phase4/`, all visually inspected
+- interpretation: **PASS only in-model.** Linear-Gaussian ridge and calibration behavior pass. Laplace, Student-like, and nonlinear results characterize misspecification; no Bayesian optimality is claimed for them.
+
+Machine-readable record: [`results/phase4_metrics.json`](results/phase4_metrics.json). Human report: [`results/phase4_uncertainty_and_noise.md`](results/phase4_uncertainty_and_noise.md).
+
+### P5-MULTIHOP-20260824 — PASS
+
+- timestamp UTC: `2026-08-24T13:20:17.591147+00:00`
+- git commit: `a8ad6e59db43ee61adadf4888d69edcb9ac705c5`; working tree dirty at experiment start
+- config: `configs/phase5_multihop.json`, with all resolved values embedded in `results/phase5_metrics.json`
+- seeds: `[0,1,2]`, deterministically mixed with dimension, edge count, representation, and graph regime
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- wall-clock time: 92.646 seconds; peak VRAM: 135,149,056 bytes (0.125867 GiB)
+- metrics: 12,960 pointer-chasing rows and 90 latency rows; controlled minimum decoded success `1.0`; maximum controlled H=16 vector error `1.600e-7`; maximum propagation-bound relative excess `7.973e-9`; many-to-one operator norm up to `3.0`
+- systems diagnostic: at `d_key=K=64`, H=16 prepared fp64 reference latency was 12,260.259 us for CSM and 522.226 us for repeated explicit softmax at comparable leading FLOPs; no practical-efficiency win is claimed
+- plots: four Phase 5 plots under `plots/phase5/`, all visually inspected
+- interpretation: **PASS architectural gate.** One maintained CSM state supports 16 chained adaptive reads on controlled codes. Random geometry, capacity, epsilon, amplification, and reference runtime failures are retained, and the systems claim remains open.
+
+Machine-readable record: [`results/phase5_metrics.json`](results/phase5_metrics.json). Human report: [`results/phase5_multihop.md`](results/phase5_multihop.md).

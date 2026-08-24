@@ -1,6 +1,6 @@
-# Phase 0–3 completion audit
+# Phase 0–5 completion audit
 
-This audit maps every explicit requirement in `phase0.md` through `phase3.md` to authoritative repository evidence. “Pass” is limited to the current scope.
+This audit maps every explicit requirement in `phase0.md` through `phase5.md` to authoritative repository evidence. “Pass” is limited to the current scope.
 
 ## Phase 0
 
@@ -101,10 +101,70 @@ This audit maps every explicit requirement in `phase0.md` through `phase3.md` to
 | required report | `results/phase3_baseline_separation.md` | PASS |
 | pass gate | four precommitted checks pass; advantage limited to characterized equal-budget regimes | PASS |
 
+## Phase 4
+
+| Requirement | Evidence | Decision |
+|---|---|---|
+| latent linear operators and `v_i = W* k_i + sigma noise` | explicit latent matrices and model-specific value generator in `experiments/phase4_uncertainty_and_noise.py`; 4,800 duplicate rows | PASS |
+| varying observation noise | committed sigma sweep `[0.1,0.5,1.0]`, raw CSV, inspected plot | PASS |
+| repeated same association | repeats `[1,2,4,8,16]`; Gaussian slope `-1.018`; complete per-method rows | PASS |
+| conflicting observations | explicit precisions 25 and 1; three estimator/consensus rows in `conflicting_observations.csv` | PASS |
+| heteroscedastic evidence | three committed variance patterns under Gaussian, Laplace, and Student-like noise | PASS |
+| missing directions in key space | observed rank 8 in a 16-dimensional key space, stated in config/report | PASS |
+| OOD query directions | outside-span components `[0,.25,.5,.75,1]`; 23,040 query rows and inspected plot | PASS |
+| `beta` represents true precision | every heteroscedastic write uses inverse variance; analytic weighted mean comparison error retained | PASS |
+| noisy-duplicate CSM comparison | CSM, simple average, Hebbian, oracle-tuned explicit softmax, and independent ridge all present in raw/summary tables | PASS |
+| CSM matches oracle ridge | maximum relative difference `5.535e-16` | PASS |
+| weighting reduces prediction risk | uniform/precision-weighted Gaussian aggregate risk ratio `23.206` | PASS |
+| record `c(q)` and actual squared error | every confidence-query CSV row has uncertainty, predicted MSE, actual error, normalized error, and coverage | PASS |
+| Spearman uncertainty/error | Gaussian `0.704`; all misspecified values retained | PASS |
+| calibration plots | eight uncertainty-quantile bins per model; raw calibration CSV and visually inspected four-panel plot | PASS |
+| risk conditioned on confidence quantile | calibration and unseen-direction summaries report empirical risk by ordered uncertainty groups | PASS |
+| high-error AUROC | Gaussian `0.875`; threshold definition and all model summaries recorded | PASS |
+| selective prediction | exact retained fractions `[1,.8,.6,.5,.4,.2]`; Gaussian half/full risk ratio `0.404` | PASS |
+| unseen distance increases uncertainty | mean `c(q)` rises `0.1111,0.1667,0.3333,0.6111,1.0`; minimum increment `0.0556` | PASS |
+| exactly linear-Gaussian data | prior-matched Gaussian latent/data generation and 5,760 confidence queries | PASS |
+| Laplace noise | unit-variance Laplace generation, full duplicate/precision/confidence records | PASS |
+| Student-like heavy-tailed noise | standardized Gaussian scale mixture, full records; p95 normalized error `2.559` vs Gaussian `2.302` | PASS |
+| nonlinear latent functions | sinusoidal nonlinear latent term; calibration ratio `1.164` and coverage `0.934` retained | PASS |
+| no outside-model Bayesian claim | report gates only linear-Gaussian rows and explicitly scopes every misspecified interpretation | PASS |
+| initial failed gate retained | `phase4_initial_strict_gate_failure.md` and `EXPERIMENT_LOG.md` preserve the seven-of-eight strict run and correction | PASS |
+| pass gate | eight corrected, requirement-aligned checks pass; in-model behavior and useful confidence established | PASS |
+| required report | `results/phase4_uncertainty_and_noise.md` plus JSON, seven CSV files, and five inspected plots | PASS |
+
+## Phase 5
+
+| Requirement | Evidence | Decision |
+|---|---|---|
+| pointer-chasing / functional graphs | permutation and many-to-one successor maps in every dataset; 12,960 raw hop rows | PASS |
+| one state stores `node -> successor(node)` | values are successor codes; CSM state is constructed once and unchanged for the complete chain | PASS |
+| adaptive recurrence `q_(j+1)=read(q_j)` | reusable `csm_chained_reads` primitive, equation-level tests, and prepared-factor experiment loop | PASS |
+| sweep stored edges and `d_key` | dimensions `[16,32,64]`; loads through `1.5`; exact edge count in every row | PASS |
+| epsilon sweep | `[1e-8,1e-4,1e-2,1e-1]`; inspected accumulation plot | PASS |
+| key conditioning | orthogonal, random, correlation `0.8`, correlation `0.98`; Gram/system condition and coherence retained | PASS |
+| `H in {1,2,4,8,16}` | all values represented for every method/dataset | PASS |
+| `K/d_key` sweep | controlled loads `[.25,.5,1]`; random loads `[.5,1,1.5]`; capacity domain explicit | PASS |
+| controlled orthogonal codes | QR-orthonormal codes restricted to the mathematically feasible `K<=d_key` domain | PASS |
+| random nonorthogonal representations | random normalized and two correlated random regimes; no learned-encoder claim | PASS |
+| success by hop | nearest-cosine decode and success rate in every configured hop row | PASS |
+| per-hop and accumulated error | mean/p90/max endpoint vector error and accumulated prefix error in every row | PASS |
+| operator norms | exact small-reference `||C(S+epsilon I)^-1||_2`, up to `3.0` on controlled many-to-one graphs | PASS |
+| confidence across hops | mean `q^T A^-1 q` in every CSM hop row | PASS |
+| total FLOPs | leading total estimate per row and representative report table | PASS |
+| latency | 90 synchronized prepared fp64 single-query chain measurements across dimensions, geometry, methods, and H | PASS |
+| one softmax access | `softmax_one` performs one access and compares directly with every H-hop target | PASS |
+| equal adaptive softmax reads | `softmax_repeated` performs H accesses and reaches 100% on controlled codes | PASS |
+| equivalent depth | adaptive read count and minimum layer depth explicit in raw and latency rows; report explains H attention layers versus one CSM read loop | PASS |
+| architecture/systems separation | controlled architectural pass reported alongside much slower CSM reference latency; no efficiency win claimed | PASS |
+| controlled expected behavior | decoded success `1.0` across all controlled gate rows; maximum H=16 vector error `1.600e-7` | PASS |
+| propagation bound | full `epsilon_1 sum L^j` checked; maximum relative excess `7.973e-9` within fp64 tolerance | PASS |
+| amplification diagnosis | many-to-one norm above one tested; report attributes failures to epsilon, geometry, capacity, and amplification | PASS |
+| required report | `results/phase5_multihop.md` plus JSON, two CSV files, and four inspected plots | PASS |
+
 ## Formal proof interpretation
 
 `lake build` proves the exact statements listed in `lean/PROOF_COVERAGE.md`, including affine associativity, recurrence aggregation, exact simultaneous `(S,C)` action, finite-matrix PSD preservation, positive definiteness/invertibility, scalar ridge-factor properties, finite softmax normalization, and impossibility of matching negative, above-one, or nonunit-sum targets with normalized nonnegative weights. Claims outside that map—including the full matrix norm bound and floating-point backward stability—are not labeled proved. The one Lean failure in this work was the missing `noncomputable` marker for real division; it was a compilation issue, not a counterexample. No failed proof was treated as evidence that mathematics was false.
 
 ## Final decision
 
-Phase 0: **PASS**. Phase 1: **PASS**. Phase 2: **PASS**. Phase 3: **PASS**. Learned-memory and NLP-scale gates remain closed.
+Phase 0: **PASS**. Phase 1: **PASS**. Phase 2: **PASS**. Phase 3: **PASS**. Phase 4: **PASS**. Phase 5: **PASS**. Learned-memory and NLP-scale gates remain closed.

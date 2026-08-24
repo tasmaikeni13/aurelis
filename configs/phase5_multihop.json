@@ -1,0 +1,22 @@
+{
+  "device": "auto",
+  "dimensions": [16, 32, 64],
+  "orthogonal_loads": [0.25, 0.5, 1.0],
+  "nonorthogonal_loads": [0.5, 1.0, 1.5],
+  "epsilons": [1e-08, 0.0001, 0.01, 0.1],
+  "nonorthogonal_conditions": ["random", "correlated_0.8", "correlated_0.98"],
+  "graph_regimes": ["permutation", "many_to_one"],
+  "hops": [1, 2, 4, 8, 16],
+  "seeds": [0, 1, 2],
+  "maximum_starts": 16,
+  "softmax_temperatures": [0.001, 0.01, 0.05, 0.1, 0.5],
+  "latency_dimensions": [16, 32, 64],
+  "latency_hops": [1, 2, 4, 8, 16],
+  "latency_warmups": 5,
+  "latency_repetitions": 30,
+  "gate": {
+    "controlled_minimum_success_rate": 1.0,
+    "controlled_maximum_h16_error": 1e-05,
+    "bound_relative_tolerance": 1e-08
+  }
+}
