@@ -14,6 +14,7 @@
 | `quadraticUpdate_nonneg` | scalar quadratic-form reduction of PSD preservation | PSD invariant behind Definition 5.1 | Redundant scalar certificate |
 | `regularizedQuadratic_positive` | scalar quadratic-form reduction of the epsilon floor | `A=S+epsilon I` in Definition 5.1 | Requires a nonzero query (`normSquared>0`) |
 | `oneKey_read_error` | exact finite-epsilon shrinkage error for one normalized key | Theorem 5.2, one-key case | Scalar/one-key specialization |
+| `oneKey_mismatched_read_error` | exact decomposition into query-chart mismatch and ridge shrinkage | Lemma 5.2a, one-key case | Scalar/one-key specialization |
 | `oneKey_variance_positive` | the one-key posterior variance is positive | Proposition 5.6, one-key case | Scalar/one-key specialization |
 | `ridgeFactor_nonneg` / `ridgeFactor_le_one` | each positive-eigenvalue ridge error multiplier lies in `[0,1]` | Theorem 5.2 finite-epsilon bound | Scalar spectral certificate; not the matrix norm theorem |
 | `ridgeFactor_antitone_eigenvalue` | better Gram eigenvalues reduce the spectral shrinkage factor | Theorem 5.2 conditioning dependence | Scalar spectral certificate |

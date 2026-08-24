@@ -1,6 +1,6 @@
-# Phase 0–5 completion audit
+# Phase 0–7 completion audit
 
-This audit maps every explicit requirement in `phases/phase0.md` through `phases/phase5.md` to authoritative repository evidence. “Pass” is limited to the current scope.
+This audit maps every explicit requirement in `phases/phase0.md` through `phases/phase7.md` to authoritative repository evidence. “Pass” is limited to the current scope.
 
 ## Phase 0
 
@@ -161,10 +161,61 @@ This audit maps every explicit requirement in `phases/phase0.md` through `phases
 | amplification diagnosis | many-to-one norm above one tested; report attributes failures to epsilon, geometry, capacity, and amplification | PASS |
 | required report | `results/phase5_multihop.md` plus JSON, two CSV files, and four inspected plots | PASS |
 
+## Phase 6
+
+| Requirement | Evidence | Decision |
+|---|---|---|
+| first learned-encoder phase, no general language model | `src/csm/learning.py` and synthetic episode generators only; report states scope | PASS |
+| associative recall | three seeds and all four primary methods in `seed_metrics.csv`; learned-CSM minimum gate includes task | PASS |
+| copy/selective-copy | selective-copy rows score target symbol rather than support slot; learned CSM aggregate success `1.0` | PASS |
+| key-value lookup | three seeds/four methods; learned CSM aggregate success `0.979` | PASS |
+| correlated-key lookup | correlation-controlled generator, geometry fields, and post-hoc regularizer ablation | PASS |
+| in-context linear regression | three seeds/four methods; learned CSM aggregate normalized MSE `0.213` | PASS |
+| noisy in-context regression | three seeds/four methods; learned CSM aggregate normalized MSE `0.297` | PASS |
+| contextual associative recall | random raw-to-context mapping; shared-chart success `0.992` versus independent-chart ablation `0.376` | PASS |
+| learn key/query/value maps | differentiable key/query chart, value encoder, output decoder; exact parameter-free memory solve | PASS |
+| initially beta=lambda=1 | all Phase 6 state construction uses fixed unit beta/lambda | PASS |
+| no natural orthogonality regularizer | all 84 primary task/method/seed rows precede and exclude geometry regularization | PASS |
+| explicit post-natural regularizer ablation | six additional rows for correlated/contextual CSM after natural sweep; never used by gate | PASS |
+| learned CSM comparison | learned CSM, frozen random-feature CSM, learned Hebbian, and learned attention on every task/seed | PASS |
+| multiple seeds | `[0,1,2]`, all retained | PASS |
+| Gram spectrum and cosine geometry | full mean eigenvalue spectrum plus pairwise cosine mean/std/max in every seed row | PASS |
+| effective rank and singular value | effective rank, reachable/nominal capacity fractions, and minimum singular value in every seed row | PASS |
+| conditioning, gradients, epsilon, retrieval | `cond(S+epsilon I)`, parameter-group gradient norms, epsilon, query scale, MSE, normalized MSE, and success | PASS |
+| matched coordinate correction | manuscript Lemma 5.2a, scalar Lean theorem, shared-chart model, and retained independent-query ablation | PASS |
+| learned tasks across seeds | minimum discrete success `0.958984`; maximum regression normalized MSE `0.312310` | PASS |
+| outperform random representation | learned/random aggregate risk ratios `[0.207611,0.155187,0.136485]` | PASS |
+| natural nontrivial geometry | minimum effective rank / reachable rank `0.303686`, above fixed `0.2` threshold | PASS |
+| initial failure studied, not hidden | failed chart/scorer/denominator assumptions in report and `EXPERIMENT_LOG.md`; invalid generated files excluded | PASS |
+| required report | `results/phase6_learnability.md`, JSON, two CSVs, and four inspected plots | PASS |
+
+## Phase 7
+
+| Requirement | Evidence | Decision |
+|---|---|---|
+| use successful Phase 6 architecture | all experiments use the shared key/query feature chart and same batched CSM recurrence | PASS |
+| controlled evidence reliability | clean, noisy, corrupt, and irrelevant categories with noisy observable quality/consistency/relevance cues | PASS |
+| learned beta | bounded positive gate weights both `S` and `C`; category means and risk retained per seed | PASS |
+| beta comparisons | fixed one, cross-statistic-only generic scalar, learned precision, and oracle precision, 12 rows | PASS |
+| beta reliability ordering | minimum clean/noisy gap `2.002178`; minimum noisy/bad gap `0.371851`; oracle correlation `0.961677` | PASS |
+| beta risk improvement | learned/fixed risk ratios `[0.047014,0.047265,0.040675]` | PASS |
+| changing latent operator | streams use controlled per-episode change points and before/after latent operators | PASS |
+| learned lambda behavior | minimum stationary lambda `0.882197`; maximum change lambda `0.021273`; minimum drift correlation `0.864607` | PASS |
+| lambda comparisons | fixed `1`, `0.95`, `0.8`, learned observable cue, innovation-only ablation, and oracle change, 18 rows | PASS |
+| lambda adaptation benefit | learned/best-fixed risk ratios `[0.476293,0.474996,0.463929]`; post-change/fixed-one ratios all at most `0.524410` | PASS |
+| changepoint semantics not forced | innovation-only failure retained; manuscript distinguishes forgetting action from detector and extra run-length state | PASS |
+| affine-scan compatibility scoped | primary gate consumes token-local noisy drift cue; state-dependent innovation gate explicitly excluded from simple affine scan claim | PASS |
+| joint only after separate success | source branches on the separate gate before producing any of the nine joint rows | PASS |
+| joint benefit and semantics | learned/fixed risk ratios `[0.767455,0.630988,0.628516]`; beta ordering and lambda drift sensitivity pass | PASS |
+| unintended usage recorded | raw absolute gate values, oracle correlations, stationary/change response, generic-gate behavior, and identifiability caveat retained | PASS |
+| equal training opportunity | every drift and joint method receives 360 steps; thresholds unchanged after 120-step undertraining probe | PASS |
+| failed runs studied, not hidden | innovation-only and 120-step failures logged; invalid partial artifacts excluded; innovation method remains a final ablation | PASS |
+| required report | `results/phase7_gating.md`, JSON, four CSVs, and three inspected plots | PASS |
+
 ## Formal proof interpretation
 
-`lake build` proves the exact statements listed in `lean/PROOF_COVERAGE.md`, including affine associativity, recurrence aggregation, exact simultaneous `(S,C)` action, finite-matrix PSD preservation, positive definiteness/invertibility, scalar ridge-factor properties, finite softmax normalization, and impossibility of matching negative, above-one, or nonunit-sum targets with normalized nonnegative weights. Claims outside that map—including the full matrix norm bound and floating-point backward stability—are not labeled proved. The one Lean failure in this work was the missing `noncomputable` marker for real division; it was a compilation issue, not a counterexample. No failed proof was treated as evidence that mathematics was false.
+`lake build` proves the exact statements listed in `lean/PROOF_COVERAGE.md`, including affine associativity, recurrence aggregation, exact simultaneous `(S,C)` action, finite-matrix PSD preservation, positive definiteness/invertibility, scalar ridge-factor properties, the one-key mismatched-query error decomposition, finite softmax normalization, and impossibility of matching negative, above-one, or nonunit-sum targets with normalized nonnegative weights. Claims outside that map—including the full matrix mismatch norm bound and floating-point backward stability—are not labeled proved. A Lean compilation or missing-premise issue is not treated as a mathematical counterexample.
 
 ## Final decision
 
-Phase 0: **PASS**. Phase 1: **PASS**. Phase 2: **PASS**. Phase 3: **PASS**. Phase 4: **PASS**. Phase 5: **PASS**. Learned-memory and NLP-scale gates remain closed.
+Phase 0: **PASS**. Phase 1: **PASS**. Phase 2: **PASS**. Phase 3: **PASS**. Phase 4: **PASS**. Phase 5: **PASS**. Phase 6: **PASS**. Phase 7: **PASS**. The synthetic and learned-memory prerequisite gates are open; no NLP experiment has been run, authorized, or validated by these results.

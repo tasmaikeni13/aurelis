@@ -141,3 +141,59 @@ Machine-readable record: [`results/phase4_metrics.json`](results/phase4_metrics.
 - interpretation: **PASS architectural gate.** One maintained CSM state supports 16 chained adaptive reads on controlled codes. Random geometry, capacity, epsilon, amplification, and reference runtime failures are retained, and the systems claim remains open.
 
 Machine-readable record: [`results/phase5_metrics.json`](results/phase5_metrics.json). Human report: [`results/phase5_multihop.md`](results/phase5_multihop.md).
+
+### P6-LEARNABILITY-INDEPENDENT-CHART-20260824 — FAIL
+
+- timestamp UTC: diagnostic run preceding `2026-08-24T14:03:48.143825+00:00`
+- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty because Phase 6 source was under development
+- config: initial Phase 6 task grid, with separately normalized key and query encoders
+- seeds: `[0,1,2]`
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- metrics: contextual associative-recall success ranged from `0.236` to `0.492`, below the `0.75` gate; the initial nominal capacity fraction reached only about `0.148`; selective-copy success near `0.63` was subsequently diagnosed as support-slot scoring in a task with repeated symbols
+- interpretation: **FAIL retained as a study, not as gate evidence.** Independent normalized encoders did not put queries in the coordinate chart in which the ridge operator was fitted. The capacity denominator and selective-copy scorer were also invalid. The faulty generated files were overwritten; the corrected report, manuscript Lemma 5.2a, post-natural independent-chart ablation, and Git diff preserve the diagnosis without presenting invalid metrics as results.
+
+### P6-LEARNABILITY-20260824 — PASS
+
+- timestamp UTC: `2026-08-24T14:03:48.143825+00:00`
+- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty at experiment start
+- config: `configs/phase6_learnability.json`, including seven tasks, four primary methods, three seeds, and post-natural regularizer/independent-chart ablations
+- seeds: `[0,1,2]`
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- wall-clock time: 89.854 seconds; peak VRAM: 430,684,672 bytes (0.401106 GiB)
+- metrics: 93 seed rows and 930 learning-curve rows; minimum learned-CSM discrete success `0.958984`; maximum regression normalized MSE `0.312310`; learned/random aggregate risk ratios `[0.207611,0.155187,0.136485]`; minimum natural reachable-capacity fraction `0.303686`
+- plots: four Phase 6 plots under `plots/phase6/`, all visually inspected
+- interpretation: **PASS with a coordinate-chart correction.** Unregularized shared-chart CSM solves all tasks and beats its frozen random-feature control across every seed. The independent-chart failure and post-hoc regularizer results remain explicit limitations; no language-model claim follows.
+
+Machine-readable record: [`results/phase6_metrics.json`](results/phase6_metrics.json). Human report: [`results/phase6_learnability.md`](results/phase6_learnability.md).
+
+### P7-DRIFT-INNOVATION-20260824 — FAIL
+
+- timestamp UTC: diagnostic run preceding `2026-08-24T14:35:36.464177+00:00`
+- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty because Phase 7 source was under development
+- config: initial Phase 7 separate-gate run; lambda consumed detached pre-write innovation and posterior uncertainty; joint training was correctly skipped
+- seeds: `[0,1,2]`
+- hardware/software: AMD Instinct MI300X VF; same software stack as the final run
+- metrics: learned stationary lambda remained approximately `0.71–0.74`, change lambda approximately `0.69–0.73`, drift correlation was weak, and learned lambda did not beat fixed values on every seed
+- interpretation: **FAIL retained.** Proposition 4.6 gives the Bayesian action conditional on a drift rate; it does not make lambda a hidden-changepoint detector. Innovation-dependent transitions also depend on the previous memory state and therefore do not retain the simple affine scan. Exact online detection requires additional belief state, such as a run-length posterior.
+
+### P7-DRIFT-CUE-120-20260824 — FAIL
+
+- timestamp UTC: controlled correction probe preceding the final run
+- config: scan-compatible noisy local drift cue with the original 120-step training budget; all gate thresholds unchanged
+- seeds: `[0,1,2]`
+- metrics: risk comparisons passed, change lambda was at most `0.304`, and drift correlation was at least `0.842`, but stationary lambda stayed near `0.72`, below the precommitted `0.8` requirement
+- interpretation: **FAIL retained as an undertraining diagnostic.** The corrected signal and recurrence worked, but the equal optimization budget was insufficient to satisfy the semantic stationary-period gate. Every drift and joint method received the same 360-step budget in the next run; thresholds were not relaxed.
+
+### P7-GATING-20260824 — PASS
+
+- timestamp UTC: `2026-08-24T14:35:36.464177+00:00`
+- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty at experiment start
+- config: `configs/phase7_gating.json`; four beta methods, six lambda methods, three joint methods, and three seeds; equal 360-step drift/joint training budgets
+- seeds: `[0,1,2]`
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
+- wall-clock time: 681.611 seconds; peak VRAM: 432,450,560 bytes (0.402751 GiB)
+- metrics: 12 beta, 18 drift, 9 joint seed rows, and 807 learning-curve rows; learned/fixed beta risk ratios `[0.047014,0.047265,0.040675]`; learned/best-fixed lambda risk ratios `[0.476293,0.474996,0.463929]`; minimum stationary lambda `0.882197`; maximum change lambda `0.021273`; minimum drift correlation `0.864607`; joint learned/fixed risk ratios `[0.767455,0.630988,0.628516]`
+- plots: three Phase 7 plots under `plots/phase7/`, all visually inspected
+- interpretation: **PASS with a detector/action boundary.** Observable-cue beta and lambda improve fixed gates across all seeds, and joint learning retains both orderings. The innovation-only failure remains an ablation; no hidden-changepoint inference or exact-gate-identifiability claim is made.
+
+Machine-readable record: [`results/phase7_metrics.json`](results/phase7_metrics.json). Human report: [`results/phase7_gating.md`](results/phase7_gating.md).

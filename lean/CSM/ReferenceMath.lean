@@ -1,4 +1,10 @@
 import CSM.AffineScan
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Data.Real.Basic
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
 
 /-!
 # Scalar certificates for the Phase 1 matrix recurrence
@@ -33,6 +39,14 @@ theorem regularizedQuadratic_positive
 theorem oneKey_read_error
     {β ε value : ℝ} (hDenominator : β + ε ≠ 0) :
     β * value / (β + ε) - value = -(ε * value) / (β + ε) := by
+  field_simp
+  ring
+
+/-- With a scalar query mismatch, error splits exactly into mismatch and ridge shrinkage. -/
+theorem oneKey_mismatched_read_error
+    {β ε value mismatch : ℝ} (hDenominator : β + ε ≠ 0) :
+    β * value * (1 + mismatch) / (β + ε) - value =
+      (β * mismatch - ε) * value / (β + ε) := by
   field_simp
   ring
 

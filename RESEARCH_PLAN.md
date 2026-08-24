@@ -2,7 +2,7 @@
 
 ## Objective and scope
 
-The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. Phase 2 attacks interpolation, conditioning, and capacity; Phase 3 compares auditable baselines under dimension and byte fairness; Phase 4 tests noisy evidence and uncertainty; Phase 5 tests chained adaptive reads. No language model, learned encoder, optimized scan, dyadic cascade, or approximate inverse belongs in these phases.
+The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. Phase 2 attacks interpolation, conditioning, and capacity; Phase 3 compares auditable baselines under dimension and byte fairness; Phase 4 tests noisy evidence and uncertainty; Phase 5 tests chained adaptive reads; Phase 6 tests learned feature maps; and Phase 7 tests learned evidence and forgetting gates. No general language model, optimized scan, dyadic cascade, or approximate inverse is part of the completed scope.
 
 ## Dependency graph
 
@@ -31,10 +31,12 @@ P0-C record schema/risks ───┘                 │
                                              v
                               P5 multi-hop functional graphs
                                              │
-                    ┌────────────────────────┴──────────────────────┐
-                    v                                               v
-       remaining synthetic claim suite                  future learned-memory suite
-                    └────────────────────────┬──────────────────────┘
+                                             v
+                               P6 learned feature maps
+                                             │
+                                             v
+                           P7 learned beta/lambda gates
+                                             │
                                              v
                              synthetic + learned gates both pass
                                              │
@@ -42,7 +44,7 @@ P0-C record schema/risks ───┘                 │
                                   NLP-scale work may be proposed
 ```
 
-The graph through the Phase 5 gate is executed in the current scope. The remaining downstream nodes are shown solely to make the hard dependency explicit.
+The graph through the Phase 7 gate is executed in the current scope. The NLP node is shown solely to make the hard dependency explicit; no NLP experiment has been run.
 
 ## Gates
 
@@ -97,9 +99,25 @@ The graph through the Phase 5 gate is executed in the current scope. The remaini
 - One-read and equal-adaptive-read softmax comparisons distinguish round count from fidelity.
 - FLOPs and prepared latency are reported separately from the one-layer architectural claim.
 
+### Phase 6 pass gate
+
+- Learned CSM features solve all seven synthetic tasks across every seed and beat the frozen random-feature CSM on aggregate risk for every seed.
+- The primary key/query parameterization uses one learned coordinate chart; an independent-query chart is retained as a failure ablation rather than silently repaired.
+- Regression normalized MSE, discrete success, full Gram spectra, effective rank, reachable capacity, conditioning, query calibration, and gradient norms are retained.
+- No orthogonality or covariance regularizer enters the natural gate; regularization is tested only afterward as an explicit ablation.
+- Hebbian and attention controls receive learned encoders of the same size, and attention is not required to lose.
+
+### Phase 7 pass gate
+
+- Learned beta improves fixed beta on varying-quality evidence across every seed, preserves reliability ordering, and correlates with oracle precision.
+- Learned lambda improves both fixed-lambda tradeoffs and post-change risk across every seed, remains near one in stationary periods, and falls at observed changes.
+- An innovation-only gate is retained as a failed detector ablation: a forgetting action is not itself a changepoint posterior.
+- The primary scan-compatible lambda gate consumes a noisy locally observable drift cue; an exact hidden-changepoint model would require an additional run-length belief state.
+- Joint beta/lambda training runs only after both separate gates pass and must retain both semantic orderings while improving the fixed-gate control.
+
 ### Non-negotiable NLP gate
 
-**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and a later learned-memory gate pass.** Phases 1–5 are still synthetic and unlearned, so their pass is not sufficient.
+**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and the learned-memory gate pass.** Both prerequisites now pass through Phase 7. This permits a future NLP proposal; it is not evidence of NLP value and does not automatically authorize one.
 
 ## Determinism policy
 
@@ -129,6 +147,12 @@ The graph through the Phase 5 gate is executed in the current scope. The remaini
 | Decoded hop success hides vector drift | False exactness claim | Record vector, accumulated, and nearest-code errors together at every configured hop. |
 | Unit successor codes are assumed contractive | Incorrect `H epsilon_1` bound | Measure the exact small reference operator norm and test many-to-one graphs with `L > 1`. |
 | Adaptive rounds are conflated with runtime | Architectural success marketed as efficiency | Record layer-depth semantics separately from FLOPs and synchronized prepared latency. |
+| Key and query encoders learn incompatible charts | The solver fits one coordinate system and is evaluated in another | Share the feature map, learn only a scalar query calibration, and retain independent encoders as a failure ablation. |
+| Retrieval success is misread as proof of high rank | A degenerate task may pass with collapsed features | Record spectrum, effective rank, minimum singular value, cosine statistics, and reachable capacity separately from task loss. |
+| Capacity is divided by an unreachable rank | A correct low-load representation looks artificially collapsed | Normalize effective rank by `min(K,d_key)`, while retaining nominal `effective_rank/d_key` separately. |
+| Repeated symbols make slot and symbol accuracy disagree | Selective-copy scorer reports a false failure | Score the decoded target symbol; retain vector error independently. |
+| Lambda is treated as a hidden changepoint detector | Bayesian tempering semantics are overstated and scan compatibility is lost | Distinguish the forgetting action from detection; use observable cues for the scan-compatible test and retain the innovation-only ablation. |
+| Gate methods receive unequal optimization opportunity | Undertraining masquerades as a theory failure | Use the same 360-step budget for every drift and joint method; keep thresholds fixed. |
 
 ## Automation
 
@@ -139,6 +163,8 @@ scripts/run_phase01.sh
 .venv/bin/python experiments/phase3_baseline_separation.py
 .venv/bin/python experiments/phase4_uncertainty_and_noise.py
 .venv/bin/python experiments/phase5_multihop.py
+.venv/bin/python experiments/phase6_learnability.py
+.venv/bin/python experiments/phase7_gating.py
 ```
 
-The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order. The remaining commands reproduce the separately gated Phase 2–5 records.
+The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order. The remaining commands reproduce the separately gated Phase 2–7 records.

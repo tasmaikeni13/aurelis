@@ -1,4 +1,7 @@
-import Mathlib
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Positivity
 
 /-!
 # Convexity certificates for normalized softmax memory
@@ -33,8 +36,9 @@ theorem softmaxWeight_nonneg (score : ι → ℝ) (index : ι) :
 theorem softmaxWeight_sum (score : ι → ℝ) :
     ∑ index, softmaxWeight score index = 1 := by
   unfold softmaxWeight
-  rw [← Finset.sum_div]
-  exact div_self (ne_of_gt (softmaxDenominator_pos score))
+  simp_rw [div_eq_mul_inv]
+  rw [← Finset.sum_mul]
+  exact mul_inv_cancel₀ (ne_of_gt (softmaxDenominator_pos score))
 
 omit [Nonempty ι] in
 /-- A nonnegative normalized coordinate cannot exceed one. -/

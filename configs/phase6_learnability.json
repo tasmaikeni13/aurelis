@@ -1,0 +1,40 @@
+{
+  "device": "auto",
+  "seeds": [0, 1, 2],
+  "tasks": [
+    "associative_recall",
+    "selective_copy",
+    "key_value_lookup",
+    "correlated_key_lookup",
+    "in_context_linear_regression",
+    "noisy_in_context_regression",
+    "contextual_associative_recall"
+  ],
+  "raw_key_dimension": 16,
+  "raw_value_dimension": 8,
+  "signal_dimension": 6,
+  "key_dimension": 12,
+  "value_dimension": 8,
+  "hidden_dimension": 32,
+  "associations": 8,
+  "batch_size": 64,
+  "training_steps": 180,
+  "learning_rate": 0.003,
+  "weight_decay": 0.00001,
+  "epsilon": 0.1,
+  "evaluation_batches": 8,
+  "log_every": 20,
+  "correlated_key_noise": 0.15,
+  "query_noise": 0.02,
+  "regression_noise": 0.3,
+  "context_signal_scale": 0.35,
+  "orthogonality_ablation_tasks": ["correlated_key_lookup", "contextual_associative_recall"],
+  "orthogonality_ablation_weight": 0.01,
+  "independent_query_ablation_tasks": ["contextual_associative_recall"],
+  "gate": {
+    "minimum_discrete_success": 0.75,
+    "maximum_regression_normalized_mse": 0.75,
+    "maximum_seed_aggregate_learned_to_random_risk": 0.8,
+    "minimum_effective_capacity_fraction": 0.2
+  }
+}

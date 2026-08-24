@@ -31,6 +31,14 @@ from .multihop import (
     prepared_read_operator,
     softmax_chained_reads,
 )
+from .learning import (
+    BatchedCSMState,
+    BoundedScalarGate,
+    EpisodicMemoryModel,
+    MemoryForward,
+    geometry_metrics,
+    orthogonality_penalty,
+)
 
 __all__ = [
     "CSMState",
@@ -61,4 +69,10 @@ __all__ = [
     "nearest_code",
     "prepared_read_operator",
     "softmax_chained_reads",
+    "BatchedCSMState",
+    "BoundedScalarGate",
+    "EpisodicMemoryModel",
+    "MemoryForward",
+    "geometry_metrics",
+    "orthogonality_penalty",
 ]

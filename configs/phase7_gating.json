@@ -1,0 +1,62 @@
+{
+  "device": "auto",
+  "seeds": [0, 1, 2],
+  "raw_key_dimension": 16,
+  "raw_value_dimension": 8,
+  "signal_dimension": 6,
+  "key_dimension": 12,
+  "value_dimension": 8,
+  "hidden_dimension": 32,
+  "gate_hidden_dimension": 16,
+  "epsilon": 0.1,
+  "learning_rate": 0.003,
+  "weight_decay": 0.00001,
+  "evaluation_batches": 8,
+  "log_every": 15,
+  "evidence": {
+    "batch_size": 64,
+    "observations": 12,
+    "training_steps": 150,
+    "clean_noise": 0.1,
+    "noisy_noise": 1.0,
+    "cue_noise": 0.08,
+    "beta_minimum": 0.001,
+    "beta_maximum": 4.0
+  },
+  "drift": {
+    "batch_size": 32,
+    "sequence_length": 30,
+    "change_point_minimum": 14,
+    "change_point_maximum": 18,
+    "training_steps": 360,
+    "warmup": 6,
+    "observation_noise": 0.05,
+    "drift_cue_noise": 0.15,
+    "lambda_minimum": 0.01,
+    "fixed_lambdas": [1.0, 0.95, 0.8]
+  },
+  "joint": {
+    "batch_size": 32,
+    "sequence_length": 30,
+    "change_point_minimum": 14,
+    "change_point_maximum": 18,
+    "training_steps": 360,
+    "warmup": 6,
+    "clean_noise": 0.08,
+    "noisy_noise": 0.8,
+    "cue_noise": 0.08,
+    "drift_cue_noise": 0.15
+  },
+  "gate": {
+    "maximum_beta_learned_to_fixed_risk": 0.8,
+    "minimum_beta_oracle_correlation": 0.5,
+    "minimum_clean_noisy_beta_gap": 0.2,
+    "minimum_noisy_bad_beta_gap": 0.02,
+    "maximum_lambda_learned_to_best_fixed_risk": 0.95,
+    "maximum_lambda_postchange_to_fixed_one_risk": 0.75,
+    "minimum_stationary_lambda": 0.8,
+    "maximum_change_lambda": 0.8,
+    "minimum_drift_correlation": 0.2,
+    "maximum_joint_learned_to_fixed_risk": 0.9
+  }
+}

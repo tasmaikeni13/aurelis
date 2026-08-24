@@ -1,4 +1,4 @@
-import Mathlib
+import Mathlib.Algebra.Module.Basic
 
 /-!
 # Affine scan algebra for Conjugate State Machines
