@@ -38,6 +38,7 @@ PyTorch uses the `torch.cuda` API namespace on ROCm. No CUDA toolkit, NVIDIA dev
 - [`CLAIMS.md`](CLAIMS.md): falsifiable claims and failure interpretations.
 - [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md): dependency graph, gates, and risk controls.
 - [`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md): immutable experiment-record schema and run log.
+- [`phases/`](phases/): authoritative Phase 0–7 specifications.
 - [`src/csm/memory.py`](src/csm/memory.py): fp64 reference recurrence, Cholesky/solve reads, recomputation, and tiny inverse oracle.
 - [`tests/`](tests): equation-level and pathological tests.
 - [`experiments/phase1_numerics.py`](experiments/phase1_numerics.py): quantitative Phase 1 experiment and plot generator.

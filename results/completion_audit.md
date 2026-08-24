@@ -1,6 +1,6 @@
 # Phase 0–5 completion audit
 
-This audit maps every explicit requirement in `phase0.md` through `phase5.md` to authoritative repository evidence. “Pass” is limited to the current scope.
+This audit maps every explicit requirement in `phases/phase0.md` through `phases/phase5.md` to authoritative repository evidence. “Pass” is limited to the current scope.
 
 ## Phase 0
 
