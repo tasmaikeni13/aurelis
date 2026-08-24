@@ -10,3 +10,5 @@ lean/.lake/
 dist/
 build/
 *.egg-info/
+data/
+checkpoints/

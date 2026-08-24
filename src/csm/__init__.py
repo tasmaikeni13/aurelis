@@ -39,6 +39,35 @@ from .learning import (
     geometry_metrics,
     orthogonality_penalty,
 )
+from .systems import (
+    AffineSummary,
+    associative_prefix_scan,
+    compose_affine,
+    csm_leading_flops_per_token,
+    csm_state_bytes,
+    prefix_states,
+    read_prefix_states,
+    sequential_decode,
+    summarize_chunks,
+    summarize_segment,
+    token_summaries,
+)
+from .language import (
+    AttentionDecodeState,
+    CSMDecodeState,
+    CSMMixer,
+    CausalSelfAttention,
+    TinyDecoderLM,
+)
+from .textdata import (
+    DiagnosticExample,
+    TASKS,
+    bytes_to_tensor,
+    diagnostic_corpus,
+    diagnostic_examples,
+    sample_token_batch,
+    wikitext_bytes,
+)
 
 __all__ = [
     "CSMState",
@@ -75,4 +104,27 @@ __all__ = [
     "MemoryForward",
     "geometry_metrics",
     "orthogonality_penalty",
+    "AffineSummary",
+    "associative_prefix_scan",
+    "compose_affine",
+    "csm_leading_flops_per_token",
+    "csm_state_bytes",
+    "prefix_states",
+    "read_prefix_states",
+    "sequential_decode",
+    "summarize_chunks",
+    "summarize_segment",
+    "token_summaries",
+    "AttentionDecodeState",
+    "CSMDecodeState",
+    "CSMMixer",
+    "CausalSelfAttention",
+    "TinyDecoderLM",
+    "DiagnosticExample",
+    "TASKS",
+    "bytes_to_tensor",
+    "diagnostic_corpus",
+    "diagnostic_examples",
+    "sample_token_batch",
+    "wikitext_bytes",
 ]

@@ -1,0 +1,57 @@
+{
+  "experimental_generation": "phase9-preregistered-g1",
+  "device": "auto",
+  "seed": 9137,
+  "dataset": {
+    "name": "Salesforce/wikitext",
+    "configuration": "wikitext-2-raw-v1",
+    "revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+    "cache": "data/wikitext",
+    "diagnostic_training_bytes": 2000000,
+    "diagnostic_batch_fraction": 0.15
+  },
+  "model": {
+    "vocabulary_size": 256,
+    "width": 256,
+    "layers": 7,
+    "heads": 8,
+    "feedforward_width": 1024,
+    "csm_key_dimension": 16,
+    "csm_epsilon": 0.1,
+    "local_attention_window": 64
+  },
+  "architectures": ["transformer", "csm", "hybrid", "recurrent"],
+  "training": {
+    "tokens": 10000000,
+    "batch_size": 64,
+    "sequence_length": 128,
+    "learning_rate": 0.0003,
+    "minimum_learning_rate_fraction": 0.1,
+    "warmup_steps": 100,
+    "weight_decay": 0.1,
+    "gradient_clip": 1.0,
+    "log_every": 50
+  },
+  "evaluation": {
+    "natural_validation_tokens": 262144,
+    "diagnostic_examples_per_task": 24,
+    "long_diagnostic_examples_per_task": 12,
+    "autoregressive_examples_per_task": 4,
+    "scaling_context_lengths": [32, 64, 128, 256, 512],
+    "scaling_batch_size": 4,
+    "scaling_warmup": 2,
+    "scaling_repetitions": 5,
+    "decode_prompt_length": 128,
+    "decode_tokens": 32,
+    "decode_batch_size": 4
+  },
+  "gate": {
+    "minimum_parameters": 5000000,
+    "maximum_parameters": 20000000,
+    "maximum_parameter_ratio": 1.4,
+    "maximum_nonfinite_steps": 0,
+    "minimum_loss_reduction_fraction": 0.2,
+    "maximum_csm_to_transformer_validation_loss": 1.3,
+    "minimum_targeted_accuracy_advantage": 0.01
+  }
+}

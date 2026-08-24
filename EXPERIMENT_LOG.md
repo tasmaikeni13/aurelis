@@ -197,3 +197,53 @@ Machine-readable record: [`results/phase6_metrics.json`](results/phase6_metrics.
 - interpretation: **PASS with a detector/action boundary.** Observable-cue beta and lambda improve fixed gates across all seeds, and joint learning retains both orderings. The innovation-only failure remains an ablation; no hidden-changepoint inference or exact-gate-identifiability claim is made.
 
 Machine-readable record: [`results/phase7_metrics.json`](results/phase7_metrics.json). Human report: [`results/phase7_gating.md`](results/phase7_gating.md).
+
+### P8-MI300X-SYSTEMS-20260824 — PASS
+
+- timestamp UTC: `2026-08-24T15:15:08.283096+00:00`
+- git commit: `c728a210077d073e9180ef683c9e85f166ecfa87`; working tree dirty because Phase 8 source and outputs were generated after the fetched specification checkpoint
+- config: `configs/phase8_mi300x.json`; complete `d_k x d_v` grid over `{16,32,64,128}`, plus batch, context, heads, dtype, optimization-path, component, and baseline measurements
+- seed: `8013` plus fixed derived seeds visible in source
+- hardware/software: AMD Instinct MI300X VF, `gfx942:sramecc+:xnack-`; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831
+- wall-clock time: 17.366 seconds; maximum recorded peak allocation: 730,496,512 bytes
+- metrics: all five batched/optimized paths finite and oracle-checked; maximum read relative error below `3e-6`; compiled construction `0.244 ms` versus vectorized `0.184 ms`; synchronized sequential decode `45.172 us/token`; 128 MiB copy estimate `4.310 TB/s`; causal attention `0.034 ms` versus CSM `0.776 ms` at the matched baseline shape
+- head economics: at fixed aggregate width and an eight-association under-capacity quality control, 8x16-dimensional heads retained recall quality `0.997683` with 32,768 state bytes versus quality `0.999492` and 262,144 bytes for 1x128; the eight-head measured workload was also faster
+- plots: none required; six raw CSV tables retain timings, utilization, throughput, VRAM, error, and complexity fields
+- interpretation: **PASS as systems characterization, not an attention win.** The bf16-feature/fp32-state policy is stable and understood. Inductor/Triton compilation is supported but did not improve this retained construction shape; exact prefix factorization remains the dominant hardware tax and a custom Cholesky kernel was not justified.
+
+Machine-readable record: [`results/phase8_metrics.json`](results/phase8_metrics.json). Human report: [`results/phase8_mi300x_systems.md`](results/phase8_mi300x_systems.md).
+
+### P9-TINY-LM-20260824 — PASS
+
+- timestamp UTC: `2026-08-24T15:30:47.449477+00:00`
+- git commit: `c728a210077d073e9180ef683c9e85f166ecfa87`; working tree dirty at experiment start
+- experimental generation/config: `phase9-preregistered-g1`; SHA-256 `b53186ef06940c5d60bcafe43f62b642031b99217065f385ebbf5ea9adfcd493`; `configs/phase9_tiny_lm.json`
+- seed: `9137`, with architecture-specific deterministic offsets; no architecture changed after checkpoint evaluation
+- data/tokenizer: checksum-pinned raw WikiText-2; raw UTF-8 byte vocabulary 256; 2,000,000 diagnostic bytes; 15% diagnostic batch mixture
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2
+- wall-clock time: 351.273 seconds; maximum training peak allocation: 2,991,553,024 bytes
+- metrics: Transformer/CSM/hybrid/recurrent parameter counts 5.57M/5.13M/5.38M/6.96M; each trained 10,002,432 tokens in 1,221 steps with zero nonfinite steps; validation perplexities 8.192/9.897/9.163/5.795; training throughput 485,542/121,558/269,970/77,714 tokens/s
+- targeted probes: on preregistered long examples, pure CSM exceeded Transformer token accuracy by 0.0833 on exact-value retrieval, 0.0588 on repeated-name recall, and 0.0435 on in-context regression while using fewer parameters; all failures and near-zero autoregressive exact rates remain in the raw table
+- decode/state: CSM used 688,128 live state bytes versus Transformer 4,587,520 at the measured prompt, but was about 3.1x slower per token; sequence-scaling rows retain training/prefill VRAM separately
+- plots: none required; four raw CSV tables retain seeds/architectures, curves, diagnostics, and scaling
+- interpretation: **PASS the optimization/measurable-memory gate, not Transformer superiority.** Pure CSM and hybrid train stably and learn natural-text structure. Diagnostic advantages are task-specific, and factorization cost is plainly visible.
+
+Machine-readable record: [`results/phase9_metrics.json`](results/phase9_metrics.json). Human report: [`results/phase9_tiny_lm.md`](results/phase9_tiny_lm.md).
+
+### P10-SMALL-NLP-20260824 — PASS SCALING GATE
+
+- timestamp UTC: `2026-08-24T17:00:59.393954+00:00`
+- git commit: `c728a210077d073e9180ef683c9e85f166ecfa87`; working tree dirty at experiment start
+- experimental generation/config: `phase10-preregistered-g1`; SHA-256 `8a4141f09296333ab0bce2ae731462221f48717751c3f438def48893f542c81a`; `configs/phase10_small_nlp.json`
+- seeds: `[0,1,2]`; all six architecture/seed runs completed; zero excluded or replacement runs
+- data/tokenizer: deterministic first 100,000,000 UTF-8 bytes of checksum-pinned raw WikiText-103; byte vocabulary 256; same 10% diagnostic mixture
+- architectures/budget: 29,499,904-parameter Transformer and 27,468,544-parameter strongest pure CSM; each run used 100,007,936 tokens, 6,104 updates, and 16,384 batch tokens; hybrid omitted because Phase 9 pure CSM passed without hybridization and had stronger aggregate long-context probes
+- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2
+- total wall-clock time: 5,116.907 seconds; maximum training peak allocation: 12,505,591,808 bytes
+- quality: mean byte perplexity 3.261 Transformer versus 3.328 CSM; paired CSM-minus-Transformer loss differences `[0.021880,0.009817,0.028710]`, mean `0.020135`, standard deviation `0.009567`; same-checkpoint 128/256/512/1024 context rows and every short/long diagnostic are retained
+- systems: mean training throughput 715,420 versus 69,161 tokens/s; mean training peak VRAM 5.09 versus 12.50 GB; standard-prompt decode 591.8 versus 1,937.6 us/token
+- qualifying advantage: at a 2,048-token prompt, measured CSM state was 786,432 bytes versus Transformer 67,371,008 bytes (ratio `0.011673`), and CSM state growth from context 128 to 2,048 was exactly `1.0x`; decode remained slower and this countervailing cost is retained
+- plots: none required; six raw CSV tables retain seed metrics, curves, context evaluation, diagnostics, prefill scaling, and live decode scaling
+- interpretation: **PASS the Phase 10 scaling gate through state scaling only.** Perplexity is competitive but worse, targeted-probe results are mixed, and the current implementation is much slower and uses more training VRAM. The result supports investigating contexts where fixed recurrent state matters, not an unqualified claim of model or hardware superiority.
+
+Machine-readable record: [`results/phase10_metrics.json`](results/phase10_metrics.json). Human report: [`results/phase10_small_nlp.md`](results/phase10_small_nlp.md).

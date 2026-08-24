@@ -2,7 +2,7 @@
 
 ## Objective and scope
 
-The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. Phase 2 attacks interpolation, conditioning, and capacity; Phase 3 compares auditable baselines under dimension and byte fairness; Phase 4 tests noisy evidence and uncertainty; Phase 5 tests chained adaptive reads; Phase 6 tests learned feature maps; and Phase 7 tests learned evidence and forgetting gates. No general language model, optimized scan, dyadic cascade, or approximate inverse is part of the completed scope.
+The repository is organized to disprove claims early. Phase 0 audits the environment and names falsifiers. Phase 1 implements only the fp64 Gauss–Markov reference and tests equation fidelity. Phase 2 attacks interpolation, conditioning, and capacity; Phase 3 compares auditable baselines under dimension and byte fairness; Phase 4 tests noisy evidence and uncertainty; Phase 5 tests chained adaptive reads; Phase 6 tests learned feature maps; Phase 7 tests learned evidence and forgetting gates; Phase 8 characterizes optimized ROCm execution; Phase 9 tests ordinary tiny-decoder optimization; and Phase 10 runs the first seeded 100M-token natural-language comparison. The dyadic cascade and approximate inverses remain outside the completed scope.
 
 ## Dependency graph
 
@@ -41,10 +41,16 @@ P0-C record schema/risks ───┘                 │
                              synthetic + learned gates both pass
                                              │
                                              v
-                                  NLP-scale work may be proposed
+                              P8 MI300X systems characterization
+                                             │
+                                             v
+                                P9 tiny-LM optimization gate
+                                             │
+                                             v
+                           P10 seeded 100M-token comparison
 ```
 
-The graph through the Phase 7 gate is executed in the current scope. The NLP node is shown solely to make the hard dependency explicit; no NLP experiment has been run.
+The graph through Phase 10 is executed in the current scope. The NLP phases began only after the Phase 0–7 prerequisite gates passed and the user explicitly authorized Phase 8–10.
 
 ## Gates
 
@@ -115,9 +121,32 @@ The graph through the Phase 7 gate is executed in the current scope. The NLP nod
 - The primary scan-compatible lambda gate consumes a noisy locally observable drift cue; an exact hidden-changepoint model would require an additional run-length belief state.
 - Joint beta/lambda training runs only after both separate gates pass and must retain both semantic orderings while improving the fixed-gate control.
 
+### Phase 8 pass gate
+
+- Vectorized, compiled, chunked, and associative paths are compared numerically with the Phase 1 oracle.
+- Outer updates, S/C construction, Cholesky, triangular solves, sequential decode, training forward/backward, memory movement, utilization, launch overhead, throughput, and VRAM are measured on MI300X/ROCm.
+- The full `d_k x d_v` grid plus batch, context, head, and dtype axes are retained.
+- Theoretical state/operation complexity is reported separately from measured behavior.
+- Attention and linear-memory baselines use matched width/context, and many-small-head quality per byte is measured rather than assumed.
+
+### Phase 9 pass gate
+
+- Transformer, pure CSM, local-attention/CSM hybrid, and recurrent decoders fall in the 5M–20M range and use matched optimizer, token, and batch-token budgets.
+- CSM or hybrid completes 10M tokens without nonfinite steps, meaningfully reduces loss, and avoids catastrophic natural-text regression.
+- All six diagnostic families are evaluated at trained and longer contexts, including an autoregressive subset.
+- A matched-parameter targeted-memory advantage is required; systems cost is reported separately.
+
+### Phase 10 scaling gate
+
+- Matched Transformer and strongest pure CSM fall in the 25M–50M range and complete three seeds at 100M tokens each.
+- Parameter counts, context, optimizer, schedule, batch tokens, token budget, seeds, evaluations, and exclusions are preregistered.
+- The same checkpoint is evaluated at several contexts; downstream/long probes, throughput, VRAM, wall-clock, inference, decode latency, and live state are all retained.
+- At least one compelling advantage is required. The recorded qualifying advantage is context-independent live decode state, not perplexity or wall-clock superiority.
+- The conditional hybrid comparator is omitted only because Phase 9 pure CSM passed without hybridization and outperformed the hybrid on aggregate long-context diagnostics.
+
 ### Non-negotiable NLP gate
 
-**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and the learned-memory gate pass.** Both prerequisites now pass through Phase 7. This permits a future NLP proposal; it is not evidence of NLP value and does not automatically authorize one.
+**NO NLP SCALE EXPERIMENT is allowed until both the complete synthetic-memory gate and the learned-memory gate pass.** Both prerequisites passed through Phase 7 before the explicitly authorized Phase 8–10 work. The resulting NLP evidence is scoped: constant state passes the Phase 10 scaling gate, while slower training/decode and higher training VRAM remain countervailing results.
 
 ## Determinism policy
 
@@ -153,6 +182,12 @@ The graph through the Phase 7 gate is executed in the current scope. The NLP nod
 | Repeated symbols make slot and symbol accuracy disagree | Selective-copy scorer reports a false failure | Score the decoded target symbol; retain vector error independently. |
 | Lambda is treated as a hidden changepoint detector | Bayesian tempering semantics are overstated and scan compatibility is lost | Distinguish the forgetting action from detection; use observable cues for the scan-compatible test and retain the innovation-only ablation. |
 | Gate methods receive unequal optimization opportunity | Undertraining masquerades as a theory failure | Use the same 360-step budget for every drift and joint method; keep thresholds fixed. |
+| Optimized scan changes the recurrence | A faster but different mechanism is benchmarked | Compare every optimized path against the Phase 1 fp64 oracle on the same quantized inputs. |
+| CUDA assumptions leak into ROCm work | Unusable MI300X implementation | Detect HIP/gfx support, use PyTorch/Inductor/rocSOLVER paths, and justify rather than assume custom fusion. |
+| Language variants receive unequal data or optimizer budget | Architecture comparison is confounded | Match optimizer, schedule, tokens, batch tokens, corpus, and diagnostic mixture; retain parameter counts. |
+| Test-set observation changes the architecture | Adaptive overfitting is presented as one experiment | Preregister an experimental generation/config hash and require a new generation for any architecture change. |
+| One seed is presented as an architecture effect | Obvious seed noise is ignored | Run three paired Phase 10 seeds and retain per-seed differences and standard deviations. |
+| Constant recurrent state is marketed as universal efficiency | Training activations and factorization cost disappear from the claim | Report live decode state, training peak VRAM, throughput, and latency side by side. |
 
 ## Automation
 
@@ -165,6 +200,9 @@ scripts/run_phase01.sh
 .venv/bin/python experiments/phase5_multihop.py
 .venv/bin/python experiments/phase6_learnability.py
 .venv/bin/python experiments/phase7_gating.py
+.venv/bin/python experiments/phase8_mi300x_systems.py
+.venv/bin/python experiments/phase9_tiny_lm.py
+.venv/bin/python experiments/phase10_small_nlp.py
 ```
 
-The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order. The remaining commands reproduce the separately gated Phase 2–7 records.
+The first command creates the local environment from pinned requirements. The second reruns the environment audit, Python tests, Lean proofs, and Phase 1 measurements in fail-fast order. The remaining commands reproduce the separately gated Phase 2–10 records. Phase 9–10 checkpoints and downloaded corpora are intentionally ignored; reports, configs, raw metric rows, and checksum-pinned loaders are tracked.

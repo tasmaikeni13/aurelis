@@ -1,4 +1,4 @@
-# Phase 0–7 completion audit
+# Phase 0–10 completion audit
 
 This audit maps every explicit requirement in `phases/phase0.md` through `phases/phase7.md` to authoritative repository evidence. “Pass” is limited to the current scope.
 
@@ -212,10 +212,127 @@ This audit maps every explicit requirement in `phases/phase0.md` through `phases
 | failed runs studied, not hidden | innovation-only and 120-step failures logged; invalid partial artifacts excluded; innovation method remains a final ablation | PASS |
 | required report | `results/phase7_gating.md`, JSON, four CSVs, and three inspected plots | PASS |
 
+## Phase 8
+
+| Requirement | Evidence | Decision |
+|---|---|---|
+| benchmark on available AMD MI300X under ROCm | `phase8_metrics.json` identifies MI300X VF, gfx942, HIP 7.0; hardware gate passes | PASS |
+| preserve mathematical operation | `src/csm/systems.py` expresses token/segment affine actions; 10 systems tests compare recurrence/every prefix and gradients | PASS |
+| outer-product state updates | `components.csv`: synchronized `outer_product_updates` latency, FLOPs, utilization, VRAM | PASS |
+| construction of S and C | separate `construct_S_C` component row and full sweep rows | PASS |
+| Cholesky factorization | separate `cholesky` component with leading FLOPs and latency | PASS |
+| triangular solves | separate `triangular_solves` component | PASS |
+| sequential decode | inclusive write/read loop measured at `45.172 us/token` in retained report | PASS |
+| training forward and backward | separate rows; 0.470 ms forward and 0.998 ms backward in retained report | PASS |
+| memory movement | 128 MiB copy row with 4.241 TB/s estimated achieved movement | PASS |
+| GPU utilization | ROCm-SMI mean/peak samples retained per timing row; sequential decode mean 93.5%, peak 97% in final raw record | PASS |
+| HBM bandwidth | direct copy bandwidth plus estimated per-operation traffic fields retained | PASS |
+| achieved FLOPs | explicit leading flop counts and achieved TFLOP/s retained where defensible | PASS |
+| kernel launch overhead | synchronized scalar launch row, `0.004 ms` | PASS |
+| peak VRAM | every row records peak allocation; maximum 730,496,512 bytes | PASS |
+| tokens/sec and decode microseconds/token | normalized fields in all applicable component/path/baseline rows | PASS |
+| exact `d_k` sweep | complete grid over `{16,32,64,128}` | PASS |
+| exact `d_v` sweep | complete grid over `{16,32,64,128}` | PASS |
+| batch-size sweep | `[1,8,32]` independent-axis rows | PASS |
+| sequence-length sweep | `[32,128,512]` independent-axis rows | PASS |
+| head-count sweep | `[1,8,32]` plus fixed-width head-economics rows `[1,2,4,8]` | PASS |
+| dtype sweep | fp32, bf16, fp16, and fp64 policies retained | PASS |
+| requested bf16/fp32 precision policy | bf16 features with fp32 S/C, Cholesky, and solves is primary; alternatives measured | PASS |
+| A vectorized PyTorch | `A_vectorized` path, 0.184 ms in retained report | PASS |
+| B torch.compile | supported on ROCm; `B_torch_compile` path, 0.244 ms and no retained speed win | PASS |
+| C chunked processing | exact `summarize_chunks`; chunk-32 latency and reduced temporary allocation retained | PASS |
+| D associative segment summaries | tested associative composition and Hillis--Steele prefix scan; every prefix matches oracle | PASS |
+| E best justified ROCm fusion | Inductor/Triton fuses construction; report explains why custom Cholesky fusion is not justified | PASS |
+| do not assume CUDA-only strategy | runtime detects HIP/gfx; code uses ROCm PyTorch namespace, Inductor, and rocSOLVER linalg | PASS |
+| every optimized path versus Phase 1 oracle | five path rows; max read relative error below `3e-6` on quantized-equal inputs | PASS |
+| attention baseline | causal PyTorch scaled-dot-product attention at matched width/context | PASS |
+| recurrent/linear-memory baseline | positive-feature causal linear memory measured at same shape | PASS |
+| theoretical complexity | report states state, write/read, factorization, and attention asymptotics | PASS |
+| actual MI300X behavior | synchronized wall-clock, VRAM, utilization, bandwidth, and throughput tables | PASS |
+| memory quality per byte and wall-clock | head-economics rows report normalized recall quality/MB and quality/s | PASS |
+| test many-small-head claim | fixed aggregate width: 8x16 heads retain 0.997683 quality with 1/8 the state bytes and lower measured latency than 1x128 | PASS |
+| stable implementation pass gate | all seven precommitted systems/oracle/stability/coverage gates pass | PASS |
+| required report | `results/phase8_mi300x_systems.md`, JSON, and six CSVs | PASS |
+
+## Phase 9
+
+| Requirement | Evidence | Decision |
+|---|---|---|
+| 5M–20M decoder-only models | all variants 5.13M–6.96M; causal/full-vs-step tests pass | PASS |
+| manageable tokenizer | deterministic raw UTF-8 byte vocabulary of 256 | PASS |
+| modest real-text data | checksum-pinned raw WikiText-2 train/validation splits | PASS |
+| diagnostic synthetic sequences | deterministic corpus covers all six named families | PASS |
+| A small Transformer | 5,574,400 parameters; full causal SDPA and incremental KV path | PASS |
+| B CSM sequence mixer | 5,130,096 parameters; exact fp32 prefix states/solves and incremental state | PASS |
+| C local-attention/CSM hybrid | 5,383,984 parameters; alternating local-attention and CSM layers | PASS |
+| D recurrent/linear-memory baseline | 6,961,408-parameter stacked GRU mixer | PASS |
+| parameter counts reasonably matched | max/min ratio 1.357 below precommitted 1.4 | PASS |
+| optimizer matched | AdamW, LR schedule, warmup, decay, and clipping identical | PASS |
+| token budget matched | every variant trains 10,002,432 tokens | PASS |
+| batch tokens matched | every variant uses 8,192 batch tokens | PASS |
+| start 10M–30M; expand only after stability | initial 10M run completed and intentionally stopped as mechanism gate | PASS |
+| training loss | complete learning curves and initial/final window summaries | PASS |
+| validation perplexity | byte perplexities 8.192/9.897/9.163/5.795 retained | PASS |
+| gradient stability | per-log gradient norms, mean/max summaries, clipping, and zero nonfinite steps | PASS |
+| NaN/Inf frequency | explicit `nonfinite_steps=0` for every architecture | PASS |
+| tokens/sec | per-run measured throughput | PASS |
+| peak VRAM | per-run training peak; maximum 2,991,553,024 bytes | PASS |
+| recurrent-state bytes | calculated and live measured state bytes; CSM 688,128 versus Transformer 4,587,520 at decode prompt | PASS |
+| decode latency | true incremental step timing; all four variants retained | PASS |
+| sequence-length scaling | context `[32,64,128,256,512]` for every architecture | PASS |
+| associative recall probe | trained/long rows plus autoregressive subset | PASS |
+| variable tracking probe | trained/long rows plus autoregressive subset | PASS |
+| repeated-name recall probe | trained/long rows; pure CSM long token-accuracy advantage 0.0588 over Transformer | PASS |
+| exact-value retrieval probe | trained/long rows; best CSM-family long advantage 0.0833 | PASS |
+| in-context regression probe | trained/long rows; pure CSM long advantage 0.0435 | PASS |
+| multi-hop probe | trained/long rows; failures retained | PASS |
+| no post-test architecture edit | generation ID/config SHA recorded before evaluation; no later generation | PASS |
+| stable optimization question | CSM and hybrid loss reductions 0.511/0.527; zero nonfinite steps | PASS |
+| useful natural representations | CSM validation loss 2.292, far below random-byte `ln(256)` and within preregistered Transformer ratio | PASS |
+| targeted memory capability beyond parameter count | pure CSM has fewer parameters than Transformer and wins three preregistered long task token-accuracy comparisons | PASS |
+| ordinary LM loss not catastrophic | best CSM-family validation-loss ratio to Transformer below 1.3 gate | PASS |
+| architecture versus kernel diagnosis | report separates validation/diagnostics from throughput/VRAM/latency | PASS |
+| pass gate | all seven precommitted Phase 9 gates pass | PASS |
+| required report | `results/phase9_tiny_lm.md`, JSON, and four CSVs | PASS |
+
+## Phase 10
+
+| Requirement | Evidence | Decision |
+|---|---|---|
+| target 25M–50M parameters | Transformer 29,499,904; CSM 27,468,544 | PASS |
+| start around 100M tokens | each of six runs trains 100,007,936 tokens | PASS |
+| extend only if healthy/informative | stopped at preregistered initial 100M after first gate became interpretable; no unsupported 200M–300M claim | PASS |
+| reproducible documented corpus | deterministic first 100,000,000 UTF-8 bytes of checksum-pinned raw WikiText-103 | PASS |
+| matched Transformer | three seeds, identical budget/protocol | PASS |
+| strongest prior CSM | pure Phase 9 CSM configuration scaled in width/depth; 16-dimensional small heads retained | PASS |
+| conditional hybrid | omitted with recorded reason: Phase 9 pure CSM passed without hybridization and hybrid was weaker on aggregate long diagnostics | PASS |
+| preregister parameter counts | config generation and SHA precede evaluation; counts fall inside gate | PASS |
+| preregister context | 256 training context | PASS |
+| preregister optimizer/LR schedule | AdamW, `3e-4`, 300 warmup, cosine/min fraction fixed | PASS |
+| preregister batch/training tokens | 16,384 batch tokens and 100M target fixed | PASS |
+| preregister seeds/evaluations/exclusions | seeds `[0,1,2]`, context/probe/scaling lists, four exclusions fixed | PASS |
+| enough seeds | three paired seeds; no exclusion/replacement | PASS |
+| validation perplexity | per-seed and mean/std; 3.261 Transformer versus 3.328 CSM mean | PASS |
+| downstream memory probes | every six-family trained/long row for every seed | PASS |
+| long-context probes | expanded synthetic prompts plus 512/1024 natural-context evaluations | PASS |
+| tokens/sec | mean 715,420 Transformer versus 69,161 CSM | PASS |
+| peak VRAM | mean 5.09 GB Transformer versus 12.50 GB CSM; per-seed rows retained | PASS |
+| training wall-clock | per-seed and mean seconds; total experiment 5,116.907 seconds | PASS |
+| inference throughput | prefill scaling and incremental decode tokens/s retained | PASS |
+| decode latency | actual incremental latency at prompt 128/512/2048 and standard prompt 256 | PASS |
+| state-memory cost | actual live state object bytes; no estimate substituted for qualifying ratio | PASS |
+| same checkpoint several contexts | each final checkpoint evaluated at 128/256/512/1024 without fine-tuning | PASS |
+| no perplexity-only claim | diagnostics, context behavior, wall-clock, VRAM, latency, and state all jointly reported | PASS |
+| architecture effects versus seed noise | paired loss gaps `[0.021880,0.009817,0.028710]`, mean/std retained | PASS |
+| compelling qualifying advantage | at prompt 2048 CSM live state 786,432 bytes versus 67,371,008; ratio 0.011673 and growth exactly 1.0x | PASS |
+| countervailing failures retained | CSM slower training/decode, higher training VRAM, slightly worse perplexity, mixed probes | PASS |
+| scaling gate | all nine precommitted Phase 10 checks pass through decode/state scaling advantage | PASS |
+| required report | `results/phase10_small_nlp.md`, JSON, and six CSVs | PASS |
+
 ## Formal proof interpretation
 
 `lake build` proves the exact statements listed in `lean/PROOF_COVERAGE.md`, including affine associativity, recurrence aggregation, exact simultaneous `(S,C)` action, finite-matrix PSD preservation, positive definiteness/invertibility, scalar ridge-factor properties, the one-key mismatched-query error decomposition, finite softmax normalization, and impossibility of matching negative, above-one, or nonunit-sum targets with normalized nonnegative weights. Claims outside that map—including the full matrix mismatch norm bound and floating-point backward stability—are not labeled proved. A Lean compilation or missing-premise issue is not treated as a mathematical counterexample.
 
 ## Final decision
 
-Phase 0: **PASS**. Phase 1: **PASS**. Phase 2: **PASS**. Phase 3: **PASS**. Phase 4: **PASS**. Phase 5: **PASS**. Phase 6: **PASS**. Phase 7: **PASS**. The synthetic and learned-memory prerequisite gates are open; no NLP experiment has been run, authorized, or validated by these results.
+Phase 0: **PASS**. Phase 1: **PASS**. Phase 2: **PASS**. Phase 3: **PASS**. Phase 4: **PASS**. Phase 5: **PASS**. Phase 6: **PASS**. Phase 7: **PASS**. Phase 8: **PASS**. Phase 9: **PASS**. Phase 10 scaling gate: **PASS**. The Phase 10 advantage is context-independent incremental state; it is explicitly not a training-speed, decode-latency, training-memory, or unqualified quality win.
