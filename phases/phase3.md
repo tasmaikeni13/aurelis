@@ -1,68 +1,70 @@
-This is Phase 3.
+# Phase 3 — Learned features and episodic routing
 
-Goal:
-Determine whether CSM's solver read has a genuine memory advantage over simpler competing reads, rather than merely demonstrating that the equations work.
+Start only after Phase 2 PASS. Read all prior evidence and
+`phases/AUTONOMY_PROTOCOL.md`. Use the failure-repair loop until all gates pass.
 
-Implement carefully controlled baselines:
+This is the first learned-memory phase. No natural-language scale run is
+allowed yet.
 
-1. Hebbian / outer-product fast-weight memory:
-   C = sum v k^T
-   read(q) = Cq
+## Models
 
-2. normalized dot-product / softmax memory over explicitly stored pairs
+Train matched small models with shared key/query feature charts and learned
+value, evidence, temperature, and episodic-responsibility projections. Include
+local-only, remote-only, learned-sum, Gated DeltaNet, cumulative least-squares,
+AURELIS-B, and AURELIS-E. Give controls the same encoder capacity and
+optimization opportunity.
 
-3. a simple linear-attention-style memory
+Retain these ablations:
 
-4. ridge/least-squares oracle where useful
+- independent key/query charts;
+- fixed versus learned evidence;
+- fixed gates `0` and `1`;
+- analytic gate without episodic override;
+- learned sigmoid gate without analytic features;
+- analytic-plus-episodic gate;
+- cache overlap/double counting as a known-invalid covariance ablation; and
+- random frozen features.
 
-Keep implementations simple enough to audit.
+## Curriculum
 
-Compare using TWO fairness regimes:
+Train and evaluate across at least seven task families:
 
-A. same key/value dimension
-B. same total state-memory bytes
+1. noisy linear and affine in-context regression;
+2. recent exact associative copy;
+3. remote structured recall within rank;
+4. mixed latent-denoising and episodic-exception targets with an observable
+   task cue;
+5. selective copy and local token shift;
+6. cache-boundary recall at ages `w-1,w,w+1,w+2`; and
+7. over-capacity, conflicting-write, and no-relevant-context negatives.
 
-Where reasonable also report:
-- FLOPs/query
-- bytes of recurrent state
-- wall-clock latency
+Use held-out dimensions, loads, temperatures, noise distributions, windows,
+and sequence lengths. Include at least five paired seeds. Measure task metrics,
+endpoint/routed risks, gate calibration by target type, AUROC for episodic
+responsibility, spectra/effective rank, conditioning, gradient norms, and
+failure rate.
 
-Experiments:
+## Self-correction focus
 
-1. random independent associative recall
-2. highly correlated keys
-3. almost-colliding keys
-4. capacity sweep
-5. epsilon sweep
-6. value dimension sweep
+If representation rank collapses, do not immediately add orthogonality loss.
+Research and diagnose normalization, parameterization, optimization, and task
+identifiability first. Any regularizer becomes a named ablation with a derived
+objective and test. If the episodic router lacks a future-query signal, add an
+observable cue or revise the claim; do not let it consume hidden labels.
 
-Then test the manuscript's linear-functional separation.
+## PASS gates
 
-Store keys k_i and values v_i.
-Construct queries:
-
-q = sum_i alpha_i k_i
-
-where alpha contains:
-- positive coefficients
-- negative coefficients
-- coefficients >1
-- mixtures summing to values other than 1
-
-Target:
-sum_i alpha_i v_i
-
-Compare CSM and normalized softmax reads.
-
-Explicitly test whether normalized smoothing is constrained by convex combinations while the CSM solver can recover linear-span answers.
-
-Do not describe results as superiority unless they survive equal-memory comparisons.
-
-Required report:
-results/phase3_baseline_separation.md
-
-PASS GATE:
-There should exist clearly characterized regimes in which the solver read delivers a reproducible fidelity advantage over simpler memories.
-Document regimes where it does NOT.
-
-If CSM only wins because it uses much more state, mark that as a serious negative result.
+- Learned AURELIS solves every task family above a preregistered threshold on
+  every seed, including negative/no-write cases.
+- It improves over frozen random features on aggregate risk for every seed.
+- Shared-chart AURELIS beats the independent-chart failure ablation and retains
+  usable effective rank.
+- AURELIS-B is calibrated on latent tasks; AURELIS-E materially improves exact
+  exception copy without unacceptable degradation on anti-copy cases.
+- The observable episodic cue, not hidden evaluator metadata, explains the
+  override.
+- Handoff-boundary degradation is within a declared tolerance or a researched,
+  proved, and tested repair is adopted.
+- Every seed, including failures and nonfinite runs, is reported.
+- Inherited gates and Lean build pass, and
+  `results/phase3/PASS.md` satisfies the shared PASS record.

@@ -1,26 +1,25 @@
 # Formal proof coverage
 
-| Lean theorem | Mathematical content | Manuscript target | Status boundary |
-|---|---|---|---|
-| `Affine.combine_assoc` | affine scan composition is associative | Theorem 4.1 / Proposition 6.1 | Full algebraic identity |
-| `Affine.combine_identity_left/right` | `(1,0)` is the scan identity | Theorem 4.1 / Proposition 6.1 | Full algebraic identity |
-| `Affine.act_combine` | combined element acts like chronological composition | Theorem 4.1 | Full algebraic identity |
-| `Affine.aggregate_correct` | an arbitrary finite recurrence equals its aggregate scan action | Definition 5.1 / Proposition 6.1 | Generic state-module recurrence |
-| `statisticsElement_action` | the affine action is exactly the simultaneous matrix `(S,C)` recurrence | Definition 5.1 | Full finite-matrix identity |
-| `outer_self_posSemidef` | a real rank-one outer product is PSD | Definition 5.1 write term | Full finite-matrix theorem |
-| `memory_S_update_posSemidef` | nonnegative decay/evidence preserves PSD under the exact matrix update | Definition 5.1 | Full finite-matrix theorem |
-| `regularized_system_posDef` | positive epsilon makes `S + epsilon I` positive definite | Definition 5.1 read system | Full finite-matrix theorem |
-| `regularized_system_isUnit` | the regularized read system is invertible | Definition 5.1 read system | Full finite-matrix theorem |
-| `quadraticUpdate_nonneg` | scalar quadratic-form reduction of PSD preservation | PSD invariant behind Definition 5.1 | Redundant scalar certificate |
-| `regularizedQuadratic_positive` | scalar quadratic-form reduction of the epsilon floor | `A=S+epsilon I` in Definition 5.1 | Requires a nonzero query (`normSquared>0`) |
-| `oneKey_read_error` | exact finite-epsilon shrinkage error for one normalized key | Theorem 5.2, one-key case | Scalar/one-key specialization |
-| `oneKey_mismatched_read_error` | exact decomposition into query-chart mismatch and ridge shrinkage | Lemma 5.2a, one-key case | Scalar/one-key specialization |
-| `oneKey_variance_positive` | the one-key posterior variance is positive | Proposition 5.6, one-key case | Scalar/one-key specialization |
-| `ridgeFactor_nonneg` / `ridgeFactor_le_one` | each positive-eigenvalue ridge error multiplier lies in `[0,1]` | Theorem 5.2 finite-epsilon bound | Scalar spectral certificate; not the matrix norm theorem |
-| `ridgeFactor_antitone_eigenvalue` | better Gram eigenvalues reduce the spectral shrinkage factor | Theorem 5.2 conditioning dependence | Scalar spectral certificate |
-| `softmaxWeight_nonneg` / `softmaxWeight_sum` | finite real softmax weights are nonnegative and normalized | Phase 3 smoothing baseline | Full finite-index weight theorem |
-| `negative_coordinate_not_normalized` | a simplex-valued read cannot reproduce a negative target coordinate | Phase 3 linear-functional separation | Full finite-index theorem |
-| `above_one_coordinate_not_normalized` | a simplex-valued read cannot reproduce a target coordinate above one | Phase 3 linear-functional separation | Full finite-index theorem |
-| `nonunit_sum_not_normalized` | normalized weights cannot reproduce a target with sum other than one | Phase 3 linear-functional separation | Full finite-index theorem |
+| Lean theorem | Paper content | Coverage boundary |
+|---|---|---|
+| `handoff_partition` | The recent cache and remote suffix partition every history occurrence | Full list identity; not a GPU ring-buffer implementation |
+| `recent_length_le_window` | Cache size is at most the fixed window | Full list theorem |
+| `Affine.combine_assoc` and identities | Remote affine summaries form a scan monoid | Full algebraic identity |
+| `Affine.aggregate_correct` | A finite sequential recurrence equals its aggregate action | Full generic recurrence theorem |
+| `statisticsElement_action` | One matrix-statistic update is the advertised affine update | Full finite-matrix identity |
+| `precision_update_posSemidef` | Nonnegative evidence preserves PSD precision statistics | Full finite real-matrix theorem |
+| `regularized_precision_posDef` / `isUnit` | A positive prior makes the remote solve uniquely defined | Full finite real-matrix theorem |
+| `corrected_error_identity` | Error splits into attention residual plus remote slope error | Full linear-map identity |
+| `corrected_reproduces_linear` | Residual correction reproduces an exact linear operator for arbitrary local barycenter | Full linear-map theorem |
+| `corrected_exact_hit` | A one-hot recent hit returns its stored target independently of remote state | Full linear-map theorem |
+| `weighted_residual_identity` | Barycentric residual equals the weighted pointwise residual sum | Full finite-index theorem |
+| `softmaxWeight_pos` / `softmaxWeight_sum` | Finite softmax weights are a strict probability vector | Full finite-index theorem |
+| `routeVariance_completion` | The routing variance is a completed square about the analytic gate | Full real-algebra theorem |
+| `rawGate_le_remote` / `rawGate_le_residual` | The unconstrained analytic gate is variance-noninferior to both endpoints | Full real-algebra theorem when the quadratic denominator is positive |
+| `clippedGate_optimal` | Projecting the gate to `[0,1]` minimizes variance over all convex gates | Full real-algebra theorem when the denominator is positive |
+| `posterior_denominator_identity` / `posterior_numerator_identity` | Posterior covariance terms simplify to the paper's gate formula | Full scalar reduction |
 
-Not yet claimed as formally proved: the full matrix interpolation bound in Theorem 5.2, Gauss–Markov optimality, calibration under the stochastic model, ricochet error bounds, Cholesky backward stability, or any dyadic-cascade theorem. Those require substantially larger probability/numerical-analysis developments. Their absence is not a proof failure.
+Not formalized: derivation of the conditional covariance from matrix-normal
+probability, concentration bounds, the fp64 Monte Carlo experiment, Cholesky
+backward error, kernel complexity, or any empirical performance claim. Those
+remain analytic or experimental evidence and are not described as Lean-proved.

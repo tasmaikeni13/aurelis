@@ -1,71 +1,45 @@
-This is Phase 4.
+# Phase 4 — Nonstationarity, compositional access, and capacity limits
 
-Goal:
-Test whether CSM behaves like the predicted Bayesian/ridge estimator under noisy repeated evidence, and whether its confidence output contains useful calibrated information.
+Start only after Phase 3 PASS. Read all prior artifacts and
+`phases/AUTONOMY_PROTOCOL.md`. Apply the failure-repair loop until PASS.
 
-Generate latent linear operators W*.
+This phase tests the principal ways an undiscounted remote relation can become
+wrong. Extensions are allowed only after deriving their changed semantics.
 
-Sample:
+## Required suites
 
-v_i = W* k_i + sigma * noise
+- abrupt and gradual operator drift with observable and unobservable changes;
+- heterogeneous write precision, corrupted precision labels, outliers,
+  Student-like noise, and nonlinear misspecification;
+- repeated updates, overrides, many-to-one mappings, and state pollution;
+- pointer chasing and multi-hop composition at hops `{1,2,4,8,16}`;
+- cache/remote mixed-hop chains in every order;
+- rank, state-byte, and adversarial-association capacity sweeps; and
+- sequences at least 16 times longer than training length.
 
-Test:
-- varying observation noise
-- repeated observations of the same association
-- conflicting observations
-- heteroscedastic evidence
-- missing directions in key space
-- out-of-distribution query directions
+Compare the undiscounted state with researched extensions such as tempered
+evidence, observable-cue decay, run-length beliefs, protected memory, or sparse
+fallback. Do not call a learned forget action a changepoint posterior unless an
+explicit probabilistic state supports that claim. Any decay changes the scan,
+posterior, variance, and gate equations; update theory, numerical oracle, Lean
+coverage, and tests before using its results.
 
-Use beta_i to represent observation precision.
+For multi-hop reads, distinguish adaptive round count, vector error, decoded
+success, operator norm, confidence, and actual latency. One attention read and
+`H` adaptive reads are different computational budgets.
 
-Experiments:
+## PASS gates
 
-A. noisy duplicates
-Compare CSM prediction against:
-- simple averaging
-- Hebbian memory
-- softmax memory
-- oracle ridge regression
-
-B. beta precision
-Provide observations with different known noise variances.
-Set beta according to true precision.
-Check whether weighting reduces prediction risk.
-
-C. confidence
-For every query record:
-
-c(q) = q^T (S + epsilon I)^-1 q
-
-and actual squared prediction error.
-
-Evaluate:
-- Spearman correlation between confidence/uncertainty and error
-- calibration plots
-- risk conditioned on confidence quantile
-- AUROC for detecting high-error queries
-- selective prediction: accuracy when abstaining on highest-confidence-risk samples
-
-D. unseen directions
-Query directions progressively farther from the observed key span.
-Check whether uncertainty increases appropriately.
-
-The manuscript distinguishes in-model calibration from model-free guarantees. Respect that distinction.
-
-Run both:
-1. exactly linear-Gaussian data
-2. deliberately misspecified data:
-   - Laplace noise
-   - Student-like heavy-tailed noise
-   - nonlinear latent functions
-
-Do not claim Bayesian optimality outside the declared model.
-
-PASS GATE:
-Within the linear-Gaussian setting, CSM should match the expected ridge/Bayesian behavior and confidence should meaningfully track predictive uncertainty.
-
-Outside the model, characterize degradation rather than hiding it.
-
-Write:
-results/phase4_uncertainty_and_noise.md
+- The stationary method retains its Phase 3 behavior on stationary controls.
+- A drift-aware variant improves post-change risk on every paired seed when an
+  observable signal exists, and unobservable-change limitations are retained.
+- Evidence weighting improves heteroscedastic risk when precision is valid and
+  degrades transparently when precision is corrupted.
+- Mixed cache/remote multi-hop chains meet preregistered vector and decoded
+  gates through the declared hop count, with error-propagation diagnostics.
+- Rank/state lower-bound failures remain present; no fixed-state unlimited
+  recall claim appears.
+- Every extension has updated mathematics, a faithful formalization where
+  feasible, a regression test, and an ablation against the base head.
+- All inherited gates and Lean proofs pass, and
+  `results/phase4/PASS.md` satisfies the shared PASS record.

@@ -1,59 +1,59 @@
-This is Phase 7.
+# Phase 7 — Matched multi-seed scaling study
 
-Goal:
-Determine whether the Bayesian interpretation of CSM gates leads to learnable and useful behavior.
+Start only after Phase 6 PASS. Read all prior artifacts and
+`phases/AUTONOMY_PROTOCOL.md`. Execute the failure-repair loop until PASS.
 
-Use the successful Phase 6 architecture.
+This phase tests whether the tiny-model mechanism persists under a meaningful
+but one-MI300X-feasible scaling budget. It may not redefine success around
+constant state alone.
 
-Experiment 1: evidence precision beta
+## Frozen design
 
-Create observations with controlled reliability.
-Some tokens contain:
-- clean evidence
-- noisy evidence
-- irrelevant distractors
-- corrupted values
+Preregister one generation with:
 
-Make beta_t learned.
+- strongest Transformer, published-style hybrid, Gated DeltaNet or Kimi-style
+  feasible comparator, cumulative least-squares comparator, and strongest
+  AURELIS variant selected without Phase 7 test results;
+- `25M–75M` parameters, at least three paired seeds, and at least `100M`
+  training tokens per model/seed unless a larger equal budget is feasible;
+- identical corpus, tokenizer, optimizer, schedule, batch tokens, context,
+  precision policy, checkpoint cadence, and evaluator;
+- parameter/FLOP/state reconciliation; and
+- fixed primary and secondary claims with confidence intervals and multiple
+  comparison treatment.
 
-Test whether learned beta:
-- increases on reliable observations
-- decreases on corrupted/irrelevant observations
-- improves downstream risk
+Do not omit a comparator because it was strong in Phase 6. Any post-test
+architecture change creates a new generation and reruns every model/seed.
 
-Compare with:
-- beta = 1
-- unconstrained generic scalar gate
-- oracle beta based on true noise
+## Evaluation
 
-Experiment 2: drift lambda
+Use the Phase 6 diagnostic suite plus natural validation at several contexts,
+long-document subsets, downstream zero/few-shot probes appropriate to scale,
+and generation-time prefill/decode sweeps. Evaluate the same checkpoint at
+trained and extrapolated contexts. Report per-seed and aggregate results,
+throughput, peak VRAM, wall time, energy/power if reliable, checkpoint size,
+live state, and latency distributions.
 
-Create streams where latent operator W changes at controlled change points.
+## Failure repair
 
-Learn lambda_t.
+Diagnose divergence, quality loss, or systems regressions from preserved
+traces. Research scaling, optimization, recurrence, attention, and numerical
+solver literature before changing the design. Mathematical repairs must update
+the paper, fp64 oracle, Lean coverage, and all prior experiments. Hyperparameter
+tuning must be symmetric across models or separately budgeted and reported.
 
-Test whether:
-- lambda approaches 1 in stationary periods
-- forgetting increases after distribution changes
-- adaptation speed improves versus lambda=1
-- learned behavior correlates with actual drift
+## PASS gates
 
-Compare:
-- fixed lambda values
-- learned lambda
-- oracle change-point forgetting
-
-Experiment 3:
-Jointly learn beta and lambda only after the separate experiments work.
-
-Record whether their interpretations remain identifiable or whether the network uses them in unintended ways.
-
-Do not force the model to behave like the theory merely because the parameters were named beta and lambda.
-
-Report what gradient descent actually does.
-
-PASS GATE:
-Learned gating must produce a reproducible benefit over fixed gates on tasks where evidence quality or latent drift genuinely varies.
-
-Write:
-results/phase7_gating.md
+- All preregistered models and all paired seeds complete the equal token budget
+  or the phase remains failed.
+- AURELIS validation loss is non-inferior within the preregistered margin to
+  the strongest efficient hybrid, with confidence intervals across seeds.
+- AURELIS retains a statistically supported targeted-memory advantage and a
+  context-independent remote-plus-window decode-state advantage.
+- At least one end-to-end quality-qualified throughput/latency Pareto advantage
+  survives at long context; theoretical bytes alone are insufficient.
+- No primary claim depends on one seed, one context, test-driven exclusions,
+  or different data/optimizer budgets.
+- Negative natural/downstream results and all resource costs are retained.
+- All inherited gates and Lean build pass, and
+  `results/phase7/PASS.md` satisfies the shared PASS record.

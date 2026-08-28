@@ -1,249 +1,52 @@
-# Experiment log
+# AURELIS research log
 
-Results are append-only records. A rerun creates or replaces generated machine-readable files only when its complete record is preserved in Git history.
+## 2026-08-28 — Theory foundation
 
-## Required record format
+### Literature research
 
-```yaml
-experiment_id: unique descriptive identifier
-timestamp_utc: ISO-8601 timestamp
-git_commit: exact tested source commit
-working_tree_dirty: true_or_false
-config: committed config path plus resolved values
-seed: scalar or complete seed list
-hardware: GPU model/architecture/VRAM and relevant host facts
-software_versions: Python, PyTorch, HIP, ROCm, Triton and relevant libraries
-wall_clock_time: seconds
-peak_vram: bytes and GiB
-metrics: names, values, units, and aggregation rule
-plots: committed plot paths
-interpretation: scoped conclusion, failures, and non-conclusions
+Reviewed primary work on local/recurrent hybrids, linear and delta attention,
+test-time regression, cumulative least-squares sequence layers, same-layer
+hybrids, and 2026 hybrid mechanism studies. The frozen comparison and novelty
+boundary is `research/LITERATURE_REVIEW.md`.
+
+### Architecture decision
+
+Named the architecture **AURELIS** and fixed delayed handoff plus the residual
+read `Mq+g(vbar-Mkbar)`. Derived the correlated endpoint covariance and
+projected analytic Bayes gate. Separated latent-denoising and episodic-copy
+targets with a distinct override rather than claiming one universal gate.
+
+### Numerical analysis
+
+Command:
+
+```bash
+.venv/bin/python analysis/aurelis_numerical.py
 ```
 
-## Runs
+Seed `20260828` passed all assertions. Highlights:
 
-### P0-ENV-20260823
+- residual identity maximum absolute error: `9.992e-16`;
+- gate-form equivalence: `3.331e-16`;
+- linear reproduction error: `2.285e-16`;
+- hard one-hot exception error: `0`;
+- conditional routed predicted/empirical MSE: `0.143750 / 0.143329`;
+- routed relative calibration error: `0.293%`; and
+- gate regret and endpoint-noninferiority slack: `0` at fp64 resolution.
 
-- timestamp UTC: `2026-08-23T15:45:30.482905+00:00`
-- git commit: `223afde` (audit script source was introduced at `80235c0`)
-- working tree dirty: `true` because generated audit outputs were created after the source checkpoint
-- config: `scripts/audit_environment.py`, GEMM size 8192, 7 measured repetitions after 3 warmups
-- seed: `0`
-- hardware: AMD Instinct MI300X VF, `gfx942`, 191.688 GiB visible VRAM; 20 host cores; 235.948 GiB RAM
-- software versions: Python 3.12.3; ROCm 7.0.2; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; Triton 3.4.0+rocm7.0.2
-- wall-clock time: 17.452 seconds (machine-readable record is authoritative)
-- peak VRAM: 2.387 GiB allocated during audit
-- metrics: `torch.compile` pass; direct Triton pass; all four dtype GEMMs finite; median sanity TFLOP/s in `results/environment.json`
-- plots: none (environment audit)
-- interpretation: host is suitable for the Phase 1 fp64 reference. Throughput numbers are untuned health checks, not benchmark claims.
+Alternate seeds `17`, `29`, and `41` passed the same assertion suite using
+separate temporary output directories. Raw committed evidence is under
+`analysis/results/` and `analysis/plots/`.
 
-### P1-REF-20260823
+### Formal analysis
 
-- timestamp UTC: `2026-08-23T15:52:13.672343+00:00`
-- git commit: `60d5922bac15526599352f805a6382e32ae0d331`
-- working tree dirty: `false` at experiment start
-- config: `configs/phase1_reference.json` with resolved values embedded in `results/phase1_metrics.json`
-- seeds: `[0,1,2,3,4]` for the 25 recurrence cases; specialized fixed seeds are visible in experiment source
-- hardware: AMD Instinct MI300X VF
-- software versions: Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 25.054 seconds
-- peak VRAM: 134,683,136 bytes (0.125433 GiB allocated)
-- metrics: state max error `8.881784e-16`; read max error `2.273737e-12`; minimum S eigenvalue `-2.855521e-16`; gradcheck pass; all pathology outputs finite; noisy-risk ratio range `[0.905,1.104]`
-- plots: `plots/phase1/recurrence_consistency.png`, `interpolation_error.png`, `conditioning_fp32.png`, `noise_averaging.png`
-- interpretation: Phase 1 reference equations pass their configured fp64 gate. This does not validate learned memory, kernel performance, the cascade, NLP, or claims beyond the measured/formalized subset.
+Rebuilt the proof project under namespace `Aurelis`, pinned to Lean/mathlib
+4.19.0. `lake build` passed. Search found no `sorry`, `admit`, or declared
+project axiom. Coverage is recorded in `lean/PROOF_COVERAGE.md`.
 
-Machine-readable record: [`results/phase1_metrics.json`](results/phase1_metrics.json). Human report: [`results/phase1_report.md`](results/phase1_report.md).
+### Paper and automation
 
-### P2-INTERPOLATION-STRICT-20260823 — FAIL
-
-- timestamp UTC: `2026-08-23T16:08:25.972587+00:00`
-- git commit: `d35e29768dbe689fa427b5abc107860e7ff37100`; complete failed outputs preserved at commit `2f7dba6`
-- working tree dirty: `false` at experiment start
-- config: the initial committed `configs/phase2_interpolation.json`; same full grid as the corrected run
-- seeds: `[0,1,2]`, deterministically mixed with dimensions and regime indices
-- hardware: AMD Instinct MI300X VF
-- software versions: Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 151.392 seconds
-- peak VRAM: 135,920,128 bytes (0.126585 GiB allocated)
-- metrics: 12,600 rows / 1,800 datasets; three of four gates passed; maximum measured-error / exact-real-bound ratio `1.003804` exceeded the strict `1.000100` fp64 threshold
-- plots: the five Phase 2 plot paths at commit `2f7dba6`
-- interpretation: **FAIL retained.** The strict gate compared a floating-point Cholesky result with an exact-real theorem bound. Its worst excess was about `1.5e-14` absolute on an error of order `1e-12`; this diagnosed a missing numerical-roundoff qualification, not a counterexample to the inequality.
-
-### P2-INTERPOLATION-20260823 — PASS
-
-- timestamp UTC: `2026-08-23T16:13:29.098769+00:00`
-- git commit: `3862d607f306830db1f558fcc4d5738ace0253f7`
-- working tree dirty: `false` at experiment start
-- config: `configs/phase2_interpolation.json`, with all resolved values embedded in `results/phase2_metrics.json`
-- seeds: `[0,1,2]`, deterministically mixed with dimensions and regime indices
-- hardware: AMD Instinct MI300X VF
-- software versions: Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 150.704 seconds
-- peak VRAM: 135,920,128 bytes (0.126585 GiB allocated)
-- metrics: 12,600 rows / 1,800 datasets; under-capacity independent median low-epsilon error `2.214321e-12`; p99 `6.195306e-8`; epsilon direction `100%`; 672/6,363 exact-bound comparisons exceeded only at fp64 scale; maximum ratio after the committed conditioning-scaled allowance `0.9999999999998866`; dependent/over-capacity median error separation `3.034e11`
-- plots: `plots/phase2/error_vs_epsilon.png`, `error_vs_load.png`, `error_vs_min_gram_eigenvalue.png`, `confidence_vs_error.png`, `load_conditioning_heatmap.png`
-- interpretation: Phase 2 supports full-row-rank interpolation and the finite-epsilon direction in its scoped synthetic domain, and clearly exposes rank-limited failure for dependent/over-capacity associations. It does not establish baseline superiority or learned/NLP performance.
-
-Machine-readable record: [`results/phase2_metrics.json`](results/phase2_metrics.json). Human report: [`results/phase2_interpolation_report.md`](results/phase2_interpolation_report.md).
-
-### P3-BASELINE-SEPARATION-20260823 — PASS
-
-- timestamp UTC: `2026-08-23T16:33:24.974687+00:00`
-- git commit: `e1c592feb09dc769477b3e8fd566ac07a55e9e0e`; the preceding complete passing output set is also preserved at that checkpoint
-- working tree dirty: `false` at experiment start
-- config: `configs/phase3_baselines.json`, with all resolved values embedded in `results/phase3_metrics.json`
-- seeds: `[0,1,2]`, deterministically mixed with dimensions and regime indices
-- hardware: AMD Instinct MI300X VF
-- software versions: Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 23.320 seconds
-- peak VRAM: 135,595,008 bytes (0.126283 GiB allocated)
-- metrics: 17,010 recall rows, 900 linear-functional rows, and 15 latency rows; correlated compressed-baseline/CSM median error ratio `2.427e6`; equal-byte nonconvex CSM median absolute error `1.399e-7`; softmax/CSM median separation `4.496e6`; convex-hull checks exact within `2.220e-16`
-- plots: `plots/phase3/recall_vs_load_same_dimension.png`, `recall_vs_load_equal_state_budget.png`, `csm_epsilon_sweep.png`, `linear_functional_separation.png`, `prepared_read_latency.png`
-- interpretation: **PASS with important no-win regimes.** CSM separates from compressed Hebbian/linear memories on correlated keys and from normalized softmax on equal-byte nonconvex linear functionals. Oracle-tuned explicit softmax and least squares match or beat CSM on stored-key recall; the reference CSM read is also much slower in the recorded prepared-read latency diagnostic. No universal superiority is claimed.
-
-Machine-readable record: [`results/phase3_metrics.json`](results/phase3_metrics.json). Human report: [`results/phase3_baseline_separation.md`](results/phase3_baseline_separation.md).
-
-### P4-UNCERTAINTY-STRICT-20260824 — FAIL
-
-- timestamp UTC: initial complete run immediately preceding `2026-08-24T13:18:33.004071+00:00`
-- git commit: `a8ad6e59db43ee61adadf4888d69edcb9ac705c5`; working tree dirty because Phase 4 source and generated outputs were not checkpointed separately
-- config: initial `configs/phase4_uncertainty.json`; selective coverages omitted exact `0.5` and required a risk ratio no larger than `0.4`
-- seeds: `[0..15]` for duplicate/precision sweeps; 48 deterministic specialized confidence trials per model
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- metrics: seven of eight checks passed; the closest retained fraction to one half was `0.6`, with Gaussian selective/full risk ratio `0.4716538778`, above the initial `0.4` threshold
-- interpretation: **FAIL retained.** The mismatch was between the named half-coverage check and a grid that omitted one half. `results/phase4_initial_strict_gate_failure.md` preserves all initial gate measurements and the correction rationale.
-
-### P4-UNCERTAINTY-20260824 — PASS
-
-- timestamp UTC: `2026-08-24T13:25:02.626168+00:00` (final rerun with the ridge oracle assembled independently from raw observations)
-- git commit: `a8ad6e59db43ee61adadf4888d69edcb9ac705c5`; working tree dirty at experiment start
-- config: `configs/phase4_uncertainty.json`, including exact `0.5` selective coverage and all resolved values in `results/phase4_metrics.json`
-- seeds: `[0..15]` plus 48 deterministic confidence trials per data model
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 19.907 seconds; peak VRAM: 134,306,816 bytes (0.125083 GiB)
-- metrics: 4,800 duplicate rows, 432 precision rows, 3 conflict rows, 23,040 confidence-query rows; CSM/oracle difference `5.535e-16`; repeat-risk slope `-1.018`; uniform/precision risk `23.206x`; Gaussian Spearman `0.704`; high-error AUROC `0.875`; actual/predicted MSE `0.957`; half/full selective risk `0.404`
-- plots: five Phase 4 plots under `plots/phase4/`, all visually inspected
-- interpretation: **PASS only in-model.** Linear-Gaussian ridge and calibration behavior pass. Laplace, Student-like, and nonlinear results characterize misspecification; no Bayesian optimality is claimed for them.
-
-Machine-readable record: [`results/phase4_metrics.json`](results/phase4_metrics.json). Human report: [`results/phase4_uncertainty_and_noise.md`](results/phase4_uncertainty_and_noise.md).
-
-### P5-MULTIHOP-20260824 — PASS
-
-- timestamp UTC: `2026-08-24T13:20:17.591147+00:00`
-- git commit: `a8ad6e59db43ee61adadf4888d69edcb9ac705c5`; working tree dirty at experiment start
-- config: `configs/phase5_multihop.json`, with all resolved values embedded in `results/phase5_metrics.json`
-- seeds: `[0,1,2]`, deterministically mixed with dimension, edge count, representation, and graph regime
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 92.646 seconds; peak VRAM: 135,149,056 bytes (0.125867 GiB)
-- metrics: 12,960 pointer-chasing rows and 90 latency rows; controlled minimum decoded success `1.0`; maximum controlled H=16 vector error `1.600e-7`; maximum propagation-bound relative excess `7.973e-9`; many-to-one operator norm up to `3.0`
-- systems diagnostic: at `d_key=K=64`, H=16 prepared fp64 reference latency was 12,260.259 us for CSM and 522.226 us for repeated explicit softmax at comparable leading FLOPs; no practical-efficiency win is claimed
-- plots: four Phase 5 plots under `plots/phase5/`, all visually inspected
-- interpretation: **PASS architectural gate.** One maintained CSM state supports 16 chained adaptive reads on controlled codes. Random geometry, capacity, epsilon, amplification, and reference runtime failures are retained, and the systems claim remains open.
-
-Machine-readable record: [`results/phase5_metrics.json`](results/phase5_metrics.json). Human report: [`results/phase5_multihop.md`](results/phase5_multihop.md).
-
-### P6-LEARNABILITY-INDEPENDENT-CHART-20260824 — FAIL
-
-- timestamp UTC: diagnostic run preceding `2026-08-24T14:03:48.143825+00:00`
-- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty because Phase 6 source was under development
-- config: initial Phase 6 task grid, with separately normalized key and query encoders
-- seeds: `[0,1,2]`
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- metrics: contextual associative-recall success ranged from `0.236` to `0.492`, below the `0.75` gate; the initial nominal capacity fraction reached only about `0.148`; selective-copy success near `0.63` was subsequently diagnosed as support-slot scoring in a task with repeated symbols
-- interpretation: **FAIL retained as a study, not as gate evidence.** Independent normalized encoders did not put queries in the coordinate chart in which the ridge operator was fitted. The capacity denominator and selective-copy scorer were also invalid. The faulty generated files were overwritten; the corrected report, manuscript Lemma 5.2a, post-natural independent-chart ablation, and Git diff preserve the diagnosis without presenting invalid metrics as results.
-
-### P6-LEARNABILITY-20260824 — PASS
-
-- timestamp UTC: `2026-08-24T14:03:48.143825+00:00`
-- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty at experiment start
-- config: `configs/phase6_learnability.json`, including seven tasks, four primary methods, three seeds, and post-natural regularizer/independent-chart ablations
-- seeds: `[0,1,2]`
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 89.854 seconds; peak VRAM: 430,684,672 bytes (0.401106 GiB)
-- metrics: 93 seed rows and 930 learning-curve rows; minimum learned-CSM discrete success `0.958984`; maximum regression normalized MSE `0.312310`; learned/random aggregate risk ratios `[0.207611,0.155187,0.136485]`; minimum natural reachable-capacity fraction `0.303686`
-- plots: four Phase 6 plots under `plots/phase6/`, all visually inspected
-- interpretation: **PASS with a coordinate-chart correction.** Unregularized shared-chart CSM solves all tasks and beats its frozen random-feature control across every seed. The independent-chart failure and post-hoc regularizer results remain explicit limitations; no language-model claim follows.
-
-Machine-readable record: [`results/phase6_metrics.json`](results/phase6_metrics.json). Human report: [`results/phase6_learnability.md`](results/phase6_learnability.md).
-
-### P7-DRIFT-INNOVATION-20260824 — FAIL
-
-- timestamp UTC: diagnostic run preceding `2026-08-24T14:35:36.464177+00:00`
-- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty because Phase 7 source was under development
-- config: initial Phase 7 separate-gate run; lambda consumed detached pre-write innovation and posterior uncertainty; joint training was correctly skipped
-- seeds: `[0,1,2]`
-- hardware/software: AMD Instinct MI300X VF; same software stack as the final run
-- metrics: learned stationary lambda remained approximately `0.71–0.74`, change lambda approximately `0.69–0.73`, drift correlation was weak, and learned lambda did not beat fixed values on every seed
-- interpretation: **FAIL retained.** Proposition 4.6 gives the Bayesian action conditional on a drift rate; it does not make lambda a hidden-changepoint detector. Innovation-dependent transitions also depend on the previous memory state and therefore do not retain the simple affine scan. Exact online detection requires additional belief state, such as a run-length posterior.
-
-### P7-DRIFT-CUE-120-20260824 — FAIL
-
-- timestamp UTC: controlled correction probe preceding the final run
-- config: scan-compatible noisy local drift cue with the original 120-step training budget; all gate thresholds unchanged
-- seeds: `[0,1,2]`
-- metrics: risk comparisons passed, change lambda was at most `0.304`, and drift correlation was at least `0.842`, but stationary lambda stayed near `0.72`, below the precommitted `0.8` requirement
-- interpretation: **FAIL retained as an undertraining diagnostic.** The corrected signal and recurrence worked, but the equal optimization budget was insufficient to satisfy the semantic stationary-period gate. Every drift and joint method received the same 360-step budget in the next run; thresholds were not relaxed.
-
-### P7-GATING-20260824 — PASS
-
-- timestamp UTC: `2026-08-24T14:35:36.464177+00:00`
-- git commit: `7e6d923a254c2e9c23485d97d389d83558d8110d`; working tree dirty at experiment start
-- config: `configs/phase7_gating.json`; four beta methods, six lambda methods, three joint methods, and three seeds; equal 360-step drift/joint training budgets
-- seeds: `[0,1,2]`
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831; NumPy 2.3.2
-- wall-clock time: 681.611 seconds; peak VRAM: 432,450,560 bytes (0.402751 GiB)
-- metrics: 12 beta, 18 drift, 9 joint seed rows, and 807 learning-curve rows; learned/fixed beta risk ratios `[0.047014,0.047265,0.040675]`; learned/best-fixed lambda risk ratios `[0.476293,0.474996,0.463929]`; minimum stationary lambda `0.882197`; maximum change lambda `0.021273`; minimum drift correlation `0.864607`; joint learned/fixed risk ratios `[0.767455,0.630988,0.628516]`
-- plots: three Phase 7 plots under `plots/phase7/`, all visually inspected
-- interpretation: **PASS with a detector/action boundary.** Observable-cue beta and lambda improve fixed gates across all seeds, and joint learning retains both orderings. The innovation-only failure remains an ablation; no hidden-changepoint inference or exact-gate-identifiability claim is made.
-
-Machine-readable record: [`results/phase7_metrics.json`](results/phase7_metrics.json). Human report: [`results/phase7_gating.md`](results/phase7_gating.md).
-
-### P8-MI300X-SYSTEMS-20260824 — PASS
-
-- timestamp UTC: `2026-08-24T15:15:08.283096+00:00`
-- git commit: `c728a210077d073e9180ef683c9e85f166ecfa87`; working tree dirty because Phase 8 source and outputs were generated after the fetched specification checkpoint
-- config: `configs/phase8_mi300x.json`; complete `d_k x d_v` grid over `{16,32,64,128}`, plus batch, context, heads, dtype, optimization-path, component, and baseline measurements
-- seed: `8013` plus fixed derived seeds visible in source
-- hardware/software: AMD Instinct MI300X VF, `gfx942:sramecc+:xnack-`; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2; HIP 7.0.51831
-- wall-clock time: 17.366 seconds; maximum recorded peak allocation: 730,496,512 bytes
-- metrics: all five batched/optimized paths finite and oracle-checked; maximum read relative error below `3e-6`; compiled construction `0.244 ms` versus vectorized `0.184 ms`; synchronized sequential decode `45.172 us/token`; 128 MiB copy estimate `4.310 TB/s`; causal attention `0.034 ms` versus CSM `0.776 ms` at the matched baseline shape
-- head economics: at fixed aggregate width and an eight-association under-capacity quality control, 8x16-dimensional heads retained recall quality `0.997683` with 32,768 state bytes versus quality `0.999492` and 262,144 bytes for 1x128; the eight-head measured workload was also faster
-- plots: none required; six raw CSV tables retain timings, utilization, throughput, VRAM, error, and complexity fields
-- interpretation: **PASS as systems characterization, not an attention win.** The bf16-feature/fp32-state policy is stable and understood. Inductor/Triton compilation is supported but did not improve this retained construction shape; exact prefix factorization remains the dominant hardware tax and a custom Cholesky kernel was not justified.
-
-Machine-readable record: [`results/phase8_metrics.json`](results/phase8_metrics.json). Human report: [`results/phase8_mi300x_systems.md`](results/phase8_mi300x_systems.md).
-
-### P9-TINY-LM-20260824 — PASS
-
-- timestamp UTC: `2026-08-24T15:30:47.449477+00:00`
-- git commit: `c728a210077d073e9180ef683c9e85f166ecfa87`; working tree dirty at experiment start
-- experimental generation/config: `phase9-preregistered-g1`; SHA-256 `b53186ef06940c5d60bcafe43f62b642031b99217065f385ebbf5ea9adfcd493`; `configs/phase9_tiny_lm.json`
-- seed: `9137`, with architecture-specific deterministic offsets; no architecture changed after checkpoint evaluation
-- data/tokenizer: checksum-pinned raw WikiText-2; raw UTF-8 byte vocabulary 256; 2,000,000 diagnostic bytes; 15% diagnostic batch mixture
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2
-- wall-clock time: 351.273 seconds; maximum training peak allocation: 2,991,553,024 bytes
-- metrics: Transformer/CSM/hybrid/recurrent parameter counts 5.57M/5.13M/5.38M/6.96M; each trained 10,002,432 tokens in 1,221 steps with zero nonfinite steps; validation perplexities 8.192/9.897/9.163/5.795; training throughput 485,542/121,558/269,970/77,714 tokens/s
-- targeted probes: on preregistered long examples, pure CSM exceeded Transformer token accuracy by 0.0833 on exact-value retrieval, 0.0588 on repeated-name recall, and 0.0435 on in-context regression while using fewer parameters; all failures and near-zero autoregressive exact rates remain in the raw table
-- decode/state: CSM used 688,128 live state bytes versus Transformer 4,587,520 at the measured prompt, but was about 3.1x slower per token; sequence-scaling rows retain training/prefill VRAM separately
-- plots: none required; four raw CSV tables retain seeds/architectures, curves, diagnostics, and scaling
-- interpretation: **PASS the optimization/measurable-memory gate, not Transformer superiority.** Pure CSM and hybrid train stably and learn natural-text structure. Diagnostic advantages are task-specific, and factorization cost is plainly visible.
-
-Machine-readable record: [`results/phase9_metrics.json`](results/phase9_metrics.json). Human report: [`results/phase9_tiny_lm.md`](results/phase9_tiny_lm.md).
-
-### P10-SMALL-NLP-20260824 — PASS SCALING GATE
-
-- timestamp UTC: `2026-08-24T17:00:59.393954+00:00`
-- git commit: `c728a210077d073e9180ef683c9e85f166ecfa87`; working tree dirty at experiment start
-- experimental generation/config: `phase10-preregistered-g1`; SHA-256 `8a4141f09296333ab0bce2ae731462221f48717751c3f438def48893f542c81a`; `configs/phase10_small_nlp.json`
-- seeds: `[0,1,2]`; all six architecture/seed runs completed; zero excluded or replacement runs
-- data/tokenizer: deterministic first 100,000,000 UTF-8 bytes of checksum-pinned raw WikiText-103; byte vocabulary 256; same 10% diagnostic mixture
-- architectures/budget: 29,499,904-parameter Transformer and 27,468,544-parameter strongest pure CSM; each run used 100,007,936 tokens, 6,104 updates, and 16,384 batch tokens; hybrid omitted because Phase 9 pure CSM passed without hybridization and had stronger aggregate long-context probes
-- hardware/software: AMD Instinct MI300X VF; Python 3.12.3; PyTorch 2.8.0+rocm7.0.2
-- total wall-clock time: 5,116.907 seconds; maximum training peak allocation: 12,505,591,808 bytes
-- quality: mean byte perplexity 3.261 Transformer versus 3.328 CSM; paired CSM-minus-Transformer loss differences `[0.021880,0.009817,0.028710]`, mean `0.020135`, standard deviation `0.009567`; same-checkpoint 128/256/512/1024 context rows and every short/long diagnostic are retained
-- systems: mean training throughput 715,420 versus 69,161 tokens/s; mean training peak VRAM 5.09 versus 12.50 GB; standard-prompt decode 591.8 versus 1,937.6 us/token
-- qualifying advantage: at a 2,048-token prompt, measured CSM state was 786,432 bytes versus Transformer 67,371,008 bytes (ratio `0.011673`), and CSM state growth from context 128 to 2,048 was exactly `1.0x`; decode remained slower and this countervailing cost is retained
-- plots: none required; six raw CSV tables retain seed metrics, curves, context evaluation, diagnostics, prefill scaling, and live decode scaling
-- interpretation: **PASS the Phase 10 scaling gate through state scaling only.** Perplexity is competitive but worse, targeted-probe results are mixed, and the current implementation is much slower and uses more training VRAM. The result supports investigating contexts where fixed recurrent state matters, not an unqualified claim of model or hardware superiority.
-
-Machine-readable record: [`results/phase10_metrics.json`](results/phase10_metrics.json). Human report: [`results/phase10_small_nlp.md`](results/phase10_small_nlp.md).
+Deleted the prior manuscript and wrote `aurelis.md` as a standalone paper.
+Replaced the previous phase set with exactly nine numbered prompts and a shared
+self-correction protocol. These prompts are not execution reports; Phase 0 and
+all trained/system phases remain pending.

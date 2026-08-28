@@ -3,15 +3,13 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "csm-research"
+name = "aurelis-theory"
 version = "0.1.0"
-description = "Falsification-first reference experiments for Conjugate State Machines"
+description = "Theory, numerical analysis, and formal proofs for AURELIS"
 requires-python = ">=3.12"
 dependencies = [
   "matplotlib==3.10.5",
   "numpy==2.3.2",
-  "psutil==7.0.0",
-  "pyarrow==21.0.0",
 ]
 
 [project.optional-dependencies]
@@ -19,9 +17,9 @@ dev = [
   "pytest==8.4.1",
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+packages = []
 
 [tool.pytest.ini_options]
 addopts = "-ra"
-testpaths = ["tests"]
+testpaths = ["analysis"]

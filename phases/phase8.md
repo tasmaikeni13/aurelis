@@ -1,81 +1,70 @@
-This is Phase 8.
+# Phase 8 — Independent reproduction, paper finalization, and release audit
 
-Goal:
-Determine whether the validated CSM mechanism can be implemented efficiently on the available AMD MI300X under ROCm.
+Start only after Phase 7 PASS. Read the entire repository and
+`phases/AUTONOMY_PROTOCOL.md`. Treat completion as unproven. Execute the
+failure-repair loop for every discrepancy until all gates pass.
 
-Correctness is already established in previous phases.
-Now optimize without changing the mathematical operation.
+## Clean-room reproduction
 
-Start by benchmarking the current PyTorch implementation.
+From a fresh clone and clean environment on the target MI300X server:
 
-Measure separately:
+- bootstrap without undocumented system state;
+- run unit/property/pathology tests and `lake build`;
+- reproduce every phase smoke gate;
+- independently regenerate the central numerical, learned, systems, tiny-LM,
+  and scale tables from pinned configs/checkpoints;
+- verify hashes and that plots/tables are generated rather than hand-edited;
+  and
+- compare raw metrics with every claim in `CLAIMS.md` and the manuscript.
 
-1. outer-product state updates
-2. construction of S and C
-3. Cholesky factorization
-4. triangular solves
-5. sequential decode
-6. training forward
-7. backward
-8. memory movement
+Use a second implementation or independently assembled oracle for the central
+head equations and a second evaluator for primary diagnostics. Investigate any
+agreement that could arise from shared helpers.
 
-Profile:
-- GPU utilization
-- HBM bandwidth
-- achieved FLOPs
-- kernel launch overhead
-- peak VRAM
-- tokens/sec
-- microseconds/token for decode
+## Standalone paper update
 
-Sweep:
-d_k in {16,32,64,128}
-d_v in {16,32,64,128}
-batch size
-sequence length
-number of heads
-dtype
+Update `aurelis.md` as a first-presentation standalone paper. Add empirical
+methods/results only when reproduced, distinguish preregistered from
+exploratory analyses, include uncertainty and resource accounting, and remove
+claims contradicted by evidence. Do not include migration history or describe
+the architecture as a modification of a repository predecessor. Keep the
+related-work/novelty boundary current through the final search date.
 
-Precision policy to test:
-- bf16 activations/features
-- fp32 S/C accumulation
-- fp32 Cholesky and solves
-and relevant alternatives.
+Reconcile every theorem with Lean coverage and every number with an artifact.
+Render/check all Markdown, links, tables, figures, equation references, and
+bibliography. If a publication-format PDF/TeX version is created, generate it
+from an authoritative source and check the rendered pages.
 
-Implement optimizations incrementally:
+## Repository and release audit
 
-A. vectorized PyTorch
-B. torch.compile where supported and useful
-C. chunked processing
-D. associative segment summaries
-E. fused implementation using the best available ROCm-compatible mechanism if justified
+- Case-insensitive search confirms no obsolete identity in tracked files.
+- There are exactly nine numbered phases, `phase0.md` through `phase8.md`.
+- Licensing, data licenses, model cards, security notes, environment pins, and
+  reproduction commands are complete.
+- No credentials, downloaded corpora, oversized checkpoints, caches, or
+  machine-specific secrets are tracked.
+- Git status is clean after generated-artifact policy is applied.
+- Remote URL and repository name are AURELIS; CI or the documented local
+  equivalent runs the release gates.
 
-Do not assume a CUDA-only implementation strategy.
-Detect what ROCm stack actually supports.
+## Completion audit
 
-Implement and validate associative chunk composition for recurrence summaries.
+Create a requirement-by-requirement matrix for the paper, code, math, Lean,
+all phase gates, MI300X/ROCm support, reproducibility, and public repository.
+For each item cite direct evidence and classify it proved, contradicted,
+incomplete, or missing. Continue working on every non-proved required item.
 
-Every optimized path must be numerically compared against the Phase 1 oracle.
+## PASS gates
 
-Benchmark against:
-- attention at equivalent width/context
-- simple recurrent/linear-memory baseline where useful
-
-Report results TWO ways:
-
-1. theoretical operation/state complexity
-2. actual MI300X wall-clock and memory behavior
-
-Critical metric:
-memory quality per byte and per unit wall-clock cost.
-
-The manuscript proposes many small heads as the economical d^2 regime. Test that claim rather than assuming it.
-
-PASS GATE:
-Obtain a stable implementation whose performance is sufficiently understood that later model comparisons will not merely measure an obviously inefficient prototype.
-
-Do NOT require CSM to beat FlashAttention yet.
-The goal is to determine the actual hardware tax.
-
-Write:
-results/phase8_mi300x_systems.md
+- Fresh-clone reproduction passes without manual fixes.
+- Primary numbers reproduce within preregistered tolerances and every paper
+  claim has direct evidence.
+- Independent implementation/evaluator checks agree within declared bounds.
+- Full Lean build has no placeholders or unreviewed axioms and coverage is
+  accurate.
+- The standalone paper, source links, figures, and release documentation pass
+  automated and visual checks.
+- The repository naming/content audit, secret/large-file audit, and all
+  inherited phase gates pass.
+- `results/phase8/PASS.md` contains the full completion matrix and shared PASS
+  record. Only then may the research program be called complete.

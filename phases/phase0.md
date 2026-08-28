@@ -1,91 +1,106 @@
-You are beginning an empirical research program on Conjugate State Machines (CSMs).
+# Phase 0 — AURELIS migration and ROCm reference substrate
 
-This is Phase 0 only. Do NOT implement the full model and do NOT train a language model.
+Read `aurelis.md`, `research/LITERATURE_REVIEW.md`, every file in `lean/`, and
+`phases/AUTONOMY_PROTOCOL.md` completely before acting. Execute the shared
+failure-repair loop until this phase passes.
 
-Read conjugate-state-machines.md completely and treat it as the theory specification. Extract the concrete claims that can be empirically tested, especially:
+This phase turns the theory repository into an AURELIS implementation research
+repository. Do not train a language model or claim accelerator superiority.
 
-- Definition 5.1 Gauss–Markov memory
-- Theorem 5.2 interpolation / finite-epsilon recall
-- confidence c_t(q)
-- noisy-observation / ridge-regression behavior
-- linear-functional queries
-- multi-hop / ricochet reads
-- beta evidence weighting
-- lambda forgetting/drift
-- associative scan composition
-- Cholesky-based decoding
-- conditioning and finite-precision predictions
+## 0.1 Remove the obsolete identity
 
-Set up a research repository whose purpose is falsification, not benchmark chasing.
+Erase the old CSM identity from the working tree, not from Git history:
 
-Environment:
-- AMD server
-- 1x AMD MI300X
-- ROCm
-- no CUDA assumptions
+- rename the Python package and all imports to `aurelis`;
+- replace project metadata, module/class names, docs, configs, scripts, tests,
+  result schemas, plot labels, comments, and environment headers;
+- delete stale experiments/results/plots whose equations or claims do not
+  represent AURELIS; do not cosmetically relabel old data;
+- preserve only reusable mechanisms after proving their equations match the
+  new paper; and
+- make case-insensitive `rg` for the old acronym and expanded name return no
+  tracked-working-tree matches outside an explicitly generated migration audit
+  that quotes the search term. The `.git` directory is out of scope.
 
-First inspect and record:
-- GPU model
-- available VRAM
-- ROCm version
-- PyTorch version
-- HIP version exposed by PyTorch
-- Python version
-- whether torch.compile works
-- whether Triton/ROCm support is usable in this environment
-- bf16/fp16/fp32 support
-- basic GEMM throughput sanity
-- available host RAM and CPU cores
+The authoritative manuscript is `aurelis.md`; there must be no second legacy
+paper.
 
-Do not upgrade the system destructively unless necessary.
+## 0.2 Build independent reference paths
 
-Create:
+Create a transparent fp64 CPU implementation with immutable state for:
 
-README.md
-RESEARCH_PLAN.md
-CLAIMS.md
-EXPERIMENT_LOG.md
-environment.txt
-src/
-tests/
-experiments/
-configs/
-results/
-plots/
-scripts/
+- the delayed FIFO handoff and exact occurrence partition;
+- `P=Lambda+sum beta kk^T`, `C=sum beta vk^T`;
+- Cholesky/solve reads without explicit inversion;
+- local causal softmax with shared key/value weights;
+- remote, full-residual, AURELIS-B, and AURELIS-E outputs;
+- `h,V_R,V_H,K_RH,g_raw,g_B`, plus diagnostic residuals;
+- batched/multi-head shapes and empty/warm-up cache behavior; and
+- autograd through keys, queries, values, evidence, temperature, projections,
+  and any learned episodic responsibility.
 
-CLAIMS.md must contain a table:
+Create an independently assembled historical oracle from the full prefix. The
+streaming and oracle paths must not share state-update logic. Keep a tiny
+dimension-capped explicit inverse only as a test oracle.
 
-claim_id
-theoretical_claim
-experiment_that_can_falsify_it
-metric
-expected_behavior
-failure_interpretation
-manuscript_section
+## 0.3 Build the ROCm/MI300X substrate
 
-Define a strict rule:
-NO NLP SCALE EXPERIMENT is allowed until the synthetic and learned-memory gates pass.
+The server target is one AMD Instinct MI300X under ROCm. Inspect and record
+actual state before installation or optimization:
 
-Also define an experiment record format containing:
-git commit
-config
-seed
-hardware
-software versions
-wall-clock time
-peak VRAM
-metrics
-plots
-interpretation
+- GPU name/architecture, VRAM, ROCm/HIP, driver, PyTorch, Python, kernel, host
+  RAM/CPU, and git state;
+- `torch.version.hip`, `torch.cuda.is_available()`, dtype support, rocBLAS,
+  rocSOLVER, TorchInductor, Triton/ROCm, and profiler availability;
+- bf16/fp16/fp32/fp64 GEMM health checks with synchronized timing; and
+- installed versus officially compatible versions.
 
-Use deterministic seeds wherever practical.
+PyTorch deliberately reuses `torch.cuda` on ROCm. This API name is allowed;
+NVIDIA libraries, CUDA wheels, CUDA toolkit assumptions, `nvcc`, and
+NVIDIA-only kernels are not. Detect ROCm with `torch.version.hip`. Consult
+current official AMD ROCm, rocSOLVER, and PyTorch HIP documentation before
+choosing versions or kernel paths.
 
-At the end, produce a Phase 0 report containing:
-1. environment audit
-2. extracted falsifiable claims
-3. planned experiment dependency graph
-4. identified implementation risks
-5. recommendation whether Phase 1 can begin
+Implement reproducible scripts for:
 
-Do not proceed to Phase 1 automatically.
+- non-destructive environment bootstrap and audit;
+- CPU/fp64 reference tests;
+- eager and `torch.compile` AURELIS forward/backward;
+- sequential decode with ring-buffer handoff and stable factor maintenance;
+- vectorized exact training reference;
+- component benchmarks for outer updates, local attention, factorization,
+  triangular solves, routing, and full head; and
+- an optional Triton/ROCm prototype only after the eager/Inductor path is
+  correct. A custom kernel is not a phase requirement if measurement shows it
+  is unjustified.
+
+## 0.4 Required repository contract
+
+Create or replace `README.md`, `CLAIMS.md`, `RESEARCH_PLAN.md`,
+`EXPERIMENT_LOG.md`, `environment.txt`, `pyproject.toml`, `requirements.txt`,
+and structured `src/`, `tests/`, `experiments/`, `configs/`, `results/`,
+`plots/`, and `scripts/` content. The claim registry must distinguish theorem,
+Lean coverage, numerical evidence, and pending empirical claims.
+
+Define one command that runs environment audit, Python unit/property tests,
+Lean build, and a small AURELIS reference experiment in fail-fast order.
+
+## PASS gates
+
+- No stale identity remains by the scoped case-insensitive search.
+- The historical oracle and streaming path agree in fp64 over random lengths,
+  windows, dimensions, evidence, empty-cache, handoff-boundary, repeated-key,
+  near-singular, and over-capacity cases.
+- The cache and remote occurrence IDs form a disjoint exhaustive partition at
+  every step.
+- Cholesky, dense solve, and capped inverse agree inside conditioned domains;
+  expected failures outside them are retained.
+- Autograd and gradcheck cover every declared differentiable input.
+- AURELIS-B gate matches dense one-dimensional variance minimization; AURELIS-E
+  exact one-hot hits pass.
+- Eager, compiled, and any custom ROCm paths agree with fp64 after dtype-aware
+  tolerances.
+- MI300X/ROCm is measured, with no NVIDIA dependency and no unsupported version
+  assumption.
+- Full Lean build and all Phase 0 tests pass from the documented command.
+- `results/phase0/PASS.md` satisfies the shared PASS record.

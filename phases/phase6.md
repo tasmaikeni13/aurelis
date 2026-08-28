@@ -1,68 +1,63 @@
-This is Phase 6.
+# Phase 6 — Tiny language-model viability
 
-Goal:
-Determine whether learned neural feature maps can discover key/query/value representations that make CSM useful.
+Start only after Phase 5 PASS. Read all prior evidence and
+`phases/AUTONOMY_PROTOCOL.md`. This is the first natural-language phase; it is
+forbidden if any synthetic, learned, formal, or systems prerequisite is not
+currently passing. Execute the failure-repair loop until PASS.
 
-This is the first phase where learned encoders are introduced.
+## Preregistration
 
-Do NOT train a general language model yet.
+Before training, freeze an experimental generation containing:
 
-Build small differentiable sequence models around the CSM memory.
+- checksum-pinned tokenizer and openly licensed corpus;
+- train/validation/test splits with decontamination checks;
+- parameter range `5M–20M`, context, optimizer, schedule, batch tokens, token
+  budget, seeds, checkpoint/evaluation cadence, and exclusions;
+- architecture equations and implementation commit; and
+- primary natural loss plus six targeted diagnostic families.
 
-Start with synthetic tasks:
+Any architecture or evaluator change increments the generation and reruns all
+models from scratch.
 
-1. associative recall
-2. copy/selective-copy
-3. key-value lookup
-4. correlated-key lookup
-5. in-context linear regression
-6. noisy in-context regression
-7. contextual associative recall where raw input keys are not already convenient vectors
+## Models
 
-Learn:
+Train matched Transformer, sliding-window Transformer, Gated DeltaNet,
+cumulative least-squares remote model, a published-style local/recurrent
+hybrid, AURELIS-B, and AURELIS-E. Include remote-only and local-only ablations.
+Match parameter count, tokens, optimizer, schedule, batch tokens, corpus, and
+tuning opportunity; report residual mismatches.
 
-k_t = normalize(f_k(x_t))
-q_t = f_q(x_t)
-v_t = f_v(x_t)
+## Diagnostics
 
-Initially fix:
-beta = 1
-lambda = 1
+Evaluate trained and longer-than-trained contexts on:
 
-Only after this works, make beta learnable.
+1. multi-query associative recall by age, load, and distractors;
+2. exact recent copy and cache-boundary copy;
+3. latent denoising versus observed exception tasks;
+4. induction/selective copy and local shifts;
+5. mixed recent/remote pointer chains; and
+6. natural-text loss sliced by repeated n-grams, document distance, and
+   context length, including an autoregressive subset.
 
-Track representation geometry:
+Report validation loss, per-task metrics, endpoint outputs, gate calibration,
+episodic AUROC, rank/conditioning, tokens/s, training peak VRAM, live decode
+state, prefill/decode latency, wall time, and all seeds.
 
-- Gram eigenvalue spectrum
-- pairwise cosine similarity
-- effective rank
-- minimum singular value
-- condition number of S + epsilon I
-- fraction of capacity used
-- gradient norms
-- epsilon
-- retrieval error
+## PASS gates
 
-Compare:
-A. learned CSM
-B. fixed random CSM features
-C. learned Hebbian memory
-D. small attention baseline
-
-Critical scientific question:
-Does gradient descent naturally produce useful, sufficiently separated CSM key geometry?
-
-Do NOT add an orthogonality regularizer initially.
-We need to know the unassisted result.
-
-Only after documenting the natural behavior may you test regularizers as explicit ablations.
-
-Run multiple seeds.
-
-PASS GATE:
-The learned CSM must reliably outperform its untrained/random representation and learn the target tasks across seeds.
-
-A representation that works only after aggressive hand-crafted geometry regularization should be reported as a limitation.
-
-Write:
-results/phase6_learnability.md
+- Every model completes the same preregistered token budget without hidden
+  restarts or nonfinite steps; failures remain visible.
+- AURELIS meaningfully learns natural text and its validation loss is within a
+  preregistered small-model tolerance of the matched Transformer and strongest
+  hybrid on every seed.
+- AURELIS has a statistically supported matched-parameter advantage on at
+  least one targeted mixed recent/remote diagnostic, not merely state bytes.
+- AURELIS-E improves exact exceptions over AURELIS-B while AURELIS-B retains
+  better or calibrated latent denoising; the target distinction survives
+  learned language features.
+- Longer-context evaluation does not show catastrophic collapse, and any
+  boundary-age discontinuity meets its threshold.
+- Systems advantages are reported separately from quality and reproduce the
+  Phase 5 operating point.
+- All inherited gates and Lean build pass, and
+  `results/phase6/PASS.md` satisfies the shared PASS record.

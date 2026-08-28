@@ -1,4 +1,4 @@
-CSM PHASE 0 ENVIRONMENT AUDIT
+AURELIS PRE-PHASE-0 HARDWARE SNAPSHOT
 =================================
 timestamp_utc: 2026-08-23T15:45:30.482905+00:00
 python: 3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]
