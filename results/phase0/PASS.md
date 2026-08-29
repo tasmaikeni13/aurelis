@@ -1,6 +1,6 @@
 # AURELIS Phase 0 PASS
 
-Generated: `2026-08-29T11:34:40.832342+00:00`
+Generated: `2026-08-29T17:21:47.536795+00:00`
 
 Phase 0 status: **PASS**. This record covers migration and the reference/ROCm
 substrate only. It makes no language-model quality or accelerator-superiority
@@ -82,12 +82,12 @@ unformalized probability/numerical/system boundaries are listed in
 
 ## Tested revision and environment fingerprint
 
-- Base commit: `efe860b154ccd7003a5660b17bdc35193694e153`
-- Working tree was intentionally dirty with `155` migration paths;
+- Base commit: `db7ef177b56cbda36bcebeaa4f31bc2a542d134c`
+- Working tree was intentionally dirty with `20` migration paths;
   each JSON record stores the dirty flag, path count, and status SHA-256.
-- Environment SHA-256: `07dd4b1ea79c22331f5ed8dba4f5092c7ff8d754764fdaf498d1a0d79851b789`
-- Reference metrics SHA-256: `2de4f66c8f21a942d8f43b10e58c7b6bf9efebee0121c8ed1c05682a5ca6cf85`
-- Benchmark metrics SHA-256: `d5195c447bbc9412cb0ec58ba8423b9950146ca0c4434ba8f6943051b5cdd841`
+- Environment SHA-256: `368d3c1bbd5b3518fad6280b66353313c8dab4361866c34059dc241d01baa342`
+- Reference metrics SHA-256: `a2e92723df23cf6a500f5d17cc47af8c9f2354fcbbfcd0dbd831423a38e5ae51`
+- Benchmark metrics SHA-256: `e6d25427fc357f7ce91456ef39c69a89dcca3fd92366b5d9283bbb5b48ac6a5f`
 
 ## Remaining limitations outside the Phase 0 claim
 

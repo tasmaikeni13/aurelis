@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "experiment": "AURELIS Phase 1 mathematical oracle and pathology gate",
+  "seed": 20260829,
+  "monte_carlo_trials": 50000,
+  "confidence_level": 0.99,
+  "normal_critical_value": 2.5758293035489004,
+  "sweeps": {
+    "d_key": [2, 4, 8, 16, 32, 64],
+    "d_value": [1, 3, 7],
+    "window": [1, 2, 8, 32],
+    "remote_load_relative_to_rank": ["below", "at", "above"],
+    "prior_precision": [1e-10, 1e-8, 1e-6, 1e-4, 0.01, 1.0, 100.0, 10000.0],
+    "attention_temperature": [0.0, 0.25, 1.0, 4.0, 16.0, 64.0, 256.0, 4096.0],
+    "evidence_precision": [0.0001, 0.01, 1.0, 100.0, 10000.0],
+    "evidence_models": ["homoscedastic", "heteroscedastic"],
+    "key_pathologies": [
+      "random",
+      "orthogonal",
+      "correlated",
+      "duplicate",
+      "near_collision",
+      "rank_deficient",
+      "zero",
+      "small_norm"
+    ],
+    "storage_dtype": ["float64", "float32", "bfloat16"]
+  },
+  "preregistered_tolerances": {
+    "fp64_identity_absolute_floor": 2e-12,
+    "fp64_identity_epsilon_multiplier": 4096.0,
+    "maximum_valid_kappa_times_epsilon": 0.01,
+    "dense_gate_grid_step": 0.0001,
+    "dense_gate_variance_slack": 2e-12,
+    "exact_one_hot_absolute": 2e-12,
+    "finite_ridge_bound_slack": 2e-11,
+    "streaming_oracle_absolute_floor": 5e-11,
+    "streaming_oracle_epsilon_multiplier": 8192.0,
+    "monte_carlo_numerical_floor": 5e-4,
+    "covariance_omission_minimum_z_score": 5.0,
+    "misspecification_minimum_regret": 0.001,
+    "fp32_minimum_observable_forward_error": 1e-10,
+    "bfloat16_minimum_observable_forward_error": 1e-7
+  },
+  "commands": {
+    "experiment": ".venv/bin/python experiments/phase1_oracle.py --config configs/phase1_oracle.json",
+    "complete_phase": "./scripts/run_phase1.sh"
+  }
+}

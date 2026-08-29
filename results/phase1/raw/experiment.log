@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "checks": {
+    "streaming": true,
+    "deterministic": true,
+    "clipping": true,
+    "one_hot": true,
+    "monte_carlo": true,
+    "covariance_omission_measurable": true,
+    "target_conflict_and_misspecification": true,
+    "handoff": true,
+    "conditioning": true,
+    "costs": true
+  },
+  "aggregate": {
+    "streaming_cases": 90,
+    "streaming_prefixes_checked": 1467,
+    "maximum_streaming_tolerance_ratio": 0.0002742402906496974,
+    "partition_failures": 0,
+    "deterministic_rows": 64,
+    "maximum_identity_tolerance_ratio": 3.3537600009044386e-06,
+    "maximum_gate_formula_tolerance_ratio": 4.1578715331926e-05,
+    "invalid_gate_cancellation_rows_retained": 12,
+    "invalid_conditioning_rows_retained": 4
+  },
+  "wall_time_seconds": 3.5006400940001186
+}

@@ -1,9 +1,9 @@
 AURELIS PHASE 0 ENVIRONMENT AUDIT
 =================================
 status: PASS
-timestamp_utc: 2026-08-29T11:34:02.356363+00:00
-git_commit: efe860b154ccd7003a5660b17bdc35193694e153
-git_dirty_state: {"dirty": true, "path_count": 155, "status_sha256": "1514735de3428f49761c0e786914c72fa227451afc5c6dfaa7782a12a0ef2944"}
+timestamp_utc: 2026-08-29T17:21:06.569510+00:00
+git_commit: db7ef177b56cbda36bcebeaa4f31bc2a542d134c
+git_dirty_state: {"dirty": true, "path_count": 22, "status_sha256": "6adc2ec4516c4a386cc011de28dcb81c6b84bc55ea19a40d4d0836c9cbdfcfa1"}
 python: 3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]
 kernel: 6.8.0-138-generic
 host_rocm_versions: {"/opt/rocm/core-10.0/.info/version": "10.0.0", "/opt/rocm/core-10/.info/version": "10.0.0", "/opt/rocm/core-7.14/.info/version": "7.14.0", "/opt/rocm/core-7/.info/version": "7.14.0"}
@@ -14,16 +14,16 @@ torch_cuda_api_namespace_available: True
 gpu_name: AMD Instinct MI300X VF
 gpu_total_memory_bytes: 205822885888
 gpu_multiprocessor_count: 304
-torch_compile: {"available": true, "compile_and_first_run_seconds": 1.799203886000214, "max_absolute_error": 9.5367431640625e-07, "usable": true}
+torch_compile: {"available": true, "compile_and_first_run_seconds": 1.7017903429996295, "max_absolute_error": 4.76837158203125e-07, "usable": true}
 profiler: {"available": true, "event_count": 15}
 triton: {"installed": true, "packages": ["triton==3.4.0+rocm7.0.2.gitf9e5bf54"]}
 rocblas_paths: ["/opt/rocm/core-10.0/lib/librocblas.so", "/opt/rocm/core-10.0/lib/librocblas.so.5", "/opt/rocm/core-10.0/lib/librocblas.so.5.6", "/opt/rocm/core-7.14/lib/librocblas.so", "/opt/rocm/core-7.14/lib/librocblas.so.5", "/opt/rocm/core-7.14/lib/librocblas.so.5.5"]
 rocsolver_paths: ["/opt/rocm/core-10.0/lib/librocsolver.so", "/opt/rocm/core-10.0/lib/librocsolver.so.0", "/opt/rocm/core-10.0/lib/librocsolver.so.0.11", "/opt/rocm/core-7.14/lib/librocsolver.so", "/opt/rocm/core-7.14/lib/librocsolver.so.0", "/opt/rocm/core-7.14/lib/librocsolver.so.0.10"]
-cholesky_solve_health: {"available": true, "finite": true, "max_residual": 1.1968318780338857e-14}
-gemm_bf16: {"finite": true, "matrix_size": 2048, "median_ms": 0.07093900012478116, "median_tflops": 242.1780565525415, "output_dtype": "torch.bfloat16", "repetitions": 5, "samples_ms": [0.08128799981932389, 0.07093900012478116, 0.06992599992372561, 0.09778499997992185, 0.06935700002941303], "supported": true}
-gemm_fp16: {"finite": true, "matrix_size": 2048, "median_ms": 0.07465199996659067, "median_tflops": 230.1327384623129, "output_dtype": "torch.float16", "repetitions": 5, "samples_ms": [0.08570199997848249, 0.07465199996659067, 0.07428099979733815, 0.07655000035811099, 0.0716499998816289], "supported": true}
-gemm_fp32: {"finite": true, "matrix_size": 2048, "median_ms": 0.2018500003941881, "median_tflops": 85.11205920460658, "output_dtype": "torch.float32", "repetitions": 5, "samples_ms": [0.2138680001735338, 0.2018500003941881, 0.20030499990753015, 0.20034099998156307, 0.2061830000457121], "supported": true}
-gemm_fp64: {"finite": true, "matrix_size": 2048, "median_ms": 0.34252800014655804, "median_tflops": 50.15610162278477, "output_dtype": "torch.float64", "repetitions": 5, "samples_ms": [0.35615199976746226, 0.34252800014655804, 0.3417190000618575, 0.34585499997774605, 0.31567300038659596], "supported": true}
+cholesky_solve_health: {"available": true, "finite": true, "max_residual": 1.702198787531272e-14}
+gemm_bf16: {"finite": true, "matrix_size": 2048, "median_ms": 0.07139999979699496, "median_tflops": 240.61441502585348, "output_dtype": "torch.bfloat16", "repetitions": 5, "samples_ms": [0.08247300002039992, 0.07139999979699496, 0.06910499996592989, 0.06859100039946497, 0.07420300016747206], "supported": true}
+gemm_fp16: {"finite": true, "matrix_size": 2048, "median_ms": 0.07652800013602246, "median_tflops": 224.4912862411685, "output_dtype": "torch.float16", "repetitions": 5, "samples_ms": [0.08712599992577452, 0.07652800013602246, 0.07694999976592953, 0.07162400015658932, 0.07217900019895751], "supported": true}
+gemm_fp32: {"finite": true, "matrix_size": 2048, "median_ms": 0.20988100004615262, "median_tflops": 81.85528551999543, "output_dtype": "torch.float32", "repetitions": 5, "samples_ms": [0.2192240003751067, 0.21366999999372638, 0.20549300006678095, 0.20622299962269608, 0.20988100004615262], "supported": true}
+gemm_fp64: {"finite": true, "matrix_size": 2048, "median_ms": 0.32777299975350616, "median_tflops": 52.41392426136292, "output_dtype": "torch.float64", "repetitions": 5, "samples_ms": [0.3597079999053676, 0.35400499973547994, 0.32134000002770335, 0.317201000143541, 0.32777299975350616], "supported": true}
 dependency_policy: {"forbidden_accelerator_packages": [], "passes": true}
 
 COMPATIBILITY ASSESSMENT
@@ -54,7 +54,7 @@ Driver version: 6.19.14.31400000
 ==========================================================================================
 ================================== Memory Usage (Bytes) ==================================
 GPU[0]		: VRAM Total Memory (B): 205822885888
-GPU[0]		: VRAM Total Used Memory (B): 1346891776
+GPU[0]		: VRAM Total Used Memory (B): 1346904064
 ==========================================================================================
 ====================================== Product Info ======================================
 GPU[0]		: Card Series: 		AMD Instinct MI300X VF
