@@ -1,5 +1,8 @@
-# ROCm 7.0.2 wheels tested by AMD for Python 3.12 / Ubuntu 24.04.
-# Source URL is pinned for reproducibility; no CUDA packages are required.
+# AMD-hosted ROCm 7.0.2 wheels used for the Phase 0 MI300X measurement.
+# PyTorch deliberately exposes the torch.cuda namespace on ROCm; detect the
+# backend with torch.version.hip. No NVIDIA wheel or toolkit is installed.
 https://repo.radeon.com/rocm/manylinux/rocm-rel-7.0.2/torch-2.8.0%2Brocm7.0.2.git245bf6ed-cp312-cp312-linux_x86_64.whl
 https://repo.radeon.com/rocm/manylinux/rocm-rel-7.0.2/triton-3.4.0%2Brocm7.0.2.gitf9e5bf54-cp312-cp312-linux_x86_64.whl
-
+numpy==2.3.2
+matplotlib==3.10.5
+pytest==8.4.1

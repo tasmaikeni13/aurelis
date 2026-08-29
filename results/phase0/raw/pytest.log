@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /root/aurelis
+configfile: pyproject.toml
+testpaths: tests
+collected 43 items
+
+tests/test_autograd.py ..                                                [  4%]
+tests/test_compile.py .                                                  [  6%]
+tests/test_oracles.py ................                                   [ 44%]
+tests/test_partition.py ................                                 [ 81%]
+tests/test_routing.py ...                                                [ 88%]
+tests/test_solvers.py .....                                              [100%]
+
+============================= 43 passed in 13.70s ==============================

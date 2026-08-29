@@ -17,46 +17,65 @@ and residual estimators. An explicit episodic responsibility can override that
 gate when the target is an observed cached exception rather than a denoised
 latent relation.
 
-## Current scope
+## Phase 0 implementation
 
-This revision is the requested theory foundation:
+The repository now contains an AURELIS-native reference substrate:
 
-- [standalone paper](aurelis.md);
-- [literature review and novelty boundary](research/LITERATURE_REVIEW.md);
-- [reproducible fp64 numerical analysis](analysis/README.md);
-- [Lean 4 formalization](lean/README.md); and
-- exactly nine autonomous research phases, [Phase 0](phases/phase0.md) through
-  [Phase 8](phases/phase8.md), governed by the
-  [self-correction protocol](phases/AUTONOMY_PROTOCOL.md).
+- immutable batched/multi-head streaming state with a fixed ring cache and
+  exact delayed occurrence handoff;
+- an independently assembled fp64 historical oracle and a dimension-capped
+  explicit-inverse test oracle;
+- Cholesky, dense-solve, remote, full-residual, AURELIS-B, and AURELIS-E paths
+  with all router and solve diagnostics;
+- an exact vectorized all-boundary training reference and learned projection
+  wrapper with autograd/gradcheck coverage;
+- eager and TorchInductor forward/backward measurements on one AMD Instinct
+  MI300X under ROCm; and
+- structured configs, raw records, reports, plots, tests, benchmarks, scripts,
+  formal proofs, and research sources.
 
-The existing Python experiment directories are pre-Phase-0 substrate and are
-not evidence for AURELIS. Phase 0 is deliberately responsible for deleting or
-re-deriving those artifacts, migrating the package identity, and implementing
-the hybrid on the AMD MI300X/ROCm server. Old results must never be relabeled as
-hybrid results.
+Phase 0 makes no language-model quality or accelerator-superiority claim.
 
-## Reproduce the current evidence
+## Reproduce Phase 0
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r analysis/requirements.txt
-.venv/bin/python analysis/aurelis_numerical.py
-(cd lean && lake update && lake build)
+./scripts/bootstrap.sh
+./scripts/run_phase0.sh
 ```
 
-The numerical run regenerates raw CSV/JSON, a report, and all paper figures.
-The Lean project is pinned to Lean/mathlib 4.19.0 and contains no proof
-placeholders or project axioms.
+The second command is fail-fast: it runs the live environment audit, Python
+unit/property/gradcheck suite, pinned Lean build, fp64 reference experiment,
+MI300X eager/compiled benchmark, and completion audit. Direct gate evidence is
+in [`results/phase0/PASS.md`](results/phase0/PASS.md).
+
+The standalone manuscript and its earlier deterministic numerical evidence
+remain separately reproducible with `./scripts/run_aurelis_theory.sh`.
+
+## Repository map
+
+| Path | Purpose |
+|---|---|
+| `src/aurelis/` | Functional read, immutable streaming state, independent history oracle, vectorized training path, learned projections |
+| `tests/` | Partition, oracle agreement, solver pathology, router, autograd, and Inductor regression gates |
+| `experiments/` | Small fp64 scientific reference experiment |
+| `benchmarks/` | Synchronized ROCm component and full-head measurements |
+| `configs/` | Versioned Phase 0 experiment/benchmark inputs |
+| `results/phase0/` | Raw logs, machine-readable metrics, reports, failure records, and PASS record |
+| `plots/phase0/` | Generated Phase 0 figure |
+| `scripts/` | Isolated bootstrap, environment audit, fail-fast runner, and verifier |
+| `lean/` | Pinned Lean 4 formalization and exact proof-coverage boundary |
+| `analysis/` | Manuscript-level deterministic fp64 analysis |
+| `phases/` | Governing protocol and Phases 0–8 |
 
 ## Evidence status
 
 | Claim class | Current evidence |
 |---|---|
-| Handoff, residual, routing, matrix algebra | Analytic derivations plus Lean kernel checks |
-| Conditional Gaussian uncertainty | Derivation plus 50,000-trial Monte Carlo calibration |
-| Finite-precision mechanism | Deterministic fp64 checks and conditioning sweep |
+| Handoff, residual, routing, matrix algebra | Lean checks, unit/property tests, independent fp64 paths |
+| Conditional Gaussian uncertainty | Derivation, Monte Carlo calibration, dense gate minimization test |
+| Finite-precision mechanism | CPU/fp64 oracle plus MI300X fp32 eager/compiled comparison |
 | Learned features and episodic detection | Pending Phases 3–4 |
-| MI300X/ROCm correctness and speed | Pending Phase 5 after Phase 0 implementation |
+| MI300X/ROCm substrate correctness | Phase 0 measured; optimization/comparative speed remains pending |
 | Language-model quality | Pending Phases 6–7; no present claim |
 
 See [CLAIMS.md](CLAIMS.md) for the claim-by-claim boundary and

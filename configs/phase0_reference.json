@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "experiment": "aurelis_phase0_reference",
+  "seeds": [20260829, 17, 29, 41],
+  "batch": 2,
+  "heads": 2,
+  "lengths": [0, 1, 2, 4, 5, 9, 17],
+  "windows": [1, 4],
+  "dimensions": [2, 5],
+  "d_value": 3,
+  "prior": 0.2,
+  "minimum_evidence": 0.05,
+  "maximum_evidence": 3.0,
+  "tolerances": {
+    "streaming_oracle_max_absolute_error": 5e-9,
+    "solver_max_absolute_error": 5e-10,
+    "partition_failures": 0
+  }
+}

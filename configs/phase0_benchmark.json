@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "experiment": "aurelis_phase0_mi300x_substrate",
+  "seed": 20260829,
+  "batch": 2,
+  "heads": 4,
+  "length": 24,
+  "d_key": 16,
+  "d_value": 16,
+  "window": 8,
+  "prior": 0.5,
+  "warmup": 3,
+  "repetitions": 10,
+  "tolerances": {
+    "fp32_forward_vs_fp64_max_absolute_error": 0.0005,
+    "compiled_vs_eager_max_absolute_error": 0.00005,
+    "compiled_vs_eager_gradient_max_absolute_error": 0.0002
+  }
+}

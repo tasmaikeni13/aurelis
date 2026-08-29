@@ -9,7 +9,7 @@ repository. Do not train a language model or claim accelerator superiority.
 
 ## 0.1 Remove the obsolete identity
 
-Erase the old CSM identity from the working tree, not from Git history:
+Erase the obsolete pre-AURELIS identity from the working tree, not from Git history:
 
 - rename the Python package and all imports to `aurelis`;
 - replace project metadata, module/class names, docs, configs, scripts, tests,

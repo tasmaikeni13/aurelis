@@ -1,25 +1,29 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools==84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aurelis-theory"
+name = "aurelis"
 version = "0.1.0"
-description = "Theory, numerical analysis, and formal proofs for AURELIS"
-requires-python = ">=3.12"
+description = "AURELIS reference implementation and ROCm research substrate"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = {file = "LICENSE"}
 dependencies = [
-  "matplotlib==3.10.5",
   "numpy==2.3.2",
+  "torch>=2.8,<2.9",
 ]
 
 [project.optional-dependencies]
 dev = [
+  "matplotlib==3.10.5",
   "pytest==8.4.1",
 ]
 
-[tool.setuptools]
-packages = []
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["aurelis*"]
 
 [tool.pytest.ini_options]
-addopts = "-ra"
-testpaths = ["analysis"]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]

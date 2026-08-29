@@ -43,7 +43,7 @@ There are exactly nine numbered phases (`0`–`8`). NLP is forbidden until the
 synthetic, learned, formal, and MI300X systems prerequisites through Phase 5
 are passing.
 
-## Current completed foundation
+## Current completed work
 
 - Literature search through 2026-08-28 with explicit closest-work boundary.
 - Standalone architecture, deterministic/probabilistic analysis, complexity,
@@ -52,9 +52,12 @@ are passing.
   checks.
 - Lean 4 proof project for core deterministic algebra and router optimality.
 - Autonomous failure-repair protocol and nine phase prompts.
+- Phase 0 identity migration, independent history/streaming references,
+  vectorized training path, autograd and solver pathology suite, live MI300X
+  environment audit, and eager/Inductor forward/backward substrate.
 
-These are foundation deliverables, not Phase 0 PASS. Implementation and all
-trained-model claims remain pending.
+Phase 1 is the next unopened gate. No trained-model work is authorized by the
+Phase 0 PASS.
 
 ## Release invariants
 
