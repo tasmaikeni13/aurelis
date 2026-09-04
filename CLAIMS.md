@@ -20,8 +20,11 @@ verified** means the committed program passes its declared finite experiment;
 | AUR-COST-1 | Decode state is independent of total context at fixed `d_k,d_v,w` | Paper Section 7.1; fixed-capacity `StreamingState`; MI300X component record | Not formalized | Implemented and measured for state; broad performance comparison pending |
 | AUR-TRAIN-1 | Remote statistics scan associatively, but exact all-prefix training solves are not automatically linear-work | Paper Sections 7.2–7.3 | Scan algebra only | Proved count with explicit solver alternatives; no speed claim |
 | AUR-ROCM-1 | Eager and Inductor AURELIS forward/backward agree with fp64 within declared tolerances on the recorded MI300X/ROCm host | `results/phase0/environment.json`, `benchmark_metrics.json`, raw timings | None | Phase 0 numerical/system evidence; competitive-speed claim remains pending |
+| AUR-GATE-2 | The full covariance gate is variance-noninferior to the independence heuristic and outperforms it under correlation | Paper Theorem 6.1, Eq. 6.8; Phase 2 correlated suite z-score >= 5.0 | `clippedGate_le_clippedIndependentGate`, `clippedGate_le_independentGate` | Proved, Lean-checked, and numerically verified |
+| AUR-SEP-1 | Hybrid mechanisms separate under matched parameter, dimension, state-byte, and FLOP budgets without universal dominance | Phase 2 falsification suites and 4 comparison views | None | Numerically verified across 10 baselines and 9 suites |
 | AUR-LEARN-1 | Learned features preserve the theoretical mechanism | Phase 3 prompt | None | Pending; no current claim |
 | AUR-LM-1 | AURELIS improves language-model quality/efficiency | Phase 6/7 prompts | None | Pending; no current claim |
+
 
 Machine-readable numerical details are in
 `analysis/results/summary.json`. Formal boundaries are in

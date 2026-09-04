@@ -98,3 +98,53 @@ head is the explicitly compiled full-graph boundary.
 
 Exact metrics, timestamps, commit/dirty state, raw samples, and PASS evidence
 are generated under `results/phase0/`.
+
+## 2026-08-29 — Phase 1 oracle and pathology gate
+
+### Mathematical oracle
+Verified mathematical oracle, calibration, dtype/conditioning pathologies,
+handoff boundaries, and analytic cost gate in `experiments/phase1_oracle.py`.
+Lean gained `gated_error_identity`, `gatedRead_one`, `scalar_ridge_slope_error`,
+and `scalar_ridge_residual_bound`. All 13 Phase 1 gates passed and are recorded
+in `results/phase1/PASS.md`.
+
+### Reproduction command
+
+```bash
+./scripts/bootstrap.sh
+./scripts/run_phase1.sh
+```
+
+## 2026-09-04 — Phase 2 hybrid mechanism separation and matched baselines
+
+### Baselines and ablations
+Implemented 10 baselines and ablations in `src/aurelis/baselines.py`:
+local softmax attention, remote Bayesian ridge, global positive-feature linear
+attention, delta-rule recurrent memory, cumulative least-squares Mesa, learned
+local-remote sum and concatenation, independent inverse-variance fusion, full
+residual ($g=1$), AURELIS-B/E, and Native Hybrid Attention.
+Verified each on hand-computable tiny test cases in `tests/test_phase2_baselines.py`.
+
+### Comparison views and falsification suites
+Evaluated all baselines across four matched views: same feature dimension,
+same parameter count, same live-state bytes, and approximately same measured FLOPs.
+Executed 9 falsification suites and a constructed correlated-endpoint suite across
+10 seeds. Verified that AURELIS-B's Gaussian regime advantage survives across every
+seed, AURELIS-E isolates episodic exceptions from Bayesian denoising, and nonlinear
+misspecified regimes with no AURELIS advantage are retained and explained.
+
+### Formal proofs
+Formalized the suboptimality of the independence heuristic in `lean/Aurelis/Router.lean`:
+`independentGate`, `clippedIndependentGate`, `clippedIndependentGate_bounds`, and
+`clippedGate_le_clippedIndependentGate`. `lake build` compiled with zero `sorry`,
+`admit`, or project `axiom`.
+
+### Reproduction command
+
+```bash
+./scripts/bootstrap.sh
+./scripts/run_phase2.sh
+```
+
+Complete gate evidence, raw row logs, metrics, and plots are generated in `results/phase2/`.
+

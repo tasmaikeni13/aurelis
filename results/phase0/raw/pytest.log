@@ -3,14 +3,15 @@ platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
 rootdir: /root/aurelis
 configfile: pyproject.toml
 testpaths: tests
-collected 46 items
+collected 56 items
 
-tests/test_autograd.py ..                                                [  4%]
-tests/test_compile.py .                                                  [  6%]
-tests/test_oracles.py ................                                   [ 41%]
-tests/test_partition.py ................                                 [ 76%]
-tests/test_phase1_identities.py ...                                      [ 82%]
-tests/test_routing.py ...                                                [ 89%]
+tests/test_autograd.py ..                                                [  3%]
+tests/test_compile.py .                                                  [  5%]
+tests/test_oracles.py ................                                   [ 33%]
+tests/test_partition.py ................                                 [ 62%]
+tests/test_phase1_identities.py ...                                      [ 67%]
+tests/test_phase2_baselines.py ..........                                [ 85%]
+tests/test_routing.py ...                                                [ 91%]
 tests/test_solvers.py .....                                              [100%]
 
-============================= 46 passed in 14.15s ==============================
+============================= 56 passed in 13.24s ==============================

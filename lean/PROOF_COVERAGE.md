@@ -19,6 +19,7 @@
 | `routeVariance_completion` | The routing variance is a completed square about the analytic gate | Full real-algebra theorem |
 | `rawGate_le_remote` / `rawGate_le_residual` | The unconstrained analytic gate is variance-noninferior to both endpoints | Full real-algebra theorem when the quadratic denominator is positive |
 | `clippedGate_optimal` | Projecting the gate to `[0,1]` minimizes variance over all convex gates | Full real-algebra theorem when the denominator is positive |
+| `clippedGate_le_clippedIndependentGate` / `clippedGate_le_independentGate` | The clipped Bayes gate is variance-noninferior to the independence heuristic | Full real-algebra theorems when the denominator is positive |
 | `posterior_denominator_identity` / `posterior_numerator_identity` | Posterior covariance terms simplify to the paper's gate formula | Full scalar reduction |
 
 Not formalized: the full matrix spectral-norm finite-ridge bound, derivation of the conditional covariance from matrix-normal

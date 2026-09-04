@@ -1,0 +1,64 @@
+[W904 05:21:26.350788333 collection.cpp:1116] Warning: ROCTracer produced duplicate flow start: 3 (function operator())
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /root/aurelis
+configfile: pyproject.toml
+testpaths: tests
+collected 56 items
+
+tests/test_autograd.py ..                                                [  3%]
+tests/test_compile.py .                                                  [  5%]
+tests/test_oracles.py ................                                   [ 33%]
+tests/test_partition.py ................                                 [ 62%]
+tests/test_phase1_identities.py ...                                      [ 67%]
+tests/test_phase2_baselines.py ..........                                [ 85%]
+tests/test_routing.py ...                                                [ 91%]
+tests/test_solvers.py .....                                              [100%]
+
+============================= 56 passed in 13.24s ==============================
+Build completed successfully.
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /root/aurelis
+configfile: pyproject.toml
+testpaths: tests
+collected 56 items
+
+tests/test_autograd.py ..                                                [  3%]
+tests/test_compile.py .                                                  [  5%]
+tests/test_oracles.py ................                                   [ 33%]
+tests/test_partition.py ................                                 [ 62%]
+tests/test_phase1_identities.py ...                                      [ 67%]
+tests/test_phase2_baselines.py ..........                                [ 85%]
+tests/test_routing.py ...                                                [ 91%]
+tests/test_solvers.py .....                                              [100%]
+
+============================= 56 passed in 13.15s ==============================
+Build completed successfully.
+{
+  "status": "PASS",
+  "checks": {
+    "streaming": true,
+    "deterministic": true,
+    "clipping": true,
+    "one_hot": true,
+    "monte_carlo": true,
+    "covariance_omission_measurable": true,
+    "target_conflict_and_misspecification": true,
+    "handoff": true,
+    "conditioning": true,
+    "costs": true
+  },
+  "aggregate": {
+    "streaming_cases": 90,
+    "streaming_prefixes_checked": 1467,
+    "maximum_streaming_tolerance_ratio": 0.0002742402906496974,
+    "partition_failures": 0,
+    "deterministic_rows": 64,
+    "maximum_identity_tolerance_ratio": 3.3537600009044386e-06,
+    "maximum_gate_formula_tolerance_ratio": 4.1578715331926e-05,
+    "invalid_gate_cancellation_rows_retained": 12,
+    "invalid_conditioning_rows_retained": 4
+  },
+  "wall_time_seconds": 3.724931933999869
+}

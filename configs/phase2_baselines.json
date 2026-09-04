@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "experiment": "AURELIS Phase 2 hybrid mechanism separation and matched baselines",
+  "seeds": [
+    20260904,
+    20260905,
+    20260906,
+    20260907,
+    20260908,
+    20260909,
+    20260910,
+    20260911,
+    20260912,
+    20260913
+  ],
+  "confidence_level": 0.99,
+  "normal_critical_value": 2.5758293035489004,
+  "default_params": {
+    "d_key": 16,
+    "d_value": 16,
+    "window": 32,
+    "recurrent_slots": 8,
+    "prior": 1.0,
+    "temperature": 1.0
+  },
+  "baselines": [
+    "local_softmax",
+    "remote_bayes",
+    "global_linear",
+    "delta_rule",
+    "mesa",
+    "learned_sum",
+    "learned_concat",
+    "independent_fusion",
+    "full_residual",
+    "aurelis_b",
+    "aurelis_e",
+    "native_hybrid"
+  ],
+  "views": [
+    "same_feature_dimension",
+    "same_parameter_count",
+    "same_live_state_bytes",
+    "same_flops"
+  ],
+  "sweeps": {
+    "d_key": [8, 16, 32],
+    "d_value": [8, 16, 32],
+    "window": [8, 16, 32, 64],
+    "temperatures": [0.01, 0.1, 0.5, 1.0, 4.0, 16.0],
+    "context_lengths": [64, 128, 256, 512, 1024, 2048],
+    "capacity_associative_items": [8, 16, 32, 64, 128]
+  },
+  "falsification_suites": [
+    "exact_linear_diffuse",
+    "nonlinear_misspecified",
+    "recent_and_remote_exceptions",
+    "correlated_keys_convex_hull",
+    "denoising_known_corrupted_evidence",
+    "cache_boundary_queries",
+    "capacity_limits_rank_and_window",
+    "adversarial_distractors",
+    "context_length_sweeps",
+    "correlated_endpoint_covariance"
+  ],
+  "preregistered_tolerances": {
+    "exact_linear_reproduction_max_error": 1e-10,
+    "recent_exception_max_error": 1e-12,
+    "covariance_minimum_advantage_z_score": 5.0,
+    "nonlinear_advantage_reversal_min_gap": 0.005,
+    "capacity_collapse_ratio": 0.5,
+    "state_bytes_exact_match": true
+  },
+  "commands": {
+    "experiment": ".venv/bin/python experiments/phase2_baselines.py --config configs/phase2_baselines.json",
+    "complete_phase": "./scripts/run_phase2.sh"
+  }
+}

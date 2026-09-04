@@ -1,6 +1,6 @@
 AURELIS PHASE 0 GENERATED MIGRATION AUDIT
 =========================================
-timestamp_utc: 2026-08-29T17:21:47.533644+00:00
+timestamp_utc: 2026-09-04T05:23:02.884491+00:00
 quoted_old_acronym: CSM
 quoted_old_expanded_name: Conjugate State Machines
 scope: case-insensitive substring search of tracked and unignored working-tree files; .git, ignored build environments, and this audit are excluded

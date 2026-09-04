@@ -119,6 +119,53 @@ theorem clippedGate_optimal
   dsimp [denominator] at hNe
   nlinarith [mul_nonneg hPositive.le (sub_nonneg.mpr hDistance)]
 
+/-- Inverse-variance gate that incorrectly assumes endpoint independence (covariance = 0). -/
+noncomputable def independentGate (vRemote vResidual : ℝ) : ℝ :=
+  vRemote / (vRemote + vResidual)
+
+/-- The clipped independence gate projects the independence heuristic to `[0, 1]`. -/
+noncomputable def clippedIndependentGate (vRemote vResidual : ℝ) : ℝ :=
+  if independentGate vRemote vResidual < 0 then 0
+  else if 1 < independentGate vRemote vResidual then 1
+  else independentGate vRemote vResidual
+
+/-- The clipped independent gate is always in `[0, 1]`. -/
+theorem clippedIndependentGate_bounds (vRemote vResidual : ℝ) :
+    0 ≤ clippedIndependentGate vRemote vResidual ∧
+      clippedIndependentGate vRemote vResidual ≤ 1 := by
+  unfold clippedIndependentGate
+  split_ifs with h1 h2
+  · exact ⟨le_refl 0, by linarith⟩
+  · exact ⟨by linarith, le_refl 1⟩
+  · push_neg at h1 h2
+    exact ⟨h1, h2⟩
+
+/-- The full covariance Bayes gate outperforms or equals the independence heuristic for any endpoints. -/
+theorem clippedGate_le_clippedIndependentGate
+    (vRemote vResidual covariance : ℝ)
+    (hPositive : 0 < vRemote + vResidual - 2 * covariance) :
+    routeVariance vRemote vResidual covariance
+        (clippedGate vRemote vResidual covariance) ≤
+      routeVariance vRemote vResidual covariance
+        (clippedIndependentGate vRemote vResidual) := by
+  have hBounds := clippedIndependentGate_bounds vRemote vResidual
+  exact clippedGate_optimal vRemote vResidual covariance
+    (clippedIndependentGate vRemote vResidual)
+    hPositive hBounds.1 hBounds.2
+
+/-- When the independent gate is already within `[0, 1]`, the unclipped formula is also non-inferior to Bayes. -/
+theorem clippedGate_le_independentGate
+    (vRemote vResidual covariance : ℝ)
+    (hPositive : 0 < vRemote + vResidual - 2 * covariance)
+    (hIndepLower : 0 ≤ independentGate vRemote vResidual)
+    (hIndepUpper : independentGate vRemote vResidual ≤ 1) :
+    routeVariance vRemote vResidual covariance
+        (clippedGate vRemote vResidual covariance) ≤
+      routeVariance vRemote vResidual covariance
+        (independentGate vRemote vResidual) :=
+  clippedGate_optimal vRemote vResidual covariance
+    (independentGate vRemote vResidual) hPositive hIndepLower hIndepUpper
+
 /-- Under the posterior formulas, the quadratic denominator simplifies. -/
 theorem posterior_denominator_identity
     (localNoise queryVariance keyVariance cross : ℝ) :
@@ -135,3 +182,4 @@ theorem posterior_numerator_identity
   ring
 
 end Aurelis
+

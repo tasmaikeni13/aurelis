@@ -1,0 +1,14 @@
+[2026-09-04T05:22:41.413436+00:00] Starting Phase 2 Experiment on cuda (dtype: torch.float64)
+Running 9 Falsification Suites across seeds...
+Evaluating 10 baselines in the Four Views...
+Running context length sweeps (64 to 2048)...
+Computing Gate Checks and Statistical Audits...
+Phase 2 Gates Status: PASS
+  gate_1_baselines_pass_equation_tests: True
+  gate_2_linear_reproduction_isolated: True
+  gate_3_gaussian_advantage_survives_every_seed: True
+  gate_4_aurelis_e_exception_isolated: True
+  gate_5_nonlinear_no_advantage_retained: True
+  gate_6_capacity_failures_agree_with_limits: True
+  gate_7_full_covariance_beats_independence_heuristic: True
+Metrics saved to /root/aurelis/results/phase2/metrics.json

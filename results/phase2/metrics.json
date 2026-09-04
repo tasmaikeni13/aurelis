@@ -1,0 +1,431 @@
+{
+  "baselines_views": [
+    {
+      "baseline": "local_softmax",
+      "error": 3.6990929338825906,
+      "flops": 2144,
+      "latency_us": 125.87399482727052,
+      "parameters": 0,
+      "state_bytes": 8192,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 3.6990929338825906,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 3.6990929338825906,
+          "flops": 2144,
+          "latency_us": 125.87399482727052
+        },
+        "same_live_state_bytes": {
+          "error": 3.4172405589330057,
+          "matched_window": 49,
+          "state_bytes": 12544
+        },
+        "same_parameter_count": {
+          "error": 3.6990929338825906,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "remote_bayes",
+      "error": 0.6552290200053649,
+      "flops": 1024,
+      "latency_us": 77.84684896469116,
+      "parameters": 0,
+      "state_bytes": 4096,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 0.6552290200053649,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 0.6552290200053649,
+          "flops": 1024,
+          "latency_us": 77.84684896469116
+        },
+        "same_live_state_bytes": {
+          "error": 0.6552290200053649,
+          "state_bytes": 4096
+        },
+        "same_parameter_count": {
+          "error": 0.6552290200053649,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "global_linear",
+      "error": 3.4362723290857495,
+      "flops": 576,
+      "latency_us": 147.45299816131592,
+      "parameters": 0,
+      "state_bytes": 2176,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 3.4362723290857495,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 3.4362723290857495,
+          "flops": 576,
+          "latency_us": 147.45299816131592
+        },
+        "same_live_state_bytes": {
+          "error": 3.4362723290857495,
+          "state_bytes": 2176
+        },
+        "same_parameter_count": {
+          "error": 3.4362723290857495,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "delta_rule",
+      "error": 0.10500093840094997,
+      "flops": 512,
+      "latency_us": 10219.151306152344,
+      "parameters": 0,
+      "state_bytes": 2048,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 0.10500093840094997,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 0.10500093840094997,
+          "flops": 512,
+          "latency_us": 10219.151306152344
+        },
+        "same_live_state_bytes": {
+          "error": 0.10500093840094997,
+          "state_bytes": 2048
+        },
+        "same_parameter_count": {
+          "error": 0.10500093840094997,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "mesa",
+      "error": 0.5112770688031019,
+      "flops": 1024,
+      "latency_us": 275.6321430206299,
+      "parameters": 0,
+      "state_bytes": 4096,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 0.5112770688031019,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 0.5112770688031019,
+          "flops": 1024,
+          "latency_us": 275.6321430206299
+        },
+        "same_live_state_bytes": {
+          "error": 0.5112770688031019,
+          "state_bytes": 4096
+        },
+        "same_parameter_count": {
+          "error": 0.5112770688031019,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "learned_sum",
+      "error": 2.1588528288733047,
+      "flops": 3216,
+      "latency_us": 218.92130374908447,
+      "parameters": 1,
+      "state_bytes": 12288,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 2.1588528288733047,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 2.1588528288733047,
+          "flops": 3216,
+          "latency_us": 218.92130374908447
+        },
+        "same_live_state_bytes": {
+          "error": 2.1588528288733047,
+          "state_bytes": 12288
+        },
+        "same_parameter_count": {
+          "error": 2.1588528288733047,
+          "params": 1
+        }
+      }
+    },
+    {
+      "baseline": "learned_concat",
+      "error": 8.928181121937921,
+      "flops": 4192,
+      "latency_us": 232.3056936264038,
+      "parameters": 512,
+      "state_bytes": 12288,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 8.928181121937921,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 8.928181121937921,
+          "flops": 4192,
+          "latency_us": 232.3056936264038
+        },
+        "same_live_state_bytes": {
+          "error": 8.928181121937921,
+          "state_bytes": 12288
+        },
+        "same_parameter_count": {
+          "error": 8.928181121937921,
+          "params": 512
+        }
+      }
+    },
+    {
+      "baseline": "independent_fusion",
+      "error": 0.6816371167006311,
+      "flops": 5952,
+      "latency_us": 556.0792446136475,
+      "parameters": 0,
+      "state_bytes": 12544,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 0.6816371167006311,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 0.6816371167006311,
+          "flops": 5952,
+          "latency_us": 556.0792446136475
+        },
+        "same_live_state_bytes": {
+          "error": 0.6816371167006311,
+          "state_bytes": 12544
+        },
+        "same_parameter_count": {
+          "error": 0.6816371167006311,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "full_residual",
+      "error": 0.7220828874930109,
+      "flops": 4320,
+      "latency_us": 375.39079189300537,
+      "parameters": 0,
+      "state_bytes": 12288,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 0.7220828874930109,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 0.7220828874930109,
+          "flops": 4320,
+          "latency_us": 375.39079189300537
+        },
+        "same_live_state_bytes": {
+          "error": 0.7220828874930109,
+          "state_bytes": 12288
+        },
+        "same_parameter_count": {
+          "error": 0.7220828874930109,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "aurelis_b",
+      "error": 0.6552290200053652,
+      "flops": 5984,
+      "latency_us": 639.8135185241699,
+      "parameters": 0,
+      "state_bytes": 12544,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 0.6552290200053652,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 0.6552290200053652,
+          "flops": 5984,
+          "latency_us": 639.8135185241699
+        },
+        "same_live_state_bytes": {
+          "error": 0.6552290200053652,
+          "state_bytes": 12544
+        },
+        "same_parameter_count": {
+          "error": 0.6552290200053652,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "aurelis_e",
+      "error": 0.6850316823506395,
+      "flops": 5984,
+      "latency_us": 635.1528167724609,
+      "parameters": 0,
+      "state_bytes": 12544,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 0.6850316823506395,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 0.6850316823506395,
+          "flops": 5984,
+          "latency_us": 635.1528167724609
+        },
+        "same_live_state_bytes": {
+          "error": 0.6850316823506395,
+          "state_bytes": 12544
+        },
+        "same_parameter_count": {
+          "error": 0.6850316823506395,
+          "params": 0
+        }
+      }
+    },
+    {
+      "baseline": "native_hybrid",
+      "error": 3.6983238900455246,
+      "flops": 2680,
+      "latency_us": 90.11470079421997,
+      "parameters": 0,
+      "state_bytes": 10240,
+      "views": {
+        "same_feature_dimension": {
+          "d_k": 16,
+          "d_v": 16,
+          "error": 3.6983238900455246,
+          "window": 32
+        },
+        "same_flops": {
+          "error": 3.6983238900455246,
+          "flops": 2680,
+          "latency_us": 90.11470079421997
+        },
+        "same_live_state_bytes": {
+          "error": 3.6983238900455246,
+          "state_bytes": 10240
+        },
+        "same_parameter_count": {
+          "error": 3.6983238900455246,
+          "params": 0
+        }
+      }
+    }
+  ],
+  "checks": {
+    "gate_1_baselines_pass_equation_tests": true,
+    "gate_2_linear_reproduction_isolated": true,
+    "gate_3_gaussian_advantage_survives_every_seed": true,
+    "gate_4_aurelis_e_exception_isolated": true,
+    "gate_5_nonlinear_no_advantage_retained": true,
+    "gate_6_capacity_failures_agree_with_limits": true,
+    "gate_7_full_covariance_beats_independence_heuristic": true
+  },
+  "config_sha256": "4655c62c9f7d46e3e69adb61429fc467ceadb268a918559b0da999c7a2698033",
+  "context_sweeps": [
+    {
+      "aurelis_latency_us": 752.7560234069824,
+      "aurelis_state_bytes": 12544,
+      "context_length": 64,
+      "full_attention_latency_us": 93.60259771347046,
+      "full_attention_state_bytes": 16384
+    },
+    {
+      "aurelis_latency_us": 745.7399845123291,
+      "aurelis_state_bytes": 12544,
+      "context_length": 128,
+      "full_attention_latency_us": 92.91710257530212,
+      "full_attention_state_bytes": 32768
+    },
+    {
+      "aurelis_latency_us": 744.1323280334473,
+      "aurelis_state_bytes": 12544,
+      "context_length": 256,
+      "full_attention_latency_us": 94.39240097999573,
+      "full_attention_state_bytes": 65536
+    },
+    {
+      "aurelis_latency_us": 746.0507392883301,
+      "aurelis_state_bytes": 12544,
+      "context_length": 512,
+      "full_attention_latency_us": 93.97144913673401,
+      "full_attention_state_bytes": 131072
+    },
+    {
+      "aurelis_latency_us": 738.7280941009521,
+      "aurelis_state_bytes": 12544,
+      "context_length": 1024,
+      "full_attention_latency_us": 94.01155114173889,
+      "full_attention_state_bytes": 262144
+    },
+    {
+      "aurelis_latency_us": 739.4738674163818,
+      "aurelis_state_bytes": 12544,
+      "context_length": 2048,
+      "full_attention_latency_us": 93.5284972190857,
+      "full_attention_state_bytes": 524288
+    }
+  ],
+  "environment": {
+    "cuda_available": true,
+    "device": "cuda",
+    "device_name": "AMD Instinct MI300X VF",
+    "git_commit": "ab2a94bc6ab19e3d1bddefd81474f956c20af839",
+    "git_dirty": true,
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.8.0+rocm7.0.2.git245bf6ed"
+  },
+  "experiment": "AURELIS Phase 2 hybrid mechanism separation and matched baselines",
+  "schema_version": 2,
+  "status": "PASS",
+  "summary": {
+    "all_seeds_advantage": true,
+    "correlated_z_score": 9.066556915232391,
+    "max_e_episodic_error": 9.930136612989092e-16,
+    "max_linear_error_aurelis": 8.579370880766939e-12,
+    "mean_correlated_regret": 0.8402722428493558,
+    "min_linear_error_local": 2.4518337057868007,
+    "retained_nonlinear_count": 10
+  },
+  "utc_completed": "2026-09-04T05:22:44.880916+00:00",
+  "utc_started": "2026-09-04T05:22:41.413436+00:00"
+}

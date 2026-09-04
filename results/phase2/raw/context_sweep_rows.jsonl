@@ -1,0 +1,6 @@
+{"aurelis_latency_us": 752.7560234069824, "aurelis_state_bytes": 12544, "context_length": 64, "full_attention_latency_us": 93.60259771347046, "full_attention_state_bytes": 16384}
+{"aurelis_latency_us": 745.7399845123291, "aurelis_state_bytes": 12544, "context_length": 128, "full_attention_latency_us": 92.91710257530212, "full_attention_state_bytes": 32768}
+{"aurelis_latency_us": 744.1323280334473, "aurelis_state_bytes": 12544, "context_length": 256, "full_attention_latency_us": 94.39240097999573, "full_attention_state_bytes": 65536}
+{"aurelis_latency_us": 746.0507392883301, "aurelis_state_bytes": 12544, "context_length": 512, "full_attention_latency_us": 93.97144913673401, "full_attention_state_bytes": 131072}
+{"aurelis_latency_us": 738.7280941009521, "aurelis_state_bytes": 12544, "context_length": 1024, "full_attention_latency_us": 94.01155114173889, "full_attention_state_bytes": 262144}
+{"aurelis_latency_us": 739.4738674163818, "aurelis_state_bytes": 12544, "context_length": 2048, "full_attention_latency_us": 93.5284972190857, "full_attention_state_bytes": 524288}
