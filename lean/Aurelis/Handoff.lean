@@ -29,4 +29,11 @@ theorem remote_empty_before_window {α : Type*} {window : Nat} {history : List �
     (h : history.length ≤ window) : remote window history = [] := by
   simp [remote, List.drop_eq_nil_iff.mpr h]
 
+/-- Double counting cache tokens inflates the history representation beyond the true sequence. -/
+theorem cache_overlap_redundancy {α : Type*} (window : Nat) (history : List α)
+    (h_pos : 0 < (recent window history).length) :
+    history.length < (recent window history ++ history).length := by
+  simp only [List.length_append]
+  omega
+
 end Aurelis

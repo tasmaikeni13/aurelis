@@ -22,7 +22,7 @@ verified** means the committed program passes its declared finite experiment;
 | AUR-ROCM-1 | Eager and Inductor AURELIS forward/backward agree with fp64 within declared tolerances on the recorded MI300X/ROCm host | `results/phase0/environment.json`, `benchmark_metrics.json`, raw timings | None | Phase 0 numerical/system evidence; competitive-speed claim remains pending |
 | AUR-GATE-2 | The full covariance gate is variance-noninferior to the independence heuristic and outperforms it under correlation | Paper Theorem 6.1, Eq. 6.8; Phase 2 correlated suite z-score >= 5.0 | `clippedGate_le_clippedIndependentGate`, `clippedGate_le_independentGate` | Proved, Lean-checked, and numerically verified |
 | AUR-SEP-1 | Hybrid mechanisms separate under matched parameter, dimension, state-byte, and FLOP budgets without universal dominance | Phase 2 falsification suites and 4 comparison views | None | Numerically verified across 10 baselines and 9 suites |
-| AUR-LEARN-1 | Learned features preserve the theoretical mechanism | Phase 3 prompt | None | Pending; no current claim |
+| AUR-LEARN-1 | Learned features and episodic routing preserve the theoretical mechanism | `results/phase3/metrics.json`, `results/phase3/PASS.md`, 7 task families across 5 paired seeds | `episodicGate`, `episodicGate_ge_bayes`, `episodicGate_ge_episodic`, `episodicGate_bounds`, `cache_overlap_redundancy` | Proved, Lean-checked, and numerically verified (risk 0.4625 vs 2.3868, AUROC 1.0000, R2 0.9478) |
 | AUR-LM-1 | AURELIS improves language-model quality/efficiency | Phase 6/7 prompts | None | Pending; no current claim |
 
 

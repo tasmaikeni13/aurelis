@@ -14,10 +14,9 @@ Preregister one generation with:
 - strongest Transformer, published-style hybrid, Gated DeltaNet or Kimi-style
   feasible comparator, cumulative least-squares comparator, and strongest
   AURELIS variant selected without Phase 7 test results;
-- `25M–75M` parameters, at least three paired seeds, and at least `100M`
-  training tokens per model/seed unless a larger equal budget is feasible;
-- identical corpus, tokenizer, optimizer, schedule, batch tokens, context,
-  precision policy, checkpoint cadence, and evaluator;
+- **125M parameters** (`d_model=768`, 12 heads, `d_k=64, d_v=64`, 12 layers), paired seeds, and **1.0 Billion training tokens** per model on the **FineWeb-Edu** corpus (`HuggingFaceFW/fineweb-edu`);
+- identical FineWeb-Edu corpus shards, pinned tokenizer, AdamW optimizer, cosine decay schedule, batch tokens, context length `2048`,
+  precision policy (bf16 with fp32 precision accumulation), checkpoint cadence, and evaluator;
 - parameter/FLOP/state reconciliation; and
 - fixed primary and secondary claims with confidence intervals and multiple
   comparison treatment.

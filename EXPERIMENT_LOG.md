@@ -148,3 +148,45 @@ Formalized the suboptimality of the independence heuristic in `lean/Aurelis/Rout
 
 Complete gate evidence, raw row logs, metrics, and plots are generated in `results/phase2/`.
 
+## 2026-09-04 — Phase 3: Learned features and episodic routing
+
+### Neural implementations and straight-through estimator
+Implemented matched small neural models (`src/aurelis/nn_phase3.py`) with shared key/query
+feature charts ($W_{kq}$), learned value, learned evidence ($\beta_t$), temperature, and
+episodic-responsibility projections. Implemented baselines: local-only, remote-only, learned-sum,
+Gated DeltaNet, cumulative least-squares, AURELIS-B, and AURELIS-E under matched encoder capacity.
+Diagnosed and resolved the subgradient dead-zone in $g_E = \max(g_B, e_t)$ where $\partial_b \max(a, b) = 0$
+via a Straight-Through Estimator (STE) computing exact hard maximum forward and smooth surrogate backward.
+
+### Multi-task curriculum and ablations
+Constructed a 7-task-family synthetic curriculum generator (`src/aurelis/curriculum.py`):
+1. Noisy linear and affine in-context regression;
+2. Recent exact associative copy;
+3. Remote structured recall within rank;
+4. Mixed latent-denoising and episodic-exception targets with an observable task cue;
+5. Selective copy and local token shift;
+6. Cache-boundary recall across delay ages $w-1, w, w+1, w+2$;
+7. Over-capacity, conflicting-write, and no-relevant-context negatives.
+
+Evaluated across 5 paired seeds (301..305) on AMD Instinct MI300X VF. Verified that learned
+AURELIS-E solves all 7 families, achieves aggregate risk `0.4625` vs `2.3868` for frozen random
+features, and outperforms independent-chart ablations (`0.4625` vs `0.6029`) while retaining effective
+rank $\text{erank} = 13.35 \ge 2.0$. Observable cue explains override with AUROC `1.0000` and $R^2 = 0.9478$.
+
+### Formal proofs
+Formalized episodic gate properties in `lean/Aurelis/Router.lean`:
+- `episodicGate`, `episodicGate_ge_bayes`, `episodicGate_ge_episodic`, `episodicGate_bounds`.
+Formalized cache overlap redundancy in `lean/Aurelis/Handoff.lean`:
+- `cache_overlap_redundancy`.
+`lake build` compiled with 0 errors, 0 warnings, 0 `sorry`, and 0 `admit`.
+
+### Reproduction command
+
+```bash
+./scripts/bootstrap.sh
+./scripts/run_phase3.sh
+```
+
+All gate evidence, metrics, logs, and plots are recorded in `results/phase3/` and `results/phase3/PASS.md`.
+
+

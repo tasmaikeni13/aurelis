@@ -1,6 +1,6 @@
 # AURELIS Phase 2 PASS
 
-Generated: `2026-09-04T05:23:38.928702+00:00`
+Generated: `2026-09-04T06:48:57.565238+00:00`
 
 Phase 2 status: **PASS**. This record covers the hybrid mechanism separation,
 four fair budget comparison views, nine falsification suites, multi-seed Gaussian
@@ -54,10 +54,10 @@ regime validation, and formal Lean proofs of covariance gate optimality.
 
 ## Tested revision and environment fingerprint
 
-- Base commit: `ab2a94bc6ab19e3d1bddefd81474f956c20af839`
+- Base commit: `f8133e366517460c218daa3ddb2a68f01857d2ff`
 - Working tree dirty status: `dirty`
 - Phase 2 config SHA-256: `4655c62c9f7d46e3e69adb61429fc467ceadb268a918559b0da999c7a2698033`
-- Phase 2 metrics SHA-256: `b9d421bf26e545ff66872ae17f3f095f26867b4e1584b9a3f108319c5343186c`
+- Phase 2 metrics SHA-256: `a3f36ef3929340c068216f4baeb83916ec9b505f6055992db313c766eb1f811f`
 
 ## Remaining limitations outside the Phase 2 claim
 

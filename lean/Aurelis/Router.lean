@@ -181,5 +181,23 @@ theorem posterior_numerator_identity
     queryVariance - (queryVariance - cross) = cross := by
   ring
 
+/-- The episodic gate combines the Bayes gate with an explicit episodic responsibility. -/
+def episodicGate (bayesGate episodicResponsibility : ℝ) : ℝ :=
+  max bayesGate episodicResponsibility
+
+@[simp] theorem episodicGate_ge_bayes (gB e : ℝ) :
+    gB ≤ episodicGate gB e :=
+  le_max_left gB e
+
+@[simp] theorem episodicGate_ge_episodic (gB e : ℝ) :
+    e ≤ episodicGate gB e :=
+  le_max_right gB e
+
+theorem episodicGate_bounds {gB e : ℝ} (hB0 : 0 ≤ gB) (hB1 : gB ≤ 1) (_he0 : 0 ≤ e) (he1 : e ≤ 1) :
+    0 ≤ episodicGate gB e ∧ episodicGate gB e ≤ 1 := by
+  constructor
+  · exact le_trans hB0 (le_max_left gB e)
+  · exact max_le hB1 he1
+
 end Aurelis
 

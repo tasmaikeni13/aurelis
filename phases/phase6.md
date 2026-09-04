@@ -9,12 +9,11 @@ currently passing. Execute the failure-repair loop until PASS.
 
 Before training, freeze an experimental generation containing:
 
-- checksum-pinned tokenizer and openly licensed corpus;
+- checksum-pinned tokenizer and FineWeb-Edu corpus (`HuggingFaceFW/fineweb-edu`);
 - train/validation/test splits with decontamination checks;
-- parameter range `5M–20M`, context, optimizer, schedule, batch tokens, token
-  budget, seeds, checkpoint/evaluation cadence, and exclusions;
+- parameter range `10M–125M` (with 125M pilot configuration `d_model=768, heads=12, layers=12`), context length `2048`, optimizer (AdamW), cosine schedule, batch tokens, token budget, seeds, checkpoint/evaluation cadence, and exclusions;
 - architecture equations and implementation commit; and
-- primary natural loss plus six targeted diagnostic families.
+- primary natural cross-entropy loss on FineWeb-Edu plus six targeted diagnostic families.
 
 Any architecture or evaluator change increments the generation and reruns all
 models from scratch.
@@ -23,8 +22,8 @@ models from scratch.
 
 Train matched Transformer, sliding-window Transformer, Gated DeltaNet,
 cumulative least-squares remote model, a published-style local/recurrent
-hybrid, AURELIS-B, and AURELIS-E. Include remote-only and local-only ablations.
-Match parameter count, tokens, optimizer, schedule, batch tokens, corpus, and
+hybrid, AURELIS-B, and AURELIS-E on FineWeb-Edu. Include remote-only and local-only ablations.
+Match parameter count (calibrated at 125M scale), tokens, optimizer, schedule, batch tokens, corpus, and
 tuning opportunity; report residual mismatches.
 
 ## Diagnostics

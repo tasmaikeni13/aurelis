@@ -1,4 +1,3 @@
-[W904 06:47:33.420030196 collection.cpp:1116] Warning: ROCTracer produced duplicate flow start: 3 (function operator())
 ============================= test session starts ==============================
 platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
 rootdir: /root/aurelis
@@ -16,5 +15,4 @@ tests/test_phase3.py ....                                                [ 86%]
 tests/test_routing.py ...                                                [ 91%]
 tests/test_solvers.py .....                                              [100%]
 
-============================= 60 passed in 14.37s ==============================
-Build completed successfully.
+============================= 60 passed in 14.40s ==============================

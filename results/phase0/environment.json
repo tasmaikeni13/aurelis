@@ -41,11 +41,11 @@
       "stdout": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  20\nOn-line CPU(s) list:                     0-19\nVendor ID:                               GenuineIntel\nBIOS Vendor ID:                          QEMU\nModel name:                              INTEL(R) XEON(R) PLATINUM 8568Y+\nBIOS Model name:                         pc-q35-6.1  CPU @ 2.0GHz\nBIOS CPU family:                         1\nCPU family:                              6\nModel:                                   207\nThread(s) per core:                      1\nCore(s) per socket:                      20\nSocket(s):                               1\nStepping:                                2\nBogoMIPS:                                4600.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq dtes64 vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 wbnoinvd arat vnmi avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b fsrm md_clear serialize tsxldtrk avx512_fp16 arch_capabilities\nVirtualization:                          VT-x\nHypervisor vendor:                       KVM\nVirtualization type:                     full\nL1d cache:                               640 KiB (20 instances)\nL1i cache:                               640 KiB (20 instances)\nL2 cache:                                80 MiB (20 instances)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-19\nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Mitigation; Aligned branch/return thunks\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Unknown: No mitigations\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI SW loop, KVM SW loop\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Mitigation; TSX disabled\nVulnerability Vmscape:                   Not affected"
     },
     "executable": "/root/aurelis/.venv/bin/python",
-    "git_commit": "ab2a94bc6ab19e3d1bddefd81474f956c20af839",
+    "git_commit": "f8133e366517460c218daa3ddb2a68f01857d2ff",
     "git_dirty_state": {
       "dirty": true,
-      "path_count": 28,
-      "status_sha256": "31565fca22b5fc7c488383d88fbefac5dd5445a20caaf9fc5936de3df78bda0a"
+      "path_count": 41,
+      "status_sha256": "94fbec2c159e9fb80bc417ef5034978a222984a1abbe9e3399bdd4144143a91d"
     },
     "hipcc": {
       "available": true,
@@ -73,7 +73,7 @@
       ],
       "returncode": 0,
       "stderr": "",
-      "stdout": "total        used        free      shared  buff/cache   available\nMem:     253347033088  7703707648 205595873280     4665344 42278858752 245643325440\nSwap:              0           0           0"
+      "stdout": "total        used        free      shared  buff/cache   available\nMem:     253347033088  7813361664 205420863488     4677632 42344226816 245533671424\nSwap:              0           0           0"
     },
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
     "python": "3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]",
@@ -88,7 +88,7 @@
       ],
       "returncode": 0,
       "stderr": "",
-      "stdout": "============================ ROCm System Management Interface ============================\n============================== Version of System Component ===============================\nDriver version: 6.19.14.31400000\n==========================================================================================\n================================== Memory Usage (Bytes) ==================================\nGPU[0]\t\t: VRAM Total Memory (B): 205822885888\nGPU[0]\t\t: VRAM Total Used Memory (B): 1346891776\n==========================================================================================\n====================================== Product Info ======================================\nGPU[0]\t\t: Card Series: \t\tAMD Instinct MI300X VF\nGPU[0]\t\t: Card Model: \t\t0x74b5\nGPU[0]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[0]\t\t: Card SKU: \t\tM3000100\nGPU[0]\t\t: Subsystem ID: \t0x74a1\nGPU[0]\t\t: Device Rev: \t\t0x00\nGPU[0]\t\t: Node ID: \t\t1\nGPU[0]\t\t: GUID: \t\t21947\nGPU[0]\t\t: GFX Version: \t\tgfx942\n==========================================================================================\n================================== End of ROCm SMI Log ==================================="
+      "stdout": "============================ ROCm System Management Interface ============================\n============================== Version of System Component ===============================\nDriver version: 6.19.14.31400000\n==========================================================================================\n================================== Memory Usage (Bytes) ==================================\nGPU[0]\t\t: VRAM Total Memory (B): 205822885888\nGPU[0]\t\t: VRAM Total Used Memory (B): 1346908160\n==========================================================================================\n====================================== Product Info ======================================\nGPU[0]\t\t: Card Series: \t\tAMD Instinct MI300X VF\nGPU[0]\t\t: Card Model: \t\t0x74b5\nGPU[0]\t\t: Card Vendor: \t\tAdvanced Micro Devices, Inc. [AMD/ATI]\nGPU[0]\t\t: Card SKU: \t\tM3000100\nGPU[0]\t\t: Subsystem ID: \t0x74a1\nGPU[0]\t\t: Device Rev: \t\t0x00\nGPU[0]\t\t: Node ID: \t\t1\nGPU[0]\t\t: GUID: \t\t21947\nGPU[0]\t\t: GFX Version: \t\tgfx942\n==========================================================================================\n================================== End of ROCm SMI Log ==================================="
     },
     "rocminfo": {
       "available": true,
@@ -104,64 +104,64 @@
     "bf16": {
       "finite": true,
       "matrix_size": 2048,
-      "median_ms": 0.0702620000083698,
-      "median_tflops": 244.51153086950967,
+      "median_ms": 0.07573800030513667,
+      "median_tflops": 226.83288593288665,
       "output_dtype": "torch.bfloat16",
       "repetitions": 5,
       "samples_ms": [
-        0.08546299977751914,
-        0.10260800036121509,
-        0.0702620000083698,
-        0.068710000050487,
-        0.06822399973316351
+        0.08533999971405137,
+        0.0750720000723959,
+        0.07822400039003696,
+        0.07206900045275688,
+        0.07573800030513667
       ],
       "supported": true
     },
     "fp16": {
       "finite": true,
       "matrix_size": 2048,
-      "median_ms": 0.07068300010359962,
-      "median_tflops": 243.05517817324642,
+      "median_ms": 0.07594299950142158,
+      "median_tflops": 226.22057723277587,
       "output_dtype": "torch.float16",
       "repetitions": 5,
       "samples_ms": [
-        0.08360800029549864,
-        0.07564399993498228,
-        0.07068300010359962,
-        0.07060100006128778,
-        0.07015800019871676
+        0.08930799958761781,
+        0.07594299950142158,
+        0.07727499996690312,
+        0.07069599996611942,
+        0.07012199966993649
       ],
       "supported": true
     },
     "fp32": {
       "finite": true,
       "matrix_size": 2048,
-      "median_ms": 0.20760000006703194,
-      "median_tflops": 82.754668489657,
+      "median_ms": 0.20264599970687414,
+      "median_tflops": 84.7777365891779,
       "output_dtype": "torch.float32",
       "repetitions": 5,
       "samples_ms": [
-        0.21927600027993321,
-        0.20846500001425738,
-        0.20760000006703194,
-        0.2037119998021808,
-        0.207354999929521
+        0.2162609998777043,
+        0.21247099994070595,
+        0.20264599970687414,
+        0.2008600004046457,
+        0.20121799934713636
       ],
       "supported": true
     },
     "fp64": {
       "finite": true,
       "matrix_size": 2048,
-      "median_ms": 0.35066600003119675,
-      "median_tflops": 48.99211552437819,
+      "median_ms": 0.35076400035904953,
+      "median_tflops": 48.978427565013284,
       "output_dtype": "torch.float64",
       "repetitions": 5,
       "samples_ms": [
-        0.36144200021226425,
-        0.35183399995730724,
-        0.35066600003119675,
-        0.33655500010354444,
-        0.30531499987773714
+        0.35869900057150517,
+        0.35076400035904953,
+        0.35151600059180055,
+        0.33634400006121723,
+        0.2977620006276993
       ],
       "supported": true
     }
@@ -170,7 +170,7 @@
     "cholesky_solve_health": {
       "available": true,
       "finite": true,
-      "max_residual": 1.162895116987624e-14
+      "max_residual": 1.12853638003564e-14
     },
     "rocblas": [
       "/opt/rocm/core-10.0/lib/librocblas.so",
@@ -243,8 +243,8 @@
     },
     "torch_compile": {
       "available": true,
-      "compile_and_first_run_seconds": 1.5045775639996464,
-      "max_absolute_error": 9.5367431640625e-07,
+      "compile_and_first_run_seconds": 1.596827294999457,
+      "max_absolute_error": 4.76837158203125e-07,
       "usable": true
     },
     "triton": {
@@ -257,5 +257,5 @@
   },
   "schema_version": 1,
   "status": "PASS",
-  "timestamp_utc": "2026-09-04T05:21:24.419056+00:00"
+  "timestamp_utc": "2026-09-04T06:47:31.384928+00:00"
 }

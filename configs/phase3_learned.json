@@ -1,0 +1,69 @@
+{
+  "phase": 3,
+  "description": "Learned feature projections and episodic routing across 7 task families with 5 paired seeds",
+  "seeds": [301, 302, 303, 304, 305],
+  "architecture": {
+    "d_in": 16,
+    "d_feat": 6,
+    "d_model": 32,
+    "d_out": 2,
+    "heads": 2,
+    "d_key": 8,
+    "d_value": 8,
+    "window": 12,
+    "prior": 1.0
+  },
+  "training": {
+    "steps": 300,
+    "batch_size_per_task": 8,
+    "total_batch_size": 56,
+    "learning_rate": 0.005,
+    "weight_decay": 0.0001,
+    "train_length": 32,
+    "cue_loss_weight": 0.4
+  },
+  "evaluation": {
+    "eval_batches": 10,
+    "eval_batch_size": 64,
+    "held_out_lengths": [32, 48],
+    "held_out_noise_stds": [0.1, 0.25],
+    "held_out_windows": [8, 16]
+  },
+  "models": [
+    "aurelis_e",
+    "aurelis_b",
+    "local_only",
+    "remote_only",
+    "learned_sum",
+    "gated_delta",
+    "cumulative_least_squares"
+  ],
+  "ablations": [
+    "independent_charts",
+    "fixed_evidence",
+    "fixed_gate_0",
+    "fixed_gate_1",
+    "analytic_gate_no_override",
+    "learned_sigmoid_gate_no_analytic",
+    "analytic_plus_episodic_gate",
+    "cache_overlap_double_counting",
+    "random_frozen_features"
+  ],
+  "gates": {
+    "family_thresholds": {
+      "noisy_linear_regression": 0.60,
+      "recent_associative_copy": 0.45,
+      "remote_structured_recall": 0.25,
+      "mixed_latent_and_exception": 1.40,
+      "selective_copy_and_shift": 0.35,
+      "cache_boundary_recall": 0.25,
+      "overcapacity_conflicting_no_context_negatives": 1.30
+    },
+    "effective_rank_min": 2.0,
+    "episodic_auroc_min": 0.90,
+    "cue_correlation_r2_min": 0.80,
+    "boundary_degradation_max": 0.15,
+    "exception_copy_improvement_ratio_min": 1.40,
+    "anticopy_degradation_max": 0.10
+  }
+}

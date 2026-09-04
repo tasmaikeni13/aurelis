@@ -1,6 +1,6 @@
 {
   "command": ".venv/bin/python experiments/phase0_reference.py",
-  "commit": "ab2a94bc6ab19e3d1bddefd81474f956c20af839",
+  "commit": "f8133e366517460c218daa3ddb2a68f01857d2ff",
   "config": {
     "batch": 2,
     "d_value": 3,
@@ -42,8 +42,8 @@
   "device": "cpu",
   "dirty_state": {
     "dirty": true,
-    "path_count": 28,
-    "status_sha256": "31565fca22b5fc7c488383d88fbefac5dd5445a20caaf9fc5936de3df78bda0a"
+    "path_count": 41,
+    "status_sha256": "94fbec2c159e9fb80bc417ef5034978a222984a1abbe9e3399bdd4144143a91d"
   },
   "dtype": "torch.float64",
   "experiment": "aurelis_phase0_reference",
@@ -1182,6 +1182,6 @@
   ],
   "schema_version": 1,
   "status": "PASS",
-  "timestamp_utc": "2026-09-04T05:21:45.982779+00:00",
-  "wall_time_seconds": 0.4007706470001722
+  "timestamp_utc": "2026-09-04T06:47:54.043760+00:00",
+  "wall_time_seconds": 0.17338814200047636
 }

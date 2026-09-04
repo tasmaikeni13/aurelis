@@ -1,4 +1,4 @@
-[W904 06:47:33.420030196 collection.cpp:1116] Warning: ROCTracer produced duplicate flow start: 3 (function operator())
+[W904 06:45:49.580050862 collection.cpp:1116] Warning: ROCTracer produced duplicate flow start: 3 (function operator())
 ============================= test session starts ==============================
 platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
 rootdir: /root/aurelis
@@ -16,7 +16,7 @@ tests/test_phase3.py ....                                                [ 86%]
 tests/test_routing.py ...                                                [ 91%]
 tests/test_solvers.py .....                                              [100%]
 
-============================= 60 passed in 14.37s ==============================
+============================= 60 passed in 14.19s ==============================
 Build completed successfully.
 ============================= test session starts ==============================
 platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
@@ -35,7 +35,7 @@ tests/test_phase3.py ....                                                [ 86%]
 tests/test_routing.py ...                                                [ 91%]
 tests/test_solvers.py .....                                              [100%]
 
-============================= 60 passed in 14.74s ==============================
+============================= 60 passed in 14.24s ==============================
 Build completed successfully.
 {
   "status": "PASS",
@@ -62,5 +62,5 @@ Build completed successfully.
     "invalid_gate_cancellation_rows_retained": 12,
     "invalid_conditioning_rows_retained": 4
   },
-  "wall_time_seconds": 4.8487622860002375
+  "wall_time_seconds": 4.791687507999995
 }

@@ -4,7 +4,7 @@ Status: **PASS**
 
 - Device: `AMD Instinct MI300X VF`
 - PyTorch/HIP: `2.8.0+rocm7.0.2.git245bf6ed` / `7.0.51831-7c9236b16`
-- Compile plus first run: `1.631` seconds
+- Compile plus first run: `1.767` seconds
 - Peak allocated memory: `428094464` bytes
 - fp32 eager vs CPU/fp64 maximum error: `7.255e-06`
 - fp32 streaming vs CPU/fp64 maximum error: `1.026e-05`
@@ -13,16 +13,16 @@ Status: **PASS**
 
 | Component | Median ms | Minimum ms |
 |---|---:|---:|
-| outer_updates | 0.056866 | 0.053388 |
-| local_attention | 0.113044 | 0.110046 |
-| cholesky_factorization | 0.081505 | 0.080322 |
-| triangular_solve | 0.041988 | 0.041283 |
-| routing | 0.058008 | 0.055898 |
-| vectorized_training_eager_forward | 1.106149 | 1.064620 |
-| prepared_head_eager_forward | 0.728274 | 0.676641 |
-| prepared_head_eager_forward_backward | 2.139080 | 2.091369 |
-| prepared_head_compiled_forward | 0.598563 | 0.537301 |
-| prepared_head_compiled_forward_backward | 1.849375 | 1.753952 |
+| outer_updates | 0.063018 | 0.060763 |
+| local_attention | 0.135888 | 0.131906 |
+| cholesky_factorization | 0.087140 | 0.085824 |
+| triangular_solve | 0.045979 | 0.045352 |
+| routing | 0.058007 | 0.056468 |
+| vectorized_training_eager_forward | 1.112108 | 1.066790 |
+| prepared_head_eager_forward | 0.733484 | 0.700409 |
+| prepared_head_eager_forward_backward | 2.151060 | 2.109534 |
+| prepared_head_compiled_forward | 0.639686 | 0.586237 |
+| prepared_head_compiled_forward_backward | 1.923812 | 1.893743 |
 
 Compilation/warm-up is excluded from steady-state rows. Every timed GPU sample
 is synchronized. These are component health measurements, not an accelerator

@@ -12,7 +12,7 @@ From a fresh clone and clean environment on the target MI300X server:
 - run unit/property/pathology tests and `lake build`;
 - reproduce every phase smoke gate;
 - independently regenerate the central numerical, learned, systems, tiny-LM,
-  and scale tables from pinned configs/checkpoints;
+  and 125M parameter / 1B token FineWeb-Edu scale tables from pinned configs/checkpoints;
 - verify hashes and that plots/tables are generated rather than hand-edited;
   and
 - compare raw metrics with every claim in `CLAIMS.md` and the manuscript.

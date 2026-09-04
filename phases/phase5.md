@@ -25,7 +25,8 @@ Compare, on identical quantized inputs:
 Profile complete heads and components over:
 
 - `d_k,d_v in {16,32,64,128,256}` where memory permits;
-- windows `{8,16,32,64,128,256}`;
+- windows `{8,16,32,64,128,256,512}`;
+- 125M parameter architecture targets (`d_model=768`, 12 heads, `d_k=64, d_v=64`, 12 layers);
 - batch, heads, context, and decode batch axes;
 - bf16/fp16/fp32 plus fp64 oracle;
 - cold compile, warm-up, tuning, and steady state; and
