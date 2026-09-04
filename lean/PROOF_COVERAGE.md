@@ -23,6 +23,8 @@
 | `posterior_denominator_identity` / `posterior_numerator_identity` | Posterior covariance terms simplify to the paper's gate formula | Full scalar reduction |
 | `cache_overlap_redundancy` | Double counting cache tokens inflates the history representation beyond the true sequence | Full list theorem |
 | `episodicGate_ge_bayes` / `episodicGate_bounds` | Episodic override gate dominates the Bayes gate and remains in `[0,1]` | Full real-algebra theorems |
+| `composition_error_identity` / `composition_reproduces_linear` | Multi-hop linear composition error splits into step-1 error propagated through step-2 truth plus step-2 slope error | Full linear-map theorems |
+| `leaky_precision_update_posDef` | Leaky convex regularized precision update under exponential decay retains positive definiteness | Full finite real-matrix theorem |
 
 Not formalized: the full matrix spectral-norm finite-ridge bound, derivation of the conditional covariance from matrix-normal
 probability, concentration bounds, the fp64 Monte Carlo experiment, Cholesky

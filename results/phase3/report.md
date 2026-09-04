@@ -1,6 +1,6 @@
 # AURELIS Phase 3 Evaluation Report
 
-Generated: `2026-09-04T07:05:55.868547+00:00`
+Generated: `2026-09-04T18:12:54.948563+00:00`
 Status: **PASS**
 
 ## Gates and Findings

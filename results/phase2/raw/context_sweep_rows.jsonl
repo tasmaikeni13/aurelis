@@ -1,6 +1,6 @@
-{"aurelis_latency_us": 744.8409557342529, "aurelis_state_bytes": 12544, "context_length": 64, "full_attention_latency_us": 88.9584481716156, "full_attention_state_bytes": 16384}
-{"aurelis_latency_us": 737.7468109130859, "aurelis_state_bytes": 12544, "context_length": 128, "full_attention_latency_us": 99.27394986152649, "full_attention_state_bytes": 32768}
-{"aurelis_latency_us": 733.9921951293945, "aurelis_state_bytes": 12544, "context_length": 256, "full_attention_latency_us": 88.89824748039246, "full_attention_state_bytes": 65536}
-{"aurelis_latency_us": 741.8901920318604, "aurelis_state_bytes": 12544, "context_length": 512, "full_attention_latency_us": 93.46669912338257, "full_attention_state_bytes": 131072}
-{"aurelis_latency_us": 733.9139938354492, "aurelis_state_bytes": 12544, "context_length": 1024, "full_attention_latency_us": 91.00509881973267, "full_attention_state_bytes": 262144}
-{"aurelis_latency_us": 733.1424236297607, "aurelis_state_bytes": 12544, "context_length": 2048, "full_attention_latency_us": 91.3799524307251, "full_attention_state_bytes": 524288}
+{"aurelis_latency_us": 748.9949703216553, "aurelis_state_bytes": 12544, "context_length": 64, "full_attention_latency_us": 93.64094734191895, "full_attention_state_bytes": 16384}
+{"aurelis_latency_us": 748.1951713562012, "aurelis_state_bytes": 12544, "context_length": 128, "full_attention_latency_us": 91.42385125160217, "full_attention_state_bytes": 32768}
+{"aurelis_latency_us": 750.3214836120605, "aurelis_state_bytes": 12544, "context_length": 256, "full_attention_latency_us": 92.66064763069153, "full_attention_state_bytes": 65536}
+{"aurelis_latency_us": 747.0962047576904, "aurelis_state_bytes": 12544, "context_length": 512, "full_attention_latency_us": 93.84534955024719, "full_attention_state_bytes": 131072}
+{"aurelis_latency_us": 760.4265213012695, "aurelis_state_bytes": 12544, "context_length": 1024, "full_attention_latency_us": 94.08190250396729, "full_attention_state_bytes": 262144}
+{"aurelis_latency_us": 761.3303661346436, "aurelis_state_bytes": 12544, "context_length": 2048, "full_attention_latency_us": 95.94410061836243, "full_attention_state_bytes": 524288}

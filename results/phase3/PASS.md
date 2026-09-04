@@ -1,6 +1,6 @@
 # AURELIS Phase 3 PASS
 
-Generated: `2026-09-04T07:05:55.872693+00:00`
+Generated: `2026-09-04T18:12:54.955531+00:00`
 
 Phase 3 status: **PASS**. This record covers the learned feature projections,
 episodic routing mechanism, 7 curriculum task families across 5 paired seeds,
@@ -49,10 +49,10 @@ None.
 
 ## Tested revision and environment fingerprint
 
-- Base commit: `f8133e366517460c218daa3ddb2a68f01857d2ff`
+- Base commit: `e4ac4e66de08384096f1cd3f06bfa288d6a3eb3f`
 - Working tree dirty status: `dirty`
 - Phase 3 config SHA-256: `09cee4dd498c97497320bedbc618e3b77c02b62fb66ddaadb800c2bb82704fd8`
-- Phase 3 metrics SHA-256: `6bc8681fa7fbb9b3ee5f15e48c4323eee16b8540b6816ceab65300150322dac3`
+- Phase 3 metrics SHA-256: `211e6217f2b22da71eeada273a01bef3571542cd8cfd712dd3779fcdc47f218a`
 
 ## Remaining limitations outside the Phase 3 claim
 

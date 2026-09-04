@@ -1,9 +1,9 @@
 AURELIS PHASE 0 ENVIRONMENT AUDIT
 =================================
 status: PASS
-timestamp_utc: 2026-09-04T06:47:31.384928+00:00
-git_commit: f8133e366517460c218daa3ddb2a68f01857d2ff
-git_dirty_state: {"dirty": true, "path_count": 41, "status_sha256": "94fbec2c159e9fb80bc417ef5034978a222984a1abbe9e3399bdd4144143a91d"}
+timestamp_utc: 2026-09-04T17:54:48.229314+00:00
+git_commit: e4ac4e66de08384096f1cd3f06bfa288d6a3eb3f
+git_dirty_state: {"dirty": true, "path_count": 42, "status_sha256": "fd86faf3e19559489c28a112e28fe60608d3ffe906e69f5d8c092c2395851d30"}
 python: 3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]
 kernel: 6.8.0-138-generic
 host_rocm_versions: {"/opt/rocm/core-10.0/.info/version": "10.0.0", "/opt/rocm/core-10/.info/version": "10.0.0", "/opt/rocm/core-7.14/.info/version": "7.14.0", "/opt/rocm/core-7/.info/version": "7.14.0"}
@@ -14,16 +14,16 @@ torch_cuda_api_namespace_available: True
 gpu_name: AMD Instinct MI300X VF
 gpu_total_memory_bytes: 205822885888
 gpu_multiprocessor_count: 304
-torch_compile: {"available": true, "compile_and_first_run_seconds": 1.596827294999457, "max_absolute_error": 4.76837158203125e-07, "usable": true}
+torch_compile: {"available": true, "compile_and_first_run_seconds": 1.5408530849999806, "max_absolute_error": 4.76837158203125e-07, "usable": true}
 profiler: {"available": true, "event_count": 15}
 triton: {"installed": true, "packages": ["triton==3.4.0+rocm7.0.2.gitf9e5bf54"]}
 rocblas_paths: ["/opt/rocm/core-10.0/lib/librocblas.so", "/opt/rocm/core-10.0/lib/librocblas.so.5", "/opt/rocm/core-10.0/lib/librocblas.so.5.6", "/opt/rocm/core-7.14/lib/librocblas.so", "/opt/rocm/core-7.14/lib/librocblas.so.5", "/opt/rocm/core-7.14/lib/librocblas.so.5.5"]
 rocsolver_paths: ["/opt/rocm/core-10.0/lib/librocsolver.so", "/opt/rocm/core-10.0/lib/librocsolver.so.0", "/opt/rocm/core-10.0/lib/librocsolver.so.0.11", "/opt/rocm/core-7.14/lib/librocsolver.so", "/opt/rocm/core-7.14/lib/librocsolver.so.0", "/opt/rocm/core-7.14/lib/librocsolver.so.0.10"]
-cholesky_solve_health: {"available": true, "finite": true, "max_residual": 1.12853638003564e-14}
-gemm_bf16: {"finite": true, "matrix_size": 2048, "median_ms": 0.07573800030513667, "median_tflops": 226.83288593288665, "output_dtype": "torch.bfloat16", "repetitions": 5, "samples_ms": [0.08533999971405137, 0.0750720000723959, 0.07822400039003696, 0.07206900045275688, 0.07573800030513667], "supported": true}
-gemm_fp16: {"finite": true, "matrix_size": 2048, "median_ms": 0.07594299950142158, "median_tflops": 226.22057723277587, "output_dtype": "torch.float16", "repetitions": 5, "samples_ms": [0.08930799958761781, 0.07594299950142158, 0.07727499996690312, 0.07069599996611942, 0.07012199966993649], "supported": true}
-gemm_fp32: {"finite": true, "matrix_size": 2048, "median_ms": 0.20264599970687414, "median_tflops": 84.7777365891779, "output_dtype": "torch.float32", "repetitions": 5, "samples_ms": [0.2162609998777043, 0.21247099994070595, 0.20264599970687414, 0.2008600004046457, 0.20121799934713636], "supported": true}
-gemm_fp64: {"finite": true, "matrix_size": 2048, "median_ms": 0.35076400035904953, "median_tflops": 48.978427565013284, "output_dtype": "torch.float64", "repetitions": 5, "samples_ms": [0.35869900057150517, 0.35076400035904953, 0.35151600059180055, 0.33634400006121723, 0.2977620006276993], "supported": true}
+cholesky_solve_health: {"available": true, "finite": true, "max_residual": 2.0590325563714943e-14}
+gemm_bf16: {"finite": true, "matrix_size": 2048, "median_ms": 0.0666089999867836, "median_tflops": 257.9211395968831, "output_dtype": "torch.bfloat16", "repetitions": 5, "samples_ms": [0.08292700022138888, 0.06884600043122191, 0.0666089999867836, 0.0657600003250991, 0.06562999988091178], "supported": true}
+gemm_fp16: {"finite": true, "matrix_size": 2048, "median_ms": 0.06988800032559084, "median_tflops": 245.82001350680025, "output_dtype": "torch.float16", "repetitions": 5, "samples_ms": [0.09040400072990451, 0.0751409997974406, 0.06988800032559084, 0.06875200051581487, 0.06925900015630759], "supported": true}
+gemm_fp32: {"finite": true, "matrix_size": 2048, "median_ms": 0.19711700042535085, "median_tflops": 87.15569507920803, "output_dtype": "torch.float32", "repetitions": 5, "samples_ms": [0.21820100027980516, 0.1989980000871583, 0.19711700042535085, 0.1950389996636659, 0.19708800027729012], "supported": true}
+gemm_fp64: {"finite": true, "matrix_size": 2048, "median_ms": 0.3269220005677198, "median_tflops": 52.5503611080506, "output_dtype": "torch.float64", "repetitions": 5, "samples_ms": [0.35391100027482025, 0.34143999982916284, 0.3209469996363623, 0.31671499982621754, 0.3269220005677198], "supported": true}
 dependency_policy: {"forbidden_accelerator_packages": [], "passes": true}
 
 COMPATIBILITY ASSESSMENT

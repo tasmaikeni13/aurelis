@@ -17,27 +17,46 @@ and residual estimators. An explicit episodic responsibility can override that
 gate when the target is an observed cached exception rather than a denoised
 latent relation.
 
-## Current Progress & Status: Phase 3 PASS
+## Current Progress & Status: Phase 4 PASS
 
 The project strictly follows [`phases/AUTONOMY_PROTOCOL.md`](phases/AUTONOMY_PROTOCOL.md) with full mathematical derivations, Lean 4 formal machine proofs, and hardware-accelerated empirical verification on **AMD Instinct MI300X VF** GPUs under ROCm.
 
-| Phase | Description | Status | Evidence Record |
-|---|---|:---:|---|
-| **Phase 0** | Reference Substrate & Hardware Foundation | **PASS** | [`results/phase0/PASS.md`](results/phase0/PASS.md) |
-| **Phase 1** | Exact Identities & Numerical Oracles | **PASS** | [`results/phase1/PASS.md`](results/phase1/PASS.md) |
-| **Phase 2** | Controlled Baselines & Falsification Matrix | **PASS** | [`results/phase2/PASS.md`](results/phase2/PASS.md) |
-| **Phase 3** | Learned Features & Episodic Routing (7 Task Families) | **PASS** | [`results/phase3/PASS.md`](results/phase3/PASS.md) |
-| **Phase 4** | Nonstationarity, Drift & Multi-Hop Composition | *Next* | [`phases/phase4.md`](phases/phase4.md) |
-| **Phase 5** | MI300X/ROCm Systems Profiling & Kernel Optimization | *Planned* | [`phases/phase5.md`](phases/phase5.md) |
-| **Phase 6** | Natural Language Pilot Runs on FineWeb-Edu | *Planned* | [`phases/phase6.md`](phases/phase6.md) |
-| **Phase 7** | **125M Parameters on 1.0B FineWeb-Edu Tokens** | *Planned* | [`phases/phase7.md`](phases/phase7.md) |
-| **Phase 8** | Camera-Ready Replication Suite | *Planned* | [`phases/phase8.md`](phases/phase8.md) |
+| Phase | Description | Hardware Target | Status | Evidence Record |
+|---|---|:---:|:---:|---|
+| **Phase 0** | Reference Substrate & Hardware Foundation | 1x MI300X | **PASS** | [`results/phase0/PASS.md`](results/phase0/PASS.md) |
+| **Phase 1** | Exact Identities & Numerical Oracles | 1x MI300X | **PASS** | [`results/phase1/PASS.md`](results/phase1/PASS.md) |
+| **Phase 2** | Controlled Baselines & Falsification Matrix | 1x MI300X | **PASS** | [`results/phase2/PASS.md`](results/phase2/PASS.md) |
+| **Phase 3** | Learned Features & Episodic Routing (7 Task Families) | 1x MI300X | **PASS** | [`results/phase3/PASS.md`](results/phase3/PASS.md) |
+| **Phase 4** | Nonstationarity, Compositional Access & Capacity Limits | 1x MI300X | **PASS** | [`results/phase4/PASS.md`](results/phase4/PASS.md) |
+| **Phase 5** | Systems Profiling, Fused Kernels & Memory Optimization | 1x MI300X | *Next* | [`phases/phase5.md`](phases/phase5.md) |
+| **Phase 6** | Natural Language Pilot Runs on FineWeb-Edu | 1x MI300X | *Planned* | [`phases/phase6.md`](phases/phase6.md) |
+| **Phase 7** | **125M Parameters on 1.0B FineWeb-Edu Tokens** | **8x MI300X** | *Planned* | [`phases/phase7.md`](phases/phase7.md) |
+| **Phase 8** | **350M Parameters on 3.0B FineWeb-Edu Tokens** | **8x MI300X** | *Planned* | [`phases/phase8.md`](phases/phase8.md) |
+| **Phase 9** | Independent Clean-Room Reproduction & Release Audit | 8x MI300X | *Planned* | [`phases/phase9.md`](phases/phase9.md) |
+
+---
+
+## Phase 4 Highlights: Nonstationarity, Composition & Capacity Limits
+
+Phase 4 tests the principal ways an undiscounted remote state can fail, introducing principled dynamic Bayesian updates, heteroscedastic precision weighting, and multi-hop pointer chasing across 5 paired seeds (401–405) on the AMD Instinct MI300X:
+
+1. **Drift-Aware Adaptation with Observable Changepoints**:
+   - Integrated dynamic linear model information discounting $\gamma_t = \text{clamp}(1 - c_t(1 - \gamma_{\min}), \gamma_{\min}, 1.0)$ into the affine state updates.
+   - On observable changepoints, drift-aware AURELIS achieves **$10\times$ to $13\times$ lower post-change risk** than the stationary model ($0.0807$ vs $0.8767$ MSE), while preserving fundamental theoretical limitations on unobservable shifts ($0.8593$ vs $0.8036$).
+2. **Gauss-Markov Heteroscedastic Precision Weighting**:
+   - Valid precision weighting $\beta_t = 1/\sigma_t^2$ reduces MSE by **$12\times$** over uniform weighting ($0.0029$ vs $0.0354$). Corrupting precision labels transparently degrades risk by **$55\times$** ($0.1603$), proving the architecture actively relies on statistical evidence quality.
+3. **Multi-Hop Composition with Cache Presence Discrimination**:
+   - Solved error propagation across mixed cache/remote chains using sharp sigmoid presence discrimination $c_{\text{cache}} = \sigma(20(s_{\max} - 0.70))$ and temperature scaling ($\tau = 8.0$), achieving **83%–100% decoded success** across all 2-hop and 4-hop mixed chains (gate thresholds $\ge 85\%$ / $50\%$) with maximum vector error $\le 0.0658 \ll 0.35$.
+4. **Subspace Capacity Limits Monotonically Enforced**:
+   - Under adversarial association stress tests, error grows strictly monotonically beyond rank $d_k=8$ ($0.3886$ at $N=2$ to $0.9661$ at $N=256$), confirming that fixed-state memory does not claim unbounded associative recall.
+5. **16x Context Length Extrapolation**:
+   - Condition numbers and prediction MSE remain strictly finite and stable up to $16\times$ train sequence length ($L=512$ vs $L=32$).
 
 ---
 
 ## Phase 3 Highlights: Learned Features & Routing
 
-Phase 3 transitions from analytical verification to trained neural sequence models across 7 task families and 5 paired seeds (301–305) on the AMD Instinct MI300X:
+Phase 3 established trained neural sequence models across 7 task families and 5 paired seeds (301–305):
 
 1. **Straight-Through Estimator (STE) for $g_E = \max(g_B, e_t)$**:
    - Resolved the subgradient dead zone $\partial_b \max(a, b) = 0$ when $b < a$ by evaluating the exact mathematical hard maximum forward while backpropagating through a smooth surrogate $g_B + (1 - g_B) e_t$.
@@ -55,9 +74,10 @@ Phase 3 transitions from analytical verification to trained neural sequence mode
 All mathematical lemmas are formalized in Lean 4 (mathlib 4.19.0) under namespace `Aurelis`:
 
 - **Handoff Partition**: `handoff_partition`, `cache_overlap_redundancy`
-- **Bayesian State Updates**: `precision_update_posSemidef`, `regularized_precision_posDef`, `regularized_precision_isUnit`
+- **Bayesian State Updates**: `precision_update_posSemidef`, `regularized_precision_posDef`, `regularized_precision_isUnit`, `leaky_precision_update_posDef`
 - **Associative Scan**: `Affine.combine_assoc`, `Affine.aggregate_correct`
 - **Residual Identities**: `corrected_error_identity`, `weighted_residual_identity`, `corrected_reproduces_linear`, `corrected_exact_hit`
+- **Multi-Hop Composition**: `composition_error_identity`, `composition_reproduces_linear`
 - **Routing Gate Optimality**: `routeVariance_completion`, `clippedGate_optimal`, `clippedGate_le_clippedIndependentGate`
 - **Episodic Router**: `episodicGate`, `episodicGate_ge_bayes`, `episodicGate_ge_episodic`, `episodicGate_bounds`
 
@@ -65,14 +85,18 @@ The proof suite compiles cleanly with **zero `sorry`**, **zero `admit`**, and **
 
 ---
 
-## Publication Roadmap (125M / 1.0B FineWeb-Edu)
+## Multi-Stage Scaling Roadmap (8x MI300X)
 
-The project targets a rigorous, reproducible publication comparing AURELIS against major attention and recurrent memory architectures:
+Starting from Phase 7, the project scales to distributed multi-GPU nodes on an **8x AMD Instinct MI300X** cluster (Phases 0–6 executed on 1x MI300X):
 
-- **Target Scale**: **125M parameters** (`d_model=768`, 12 heads, `d_k=64, d_v=64`, 12 layers, context length 2048).
-- **Corpus**: **1.0 Billion tokens** of **FineWeb-Edu** (`HuggingFaceFW/fineweb-edu`).
-- **Matched Comparators**: Standard Transformer, Sliding-Window Transformer, Gated DeltaNet, Cumulative Least-Squares (Mesa/RWKV-style), and Native Hybrid Attention.
-- **Compute Target**: 8x AMD Instinct MI300X node using distributed PyTorch FSDP on ROCm.
+1. **Stage 1 (Phase 7)**:
+   - **Scale**: **125M parameters** (`d_model=768`, 12 heads, `d_k=64, d_v=64`, 12 layers, context length 2048).
+   - **Corpus**: **1.0 Billion tokens** of **FineWeb-Edu** (`HuggingFaceFW/fineweb-edu`).
+   - **Cluster**: Distributed 8x AMD Instinct MI300X node using PyTorch FSDP on ROCm.
+2. **Stage 2 (Phase 8)**:
+   - **Scale**: **350M parameters** (`d_model=1024`, 16 heads, `d_k=64, d_v=64`, 24 layers, context length 2048).
+   - **Corpus**: **3.0 Billion tokens** of **FineWeb-Edu** (`HuggingFaceFW/fineweb-edu`).
+   - **Cluster**: Distributed 8x AMD Instinct MI300X cluster with long-context passkey and needle-in-a-haystack verification up to 16k context.
 
 ---
 
@@ -95,24 +119,9 @@ To set up the environment and run the complete verified test and experiment pipe
 
 # 5. Run Phase 3 (Learned neural models, 7 task families, 5 paired seeds)
 ./scripts/run_phase3.sh
+
+# 6. Run Phase 4 (Nonstationarity, multi-hop composition, and capacity limits)
+./scripts/run_phase4.sh
 ```
 
 All raw training rows, JSON metrics, evaluation tables, and generated publication plots are stored under `results/` and `plots/`.
-
----
-
-## Repository Map
-
-| Path | Description |
-|---|---|
-| [`src/aurelis/`](src/aurelis/) | Core library: streaming state, history oracles, baselines, and Phase 3 neural models |
-| [`lean/`](lean/) | Lean 4 formal mathematical proofs (`Aurelis.Router`, `Aurelis.Handoff`, etc.) |
-| [`configs/`](configs/) | Versioned hyperparameters, task thresholds, and gate configurations |
-| [`experiments/`](experiments/) | Multi-seed experiment runners for each phase |
-| [`tests/`](tests/) | Unit and property test suite (60/60 passing tests) |
-| [`phases/`](phases/) | Project protocol ([`AUTONOMY_PROTOCOL.md`](phases/AUTONOMY_PROTOCOL.md)) and Phase 0–8 specifications |
-| [`results/`](results/) | Versioned `metrics.json`, `report.md`, and official `PASS.md` records |
-| [`plots/`](plots/) | Generated publication figures for empirical regimes and gate evidence |
-| [`scripts/`](scripts/) | End-to-end execution and automated gate verification scripts |
-| [`CLAIMS.md`](CLAIMS.md) | Official claim-by-claim registry tracking proof and empirical status |
-| [`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md) | Chronological research journal and execution log |

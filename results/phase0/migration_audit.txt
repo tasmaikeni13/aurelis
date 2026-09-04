@@ -1,8 +1,10 @@
 AURELIS PHASE 0 GENERATED MIGRATION AUDIT
 =========================================
-timestamp_utc: 2026-09-04T06:48:09.954145+00:00
+timestamp_utc: 2026-09-04T18:06:19.907012+00:00
 quoted_old_acronym: CSM
 quoted_old_expanded_name: Conjugate State Machines
 scope: case-insensitive substring search of tracked and unignored working-tree files; .git, ignored build environments, and this audit are excluded
-match_count_outside_this_audit: 0
-status: PASS
+match_count_outside_this_audit: 2
+results/phase0/verification_failure.json:11:"plots/phase2/mechanism_separation.png:4468:\u001a4(\ufffd\ufffd\ufffd\ufffd\ufffd\u0002~~~X\ufffd|9\ufffd?\u007f.;\u0017CSM\ufffd6\ufffd\ufffd\ufffd\ufffd\ufffdWo\ufffd\ufffd\u0010\u0011\u0001\ufffdB\u0010\u0004\ufffd\u060d \"\"\"\"2\ufffd{\ufffd\ufffd\ufffd\ufffd\ufffd\u06c8\ufffd\ufffdC\\\\"
+plots/phase2/mechanism_separation.png:4468:4(�����~~~X�|9�?.;CSM�6�����Wo���B�؍ """"2�{�����ۈ��C\\
+status: FAIL

@@ -2853,17 +2853,17 @@
     }
   ],
   "environment": {
-    "commit": "f8133e366517460c218daa3ddb2a68f01857d2ff",
+    "commit": "e4ac4e66de08384096f1cd3f06bfa288d6a3eb3f",
     "device": "cuda",
-    "dirty_paths": 41,
+    "dirty_paths": 42,
     "numpy": "2.3.2",
-    "pid": 33605,
+    "pid": 356818,
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
     "python": "3.12.3",
     "torch": "2.8.0+rocm7.0.2.git245bf6ed",
     "torch_hip": "7.0.51831-7c9236b16"
   },
-  "generated_utc": "2026-09-04T06:48:34.420327+00:00",
+  "generated_utc": "2026-09-04T17:55:48.655371+00:00",
   "handoff": {
     "boundaries": [
       {
@@ -4873,5 +4873,5 @@
     },
     "status": "PASS"
   },
-  "wall_time_seconds": 4.8487622860002375
+  "wall_time_seconds": 3.2962742620002246
 }

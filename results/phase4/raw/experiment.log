@@ -1,0 +1,46 @@
+=== Starting Phase 4 Suites across 5 seeds on cuda:0 ===
+
+--- Running Seed 401 ---
+  Training on stationary curriculum (450 steps)...
+  Stationary Retention: agg_risk = 0.4044
+  Drift MSE: stat=0.7558, decay=0.0795
+  Het Precision MSE: valid=0.0030, fixed=0.0399, corrupt=0.1703
+  Pointer 4-hop: vec_err=0.0617, success=0.80
+
+--- Running Seed 402 ---
+  Training on stationary curriculum (450 steps)...
+  Stationary Retention: agg_risk = 0.4878
+  Drift MSE: stat=0.9834, decay=0.0761
+  Het Precision MSE: valid=0.0029, fixed=0.0293, corrupt=0.1576
+  Pointer 4-hop: vec_err=0.0655, success=0.75
+
+--- Running Seed 403 ---
+  Training on stationary curriculum (450 steps)...
+  Stationary Retention: agg_risk = 0.4183
+  Drift MSE: stat=0.8029, decay=0.0872
+  Het Precision MSE: valid=0.0028, fixed=0.0359, corrupt=0.1395
+  Pointer 4-hop: vec_err=0.0653, success=0.75
+
+--- Running Seed 404 ---
+  Training on stationary curriculum (450 steps)...
+  Stationary Retention: agg_risk = 0.5099
+  Drift MSE: stat=1.0167, decay=0.0783
+  Het Precision MSE: valid=0.0029, fixed=0.0380, corrupt=0.1663
+  Pointer 4-hop: vec_err=0.0634, success=0.83
+
+--- Running Seed 405 ---
+  Training on stationary curriculum (450 steps)...
+  Stationary Retention: agg_risk = 0.3372
+  Drift MSE: stat=0.8249, decay=0.0824
+  Het Precision MSE: valid=0.0030, fixed=0.0341, corrupt=0.1679
+  Pointer 4-hop: vec_err=0.0646, success=0.80
+Generating plots...
+
+=== Phase 4 Experiment Finished. Status: PASS ===
+  gate_1_stationary_controls_retained: PASS
+  gate_2_drift_aware_improves_on_paired_seeds: PASS
+  gate_3_evidence_weighting_and_corruption_degradation: PASS
+  gate_4_mixed_chains_multihop_decoded_vector_gates: PASS
+  gate_5_capacity_lower_bound_failures_preserved: PASS
+  gate_6_extrapolation_16x_finite_and_stable: PASS
+  gate_7_all_seeds_reported_finite: PASS

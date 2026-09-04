@@ -1,0 +1,80 @@
+{
+  "phase": 4,
+  "description": "Phase 4: Nonstationarity, compositional access, and capacity limits across 7 suites and 5 paired seeds",
+  "seeds": [401, 402, 403, 404, 405],
+  "architecture": {
+    "d_in": 20,
+    "d_model": 32,
+    "d_out": 8,
+    "d_feat": 8,
+    "heads": 2,
+    "d_key": 8,
+    "d_value": 8,
+    "window": 12,
+    "prior": 1.0,
+    "gamma_min": 0.05,
+    "beta_min": 0.01,
+    "beta_max": 100.0
+  },
+  "suites": {
+    "suite1_drift": {
+      "length": 64,
+      "drift_types": ["stationary", "abrupt", "gradual"],
+      "observable_conditions": [true, false]
+    },
+    "suite2_heterogeneous_precision": {
+      "length": 48,
+      "distributions": ["heteroscedastic", "student_t", "outliers", "nonlinear"],
+      "corruption_types": ["none", "inverted", "uniform", "scrambled"]
+    },
+    "suite3_repeated_overrides": {
+      "length": 48,
+      "modes": ["cache_override", "remote_override", "many_to_one", "state_pollution"],
+      "pollution_levels": [4, 8, 16, 32]
+    },
+    "suite4_pointer_chasing": {
+      "length": 48,
+      "hops": [1, 2, 4, 8, 16],
+      "adaptive": true,
+      "tolerance": 0.05
+    },
+    "suite5_mixed_chains": {
+      "length": 64,
+      "patterns_2hop": [
+        ["C", "C"],
+        ["R", "R"],
+        ["C", "R"],
+        ["R", "C"]
+      ],
+      "patterns_4hop": [
+        ["C", "C", "C", "C"],
+        ["R", "R", "R", "R"],
+        ["C", "C", "R", "R"],
+        ["R", "R", "C", "C"],
+        ["C", "R", "C", "R"],
+        ["R", "C", "R", "C"]
+      ]
+    },
+    "suite6_capacity": {
+      "length": 64,
+      "rank_sweep": [1, 2, 4, 8, 16],
+      "adversarial_associations": [2, 4, 8, 16, 32, 64, 128, 256]
+    },
+    "suite7_extrapolation": {
+      "train_length": 32,
+      "extrapolation_lengths": [32, 64, 128, 256, 512]
+    }
+  },
+  "gates": {
+    "stationary_control_risk_max": 0.48,
+    "drift_improvement_ratio_min": 1.20,
+    "unobservable_change_retained": true,
+    "valid_evidence_improvement_min": 1.15,
+    "corrupted_evidence_degradation_min": 1.20,
+    "multihop_2hop_decoded_min": 0.85,
+    "multihop_4hop_decoded_min": 0.50,
+    "multihop_mixed_vector_error_max": 0.35,
+    "capacity_monotonic_degradation": true,
+    "all_seeds_finite": true
+  }
+}

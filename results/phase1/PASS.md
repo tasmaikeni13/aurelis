@@ -1,6 +1,6 @@
 # AURELIS Phase 1 PASS
 
-Generated: `2026-09-04T06:48:34.837108+00:00`
+Generated: `2026-09-04T17:55:49.041156+00:00`
 
 Phase 1 status: **PASS**. This record covers the mathematical oracle,
 calibration, dtype/conditioning pathologies, handoff boundary, and analytic
@@ -76,11 +76,11 @@ evidence.
 
 ## Tested revision and environment fingerprint
 
-- Base commit: `f8133e366517460c218daa3ddb2a68f01857d2ff`
-- Working tree intentionally dirty with `41` Phase 0/1 research paths.
+- Base commit: `e4ac4e66de08384096f1cd3f06bfa288d6a3eb3f`
+- Working tree intentionally dirty with `42` Phase 0/1 research paths.
 - Phase 1 config SHA-256: `50e309cddf5476ed8808687cc0e18e6782eb057e2349a84844c3d029ae6a9f84`
-- Phase 1 metrics SHA-256: `2db252b3c4716b1819ee937f4b6ec00968b5aac91c83b60afb3bb32f7cf583fc`
-- Phase 0 environment SHA-256: `48987d016e5c802f2bb6b46e13b306700ee410816ae68984f2d58c99214714dc`
+- Phase 1 metrics SHA-256: `c23b919b419425972f6528aefe489315aa62f2f86aae32dbf3e1322a52563499`
+- Phase 0 environment SHA-256: `9d64fa4773bdca6cd522dc7d70b267129ea9878aba1b1928f5f0b507f9ad9ae8`
 
 ## Remaining limitations outside the Phase 1 claim
 

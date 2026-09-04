@@ -4,7 +4,7 @@
       "baseline": "local_softmax",
       "error": 3.6990929338825906,
       "flops": 2144,
-      "latency_us": 105.84089756011963,
+      "latency_us": 108.84544849395752,
       "parameters": 0,
       "state_bytes": 8192,
       "views": {
@@ -17,7 +17,7 @@
         "same_flops": {
           "error": 3.6990929338825906,
           "flops": 2144,
-          "latency_us": 105.84089756011963
+          "latency_us": 108.84544849395752
         },
         "same_live_state_bytes": {
           "error": 3.4172405589330057,
@@ -34,7 +34,7 @@
       "baseline": "remote_bayes",
       "error": 0.6552290200053649,
       "flops": 1024,
-      "latency_us": 73.82400035858154,
+      "latency_us": 75.4755973815918,
       "parameters": 0,
       "state_bytes": 4096,
       "views": {
@@ -47,7 +47,7 @@
         "same_flops": {
           "error": 0.6552290200053649,
           "flops": 1024,
-          "latency_us": 73.82400035858154
+          "latency_us": 75.4755973815918
         },
         "same_live_state_bytes": {
           "error": 0.6552290200053649,
@@ -63,7 +63,7 @@
       "baseline": "global_linear",
       "error": 3.4362723290857495,
       "flops": 576,
-      "latency_us": 118.94464492797852,
+      "latency_us": 122.80319929122925,
       "parameters": 0,
       "state_bytes": 2176,
       "views": {
@@ -76,7 +76,7 @@
         "same_flops": {
           "error": 3.4362723290857495,
           "flops": 576,
-          "latency_us": 118.94464492797852
+          "latency_us": 122.80319929122925
         },
         "same_live_state_bytes": {
           "error": 3.4362723290857495,
@@ -92,7 +92,7 @@
       "baseline": "delta_rule",
       "error": 0.10500093840094997,
       "flops": 512,
-      "latency_us": 9542.44613647461,
+      "latency_us": 9825.508880615234,
       "parameters": 0,
       "state_bytes": 2048,
       "views": {
@@ -105,7 +105,7 @@
         "same_flops": {
           "error": 0.10500093840094997,
           "flops": 512,
-          "latency_us": 9542.44613647461
+          "latency_us": 9825.508880615234
         },
         "same_live_state_bytes": {
           "error": 0.10500093840094997,
@@ -121,7 +121,7 @@
       "baseline": "mesa",
       "error": 0.5112770688031019,
       "flops": 1024,
-      "latency_us": 278.13899517059326,
+      "latency_us": 278.8960933685303,
       "parameters": 0,
       "state_bytes": 4096,
       "views": {
@@ -134,7 +134,7 @@
         "same_flops": {
           "error": 0.5112770688031019,
           "flops": 1024,
-          "latency_us": 278.13899517059326
+          "latency_us": 278.8960933685303
         },
         "same_live_state_bytes": {
           "error": 0.5112770688031019,
@@ -150,7 +150,7 @@
       "baseline": "learned_sum",
       "error": 2.1588528288733047,
       "flops": 3216,
-      "latency_us": 216.81139469146729,
+      "latency_us": 220.98045349121094,
       "parameters": 1,
       "state_bytes": 12288,
       "views": {
@@ -163,7 +163,7 @@
         "same_flops": {
           "error": 2.1588528288733047,
           "flops": 3216,
-          "latency_us": 216.81139469146729
+          "latency_us": 220.98045349121094
         },
         "same_live_state_bytes": {
           "error": 2.1588528288733047,
@@ -177,29 +177,29 @@
     },
     {
       "baseline": "learned_concat",
-      "error": 11.57484126037178,
+      "error": 13.81203836825726,
       "flops": 4192,
-      "latency_us": 228.72655391693115,
+      "latency_us": 231.9192886352539,
       "parameters": 512,
       "state_bytes": 12288,
       "views": {
         "same_feature_dimension": {
           "d_k": 16,
           "d_v": 16,
-          "error": 11.57484126037178,
+          "error": 13.81203836825726,
           "window": 32
         },
         "same_flops": {
-          "error": 11.57484126037178,
+          "error": 13.81203836825726,
           "flops": 4192,
-          "latency_us": 228.72655391693115
+          "latency_us": 231.9192886352539
         },
         "same_live_state_bytes": {
-          "error": 11.57484126037178,
+          "error": 13.81203836825726,
           "state_bytes": 12288
         },
         "same_parameter_count": {
-          "error": 11.57484126037178,
+          "error": 13.81203836825726,
           "params": 512
         }
       }
@@ -208,7 +208,7 @@
       "baseline": "independent_fusion",
       "error": 0.6816371167006311,
       "flops": 5952,
-      "latency_us": 550.1219272613525,
+      "latency_us": 559.8409652709961,
       "parameters": 0,
       "state_bytes": 12544,
       "views": {
@@ -221,7 +221,7 @@
         "same_flops": {
           "error": 0.6816371167006311,
           "flops": 5952,
-          "latency_us": 550.1219272613525
+          "latency_us": 559.8409652709961
         },
         "same_live_state_bytes": {
           "error": 0.6816371167006311,
@@ -237,7 +237,7 @@
       "baseline": "full_residual",
       "error": 0.7220828874930109,
       "flops": 4320,
-      "latency_us": 376.4807939529419,
+      "latency_us": 377.7268409729004,
       "parameters": 0,
       "state_bytes": 12288,
       "views": {
@@ -250,7 +250,7 @@
         "same_flops": {
           "error": 0.7220828874930109,
           "flops": 4320,
-          "latency_us": 376.4807939529419
+          "latency_us": 377.7268409729004
         },
         "same_live_state_bytes": {
           "error": 0.7220828874930109,
@@ -266,7 +266,7 @@
       "baseline": "aurelis_b",
       "error": 0.6552290200053652,
       "flops": 5984,
-      "latency_us": 634.2995166778564,
+      "latency_us": 638.7423038482666,
       "parameters": 0,
       "state_bytes": 12544,
       "views": {
@@ -279,7 +279,7 @@
         "same_flops": {
           "error": 0.6552290200053652,
           "flops": 5984,
-          "latency_us": 634.2995166778564
+          "latency_us": 638.7423038482666
         },
         "same_live_state_bytes": {
           "error": 0.6552290200053652,
@@ -295,7 +295,7 @@
       "baseline": "aurelis_e",
       "error": 0.6850316823506395,
       "flops": 5984,
-      "latency_us": 629.6327114105225,
+      "latency_us": 640.8831119537354,
       "parameters": 0,
       "state_bytes": 12544,
       "views": {
@@ -308,7 +308,7 @@
         "same_flops": {
           "error": 0.6850316823506395,
           "flops": 5984,
-          "latency_us": 629.6327114105225
+          "latency_us": 640.8831119537354
         },
         "same_live_state_bytes": {
           "error": 0.6850316823506395,
@@ -324,7 +324,7 @@
       "baseline": "native_hybrid",
       "error": 3.6983238900455246,
       "flops": 2680,
-      "latency_us": 86.78950071334839,
+      "latency_us": 89.72200155258179,
       "parameters": 0,
       "state_bytes": 10240,
       "views": {
@@ -337,7 +337,7 @@
         "same_flops": {
           "error": 3.6983238900455246,
           "flops": 2680,
-          "latency_us": 86.78950071334839
+          "latency_us": 89.72200155258179
         },
         "same_live_state_bytes": {
           "error": 3.6983238900455246,
@@ -362,45 +362,45 @@
   "config_sha256": "4655c62c9f7d46e3e69adb61429fc467ceadb268a918559b0da999c7a2698033",
   "context_sweeps": [
     {
-      "aurelis_latency_us": 744.8409557342529,
+      "aurelis_latency_us": 748.9949703216553,
       "aurelis_state_bytes": 12544,
       "context_length": 64,
-      "full_attention_latency_us": 88.9584481716156,
+      "full_attention_latency_us": 93.64094734191895,
       "full_attention_state_bytes": 16384
     },
     {
-      "aurelis_latency_us": 737.7468109130859,
+      "aurelis_latency_us": 748.1951713562012,
       "aurelis_state_bytes": 12544,
       "context_length": 128,
-      "full_attention_latency_us": 99.27394986152649,
+      "full_attention_latency_us": 91.42385125160217,
       "full_attention_state_bytes": 32768
     },
     {
-      "aurelis_latency_us": 733.9921951293945,
+      "aurelis_latency_us": 750.3214836120605,
       "aurelis_state_bytes": 12544,
       "context_length": 256,
-      "full_attention_latency_us": 88.89824748039246,
+      "full_attention_latency_us": 92.66064763069153,
       "full_attention_state_bytes": 65536
     },
     {
-      "aurelis_latency_us": 741.8901920318604,
+      "aurelis_latency_us": 747.0962047576904,
       "aurelis_state_bytes": 12544,
       "context_length": 512,
-      "full_attention_latency_us": 93.46669912338257,
+      "full_attention_latency_us": 93.84534955024719,
       "full_attention_state_bytes": 131072
     },
     {
-      "aurelis_latency_us": 733.9139938354492,
+      "aurelis_latency_us": 760.4265213012695,
       "aurelis_state_bytes": 12544,
       "context_length": 1024,
-      "full_attention_latency_us": 91.00509881973267,
+      "full_attention_latency_us": 94.08190250396729,
       "full_attention_state_bytes": 262144
     },
     {
-      "aurelis_latency_us": 733.1424236297607,
+      "aurelis_latency_us": 761.3303661346436,
       "aurelis_state_bytes": 12544,
       "context_length": 2048,
-      "full_attention_latency_us": 91.3799524307251,
+      "full_attention_latency_us": 95.94410061836243,
       "full_attention_state_bytes": 524288
     }
   ],
@@ -408,7 +408,7 @@
     "cuda_available": true,
     "device": "cuda",
     "device_name": "AMD Instinct MI300X VF",
-    "git_commit": "f8133e366517460c218daa3ddb2a68f01857d2ff",
+    "git_commit": "e4ac4e66de08384096f1cd3f06bfa288d6a3eb3f",
     "git_dirty": true,
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
     "python": "3.12.3",
@@ -426,6 +426,6 @@
     "min_linear_error_local": 2.4518337057868007,
     "retained_nonlinear_count": 10
   },
-  "utc_completed": "2026-09-04T06:48:57.143497+00:00",
-  "utc_started": "2026-09-04T06:48:53.823586+00:00"
+  "utc_completed": "2026-09-04T17:56:11.047399+00:00",
+  "utc_started": "2026-09-04T17:56:07.738479+00:00"
 }

@@ -94,4 +94,17 @@ theorem regularized_precision_isUnit
     IsUnit (state + Matrix.diagonal (fun _ ↦ prior)) := by
   exact (regularized_precision_posDef hState hPrior).isUnit
 
+/-- Leaky convex regularization under exponential decay preserves positive definiteness. -/
+theorem leaky_precision_update_posDef
+    [DecidableEq n] {state : Matrix n n ℝ} (hState : state.PosSemidef)
+    (key : n → ℝ) {decay prior evidence : ℝ}
+    (hDecayNonneg : 0 ≤ decay) (hDecayLt : decay < 1)
+    (hPrior : 0 < prior) (hEvidence : 0 ≤ evidence) :
+    (decay • state + evidence • Matrix.vecMulVec key key +
+      Matrix.diagonal (fun _ ↦ (1 - decay) * prior)).PosDef := by
+  have hPos : 0 < (1 - decay) * prior := mul_pos (sub_pos.mpr hDecayLt) hPrior
+  exact Matrix.PosDef.posSemidef_add
+    (precision_update_posSemidef hState key hDecayNonneg hEvidence)
+    (Matrix.PosDef.diagonal (fun _ ↦ hPos))
+
 end Aurelis

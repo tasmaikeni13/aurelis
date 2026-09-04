@@ -68,6 +68,18 @@ theorem corrected_exact_hit (memory : X →ₗ[ℝ] Y)
     correctedRead memory target query query = target := by
   simp [correctedRead]
 
+/-- Error decomposition for multi-hop composition of two linear maps. -/
+theorem composition_error_identity (memory2 truth2 memory1 truth1 : X →ₗ[ℝ] X) (query : X) :
+    (memory2.comp memory1) query - (truth2.comp truth1) query =
+      (memory2 - truth2) (memory1 query) + truth2 ((memory1 - truth1) query) := by
+  simp only [LinearMap.comp_apply, LinearMap.sub_apply, map_sub]
+  module
+
+/-- Exact composition reproduces the true composite linear operator. -/
+theorem composition_reproduces_linear (truth2 truth1 : X →ₗ[ℝ] X) (query : X) :
+    (truth2.comp truth1) query = truth2 (truth1 query) := by
+  rfl
+
 variable {ι : Type*} [Fintype ι]
 
 def weightedMean (weight : ι → ℝ) (value : ι → X) : X :=
