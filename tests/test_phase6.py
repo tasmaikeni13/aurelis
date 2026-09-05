@@ -180,3 +180,54 @@ def test_constant_decode_state_memory():
 
     assert tf_state_sizes[-1] > tf_state_sizes[0], "Transformer cache did not grow"
     assert tf_state_sizes[-1] == tf_state_sizes[0] * 30, "Transformer cache growth was not linear"
+
+
+def test_fused_rmsnorm_and_swiglu_parity():
+    """Verify fused RMSNorm and SwiGLU HIP kernels match PyTorch reference implementations."""
+    from aurelis.models import hip_rmsnorm, hip_swiglu
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # RMSNorm parity
+    x = torch.randn(4, 32, 128, device=device, dtype=torch.float32)
+    weight = torch.randn(128, device=device, dtype=torch.float32)
+    norm_out = hip_rmsnorm(x, weight, eps=1e-6)
+    var = x.pow(2).mean(-1, keepdim=True)
+    norm_ref = x * torch.rsqrt(var + 1e-6) * weight
+    assert (norm_out - norm_ref).abs().max().item() < 1e-5
+
+    # SwiGLU parity & gradient flow
+    gate = torch.randn(4, 32, 256, device=device, dtype=torch.float32, requires_grad=True)
+    up = torch.randn(4, 32, 256, device=device, dtype=torch.float32, requires_grad=True)
+    swiglu_out = hip_swiglu(gate, up)
+    loss = swiglu_out.sum()
+    loss.backward()
+
+    gate_ref = gate.detach().clone().requires_grad_(True)
+    up_ref = up.detach().clone().requires_grad_(True)
+    swiglu_ref = torch.nn.functional.silu(gate_ref) * up_ref
+    loss_ref = swiglu_ref.sum()
+    loss_ref.backward()
+
+    assert (swiglu_out - swiglu_ref).abs().max().item() < 1e-6
+    assert (gate.grad - gate_ref.grad).abs().max().item() < 1e-6
+    assert (up.grad - up_ref.grad).abs().max().item() < 1e-6
+
+
+def test_jamba_hybrid_architecture():
+    """Verify Jamba-style hybrid model configuration, interleave ratios, and alias compatibility."""
+    from aurelis.models import JambaHybridLM, HybridSSMLM
+
+    # Test alias
+    assert JambaHybridLM is HybridSSMLM
+
+    cfg = get_125m_config("ssm_hybrid")
+    # 1:1 alternating (default period 2)
+    m_1to1 = JambaHybridLM(cfg, attention_layer_period=2)
+    attn_count_1to1 = sum(1 for layer in m_1to1.layers if layer.is_attention_layer)
+    assert attn_count_1to1 == cfg.n_layers // 2
+
+    # 1:3 attention (Jamba standard period 4)
+    m_1to3 = JambaHybridLM(cfg, attention_layer_period=4)
+    attn_count_1to3 = sum(1 for layer in m_1to3.layers if layer.is_attention_layer)
+    assert attn_count_1to3 == cfg.n_layers // 4
+

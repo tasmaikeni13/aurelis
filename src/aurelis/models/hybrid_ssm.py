@@ -153,22 +153,28 @@ class HybridBlock(nn.Module):
         return x, new_cache
 
 
-class HybridSSMLM(nn.Module):
-    """Full SSM + Attention Hybrid Language Model (Candidate 3)."""
+class JambaHybridLM(nn.Module):
+    """Jamba-style Hybrid Language Model (Candidate 3: Mamba-2 Selective SSM + Multi-Head Attention).
 
-    def __init__(self, config: LMConfig) -> None:
+    Follows the architecture established by Jamba (Lieber et al., AI21 Labs, 2024; arXiv:2403.19887)
+    and Samba (Ren et al., Microsoft / Georgia Tech, 2024; arXiv:2406.07522):
+    interleaving Mamba-2 style Selective State Space layers with Causal Multi-Head Attention,
+    Pre-RMSNorm, and SwiGLU feedforward networks.
+    """
+
+    def __init__(self, config: LMConfig, attention_layer_period: int = 2) -> None:
         super().__init__()
         self.config = config
+        self.attention_layer_period = attention_layer_period
         self.embed_tokens = nn.Embedding(config.vocab_size, config.d_model)
         self.rope = RotaryEmbedding(
             config.head_dim, max_seq_len=config.max_position_embeddings, theta=config.rope_theta
         )
 
-        # Interleave SSM and Attention: every 2nd or 3rd layer is Attention
-        # Standard Samba / Jamba pattern: alternating or 1 attention every 2 SSM layers
+        # Interleave SSM and Attention layers (default period 2 is 1:1 alternating Samba/Jamba)
         layers = []
         for i in range(config.n_layers):
-            is_attn = (i % 2 == 1)  # 1:1 alternating SSM and Attention
+            is_attn = (i % attention_layer_period == attention_layer_period - 1)
             layers.append(HybridBlock(config, is_attention_layer=is_attn))
         self.layers = nn.ModuleList(layers)
 
@@ -210,3 +216,8 @@ class HybridSSMLM(nn.Module):
 
     def count_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters())
+
+
+# Alias for backwards compatibility
+HybridSSMLM = JambaHybridLM
+

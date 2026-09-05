@@ -1,7 +1,7 @@
 # Phase 6 PASS Record — Language-Model Viability and Publication Gate
 
-- **Date**: `2026-09-05T05:26:05.314416+00:00`
-- **Git Commit**: `0495474fe49d765a8e348779e59d7817dd6f946c`
+- **Date**: `2026-09-05T05:49:28.539300+00:00`
+- **Git Commit**: `1c6d432474edfde5bb0eea74b1e0ba11658bbfb1`
 - **Status**: **PASS**
 - **Hardware Target**: AMD Instinct MI300X VF (191.69 GiB VRAM)
 - **Software Substrate**: PyTorch 2.8.0+rocm7.0.2.git245bf6ed under ROCm 7.0.51831-7c9236b16
@@ -37,12 +37,12 @@
 ## 3. Direct Evidence & Artifact Checksums
 
 - Config: `configs/phase6_models.json` (`d377f4402a3f4e3e99aee3767d167612441d5b2d20b4675d3d6ab8d266f903f4`)
-- Metrics: `results/phase6/metrics.json` (`e3b51947494e724bec3d610afc64730c4d69a212635c8ee8f39ed0b1b1225cd8`)
+- Metrics: `results/phase6/metrics.json` (`9c92fe46118b7f80433b16c65ce64c9a316008723b92313801f40edff465f98d`)
 - Evaluation log: `results/phase6/raw/evaluation_rows.jsonl`
 - Systems log: `results/phase6/raw/systems_rows.jsonl`
 - Generated Figures:
   - `plots/phase6/decode_memory_scaling.png` (`18dd37b62ca30e1977de9db3078ed2349b0065e2953f23d7ea16e0a26ee6f426`)
-  - `plots/phase6/comparative_tradeoffs.png` (`4ebec73db3307f86ccdf53f1701a9e2feaaa84fdf55d9a439504a3205f0ad5a8`)
+  - `plots/phase6/comparative_tradeoffs.png` (`41c80e621deae58791a16042570a2966418d040a86fbeefa556575f0f4a8df19`)
   - `plots/phase6/diagnostic_retrieval.png` (`5302dca26dd4d41dc40e5d9c4a2115461eec92942f1647f46cee3eef1b6d5f4b`)
 
 ## 4. Exact Reproduction Command

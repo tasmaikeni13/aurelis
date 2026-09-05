@@ -88,6 +88,58 @@ __global__ void fused_residual_gate_f32_kernel(
     out[elem_idx] = r + g * (v - mk);
 }
 
+// Fused RMSNorm: out = (x / sqrt(mean(x^2) + eps)) * weight
+__global__ void fused_rmsnorm_f32_kernel(
+    const float* __restrict__ x,
+    const float* __restrict__ weight,
+    float* __restrict__ out,
+    float eps,
+    int N, int D
+) {
+    int row = blockIdx.x;
+    if (row >= N) return;
+
+    extern __shared__ float sdata[];
+    int tid = threadIdx.x;
+
+    float sum_sq = 0.0f;
+    for (int d = tid; d < D; d += blockDim.x) {
+        float val = x[row * D + d];
+        sum_sq += val * val;
+    }
+    sdata[tid] = sum_sq;
+    __syncthreads();
+
+    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            sdata[tid] += sdata[tid + s];
+        }
+        __syncthreads();
+    }
+
+    float inv_rms = rsqrtf(sdata[0] / (float)D + eps);
+
+    for (int d = tid; d < D; d += blockDim.x) {
+        out[row * D + d] = x[row * D + d] * inv_rms * weight[d];
+    }
+}
+
+// Fused SwiGLU: out = (gate / (1.0 + exp(-gate))) * up
+__global__ void fused_swiglu_f32_kernel(
+    const float* __restrict__ gate,
+    const float* __restrict__ up,
+    float* __restrict__ out,
+    int total_elements
+) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= total_elements) return;
+
+    float g = gate[idx];
+    float u = up[idx];
+    float silu = g / (1.0f + expf(-g));
+    out[idx] = silu * u;
+}
+
 void launch_recurrent_scan_f32(at::Tensor x, at::Tensor decay, at::Tensor out) {
     int B = x.size(0);
     int H = x.size(1);
@@ -127,18 +179,48 @@ void launch_fused_residual_gate_f32(
         B, H, L, D
     );
 }
+
+void launch_fused_rmsnorm_f32(at::Tensor x, at::Tensor weight, at::Tensor out, double eps) {
+    int D = x.size(-1);
+    int N = x.numel() / D;
+    int threads = 256;
+    size_t shared_mem = threads * sizeof(float);
+    hipLaunchKernelGGL(
+        fused_rmsnorm_f32_kernel, dim3(N), dim3(threads), shared_mem, 0,
+        x.data_ptr<float>(), weight.data_ptr<float>(), out.data_ptr<float>(),
+        (float)eps, N, D
+    );
+}
+
+void launch_fused_swiglu_f32(at::Tensor gate, at::Tensor up, at::Tensor out) {
+    int total = gate.numel();
+    int threads = 256;
+    int blocks = (total + threads - 1) / threads;
+    hipLaunchKernelGGL(
+        fused_swiglu_f32_kernel, dim3(blocks), dim3(threads), 0, 0,
+        gate.data_ptr<float>(), up.data_ptr<float>(), out.data_ptr<float>(),
+        total
+    );
+}
 """
         cpp_sources = """
 void launch_recurrent_scan_f32(at::Tensor x, at::Tensor decay, at::Tensor out);
 void launch_fused_residual_gate_f32(
     at::Tensor remote, at::Tensor vbar, at::Tensor mapped_kbar, at::Tensor gate, at::Tensor out
 );
+void launch_fused_rmsnorm_f32(at::Tensor x, at::Tensor weight, at::Tensor out, double eps);
+void launch_fused_swiglu_f32(at::Tensor gate, at::Tensor up, at::Tensor out);
 """
         _HIP_MODULE = load_inline(
-            name="aurelis_hip_kernels",
+            name="aurelis_all_fused_hip_ops",
             cpp_sources=cpp_sources,
             cuda_sources=hip_sources,
-            functions=["launch_recurrent_scan_f32", "launch_fused_residual_gate_f32"],
+            functions=[
+                "launch_recurrent_scan_f32",
+                "launch_fused_residual_gate_f32",
+                "launch_fused_rmsnorm_f32",
+                "launch_fused_swiglu_f32",
+            ],
             extra_cuda_cflags=["-O3", "--offload-arch=gfx942"],
         )
         return _HIP_MODULE
@@ -199,4 +281,54 @@ def hip_fused_residual_gate(
     # PyTorch fallback: broadcast [B, H, L, 1]
     g = gate_3d.unsqueeze(-1)
     return remote + g * (vbar - mapped_kbar)
+
+
+def hip_rmsnorm(x: Tensor, weight: Tensor, eps: float = 1e-6) -> Tensor:
+    """Fused RMSNorm targeting AMD Instinct MI300X with PyTorch reference fallback."""
+    if (
+        x.is_cuda
+        and getattr(torch.version, "hip", None)
+        and x.dtype == torch.float32
+        and not x.requires_grad
+    ):
+        mod = _build_hip_kernels()
+        if mod is not None:
+            out = torch.empty_like(x)
+            mod.launch_fused_rmsnorm_f32(x.contiguous(), weight.contiguous(), out, eps)
+            return out
+
+    # PyTorch reference / autograd path
+    variance = x.pow(2).mean(-1, keepdim=True)
+    return x * torch.rsqrt(variance + eps) * weight
+
+
+class _FusedSwiGLUFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, gate: Tensor, up: Tensor) -> Tensor:
+        ctx.save_for_backward(gate, up)
+        if (
+            gate.is_cuda
+            and getattr(torch.version, "hip", None)
+            and gate.dtype == torch.float32
+        ):
+            mod = _build_hip_kernels()
+            if mod is not None:
+                out = torch.empty_like(gate)
+                mod.launch_fused_swiglu_f32(gate.contiguous(), up.contiguous(), out)
+                return out
+        return torch.nn.functional.silu(gate) * up
+
+    @staticmethod
+    def backward(ctx, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
+        gate, up = ctx.saved_tensors
+        sig = torch.sigmoid(gate)
+        silu = sig * gate
+        d_up = grad_output * silu
+        d_gate = grad_output * up * (sig + silu * (1.0 - sig))
+        return d_gate, d_up
+
+
+def hip_swiglu(gate: Tensor, up: Tensor) -> Tensor:
+    """Fused SwiGLU forward and backward targeting AMD Instinct MI300X."""
+    return _FusedSwiGLUFunction.apply(gate, up)
 

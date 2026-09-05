@@ -1,6 +1,6 @@
 # Phase 6 Language-Model Viability and Publication Gate Report
 
-- **Date**: 2026-09-05T05:26:04Z
+- **Date**: 2026-09-05T05:49:27Z
 - **Hardware Target**: AMD Instinct MI300X VF (191.69 GiB VRAM)
 - **Software Substrate**: PyTorch 2.8.0+rocm7.0.2.git245bf6ed under ROCm 7.0.51831-7c9236b16
 - **Overall Gate Status**: **PASS**
