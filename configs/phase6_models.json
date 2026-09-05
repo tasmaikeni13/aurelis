@@ -1,0 +1,108 @@
+{
+  "phase": 6,
+  "description": "Phase 6: Language-Model Viability and Comparative Publication Gate for AURELIS vs Transformer vs SSM+Attention Hybrid across 125M and 350M scales",
+  "hardware_target": "AMD Instinct MI300X VF (gfx942)",
+  "candidates": [
+    {
+      "name": "aurelis_e",
+      "display_name": "AURELIS-E",
+      "type": "dual_store_bayesian",
+      "gate_mode": "aurelis_e"
+    },
+    {
+      "name": "aurelis_b",
+      "display_name": "AURELIS-B",
+      "type": "dual_store_bayesian",
+      "gate_mode": "aurelis_b"
+    },
+    {
+      "name": "transformer",
+      "display_name": "Modern Causal Transformer",
+      "type": "pure_attention",
+      "position_encoding": "rope",
+      "mlp": "swiglu"
+    },
+    {
+      "name": "ssm_hybrid",
+      "display_name": "SSM + Attention Hybrid",
+      "type": "ssm_attention_hybrid",
+      "recurrent_block": "mamba2_selective_scan",
+      "mlp": "swiglu"
+    }
+  ],
+  "scales": {
+    "125M": {
+      "d_model": 768,
+      "n_heads": 12,
+      "n_layers": 12,
+      "d_key": 64,
+      "d_value": 64,
+      "d_ffn": 2048,
+      "window_size": 128,
+      "vocab_size": 50257,
+      "max_position_embeddings": 4096
+    },
+    "350M": {
+      "d_model": 1024,
+      "n_heads": 16,
+      "n_layers": 24,
+      "d_key": 64,
+      "d_value": 64,
+      "d_ffn": 2730,
+      "window_size": 128,
+      "vocab_size": 50257,
+      "max_position_embeddings": 4096
+    }
+  },
+  "seeds": [601, 602, 603],
+  "training": {
+    "context_length": 2048,
+    "batch_size": 4,
+    "learning_rate": 3e-4,
+    "weight_decay": 0.1,
+    "betas": [0.9, 0.95],
+    "precision": "bfloat16_with_fp32_accumulation",
+    "token_budget_pilot": 10000000
+  },
+  "diagnostics": {
+    "mqar": {
+      "num_pairs": [8, 16, 32, 64],
+      "distractor_ratio": [1.0, 2.0, 4.0],
+      "context_lengths": [512, 1024, 2048]
+    },
+    "cache_boundary": {
+      "window_size": 128,
+      "offsets": [-32, -8, -1, 0, 1, 8, 32, 64]
+    },
+    "induction_copy": {
+      "prefix_lengths": [16, 32, 64],
+      "repeat_distances": [64, 128, 256, 512]
+    },
+    "exceptions_vs_latent": {
+      "noise_sigma": [0.05, 0.1, 0.2],
+      "exception_fraction": [0.05, 0.10, 0.20]
+    },
+    "pointer_chains": {
+      "hops": [2, 4, 8],
+      "cache_remote_mixes": ["all_cache", "all_remote", "alternating"]
+    },
+    "passkey_retrieval": {
+      "context_lengths": [512, 1024, 2048, 4096],
+      "depths": [0.1, 0.25, 0.5, 0.75, 0.9]
+    }
+  },
+  "systems_benchmark": {
+    "context_lengths": [512, 1024, 2048, 4096],
+    "batch_size": 4,
+    "warmup_steps": 3,
+    "measured_steps": 5,
+    "decode_steps": 64
+  },
+  "gates": {
+    "parameter_calibration_tolerance": 0.08,
+    "hip_kernel_max_abs_error": 1e-5,
+    "mqar_aurelis_min_accuracy": 0.85,
+    "passkey_min_accuracy_2048": 0.90,
+    "constant_decode_memory_enforced": true
+  }
+}

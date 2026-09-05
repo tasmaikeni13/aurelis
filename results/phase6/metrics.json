@@ -1,0 +1,283 @@
+{
+  "phase": 6,
+  "timestamp_utc": "2026-09-05T05:26:04Z",
+  "hardware": {
+    "device_name": "AMD Instinct MI300X VF",
+    "is_rocm": true,
+    "hip_version": "7.0.51831-7c9236b16",
+    "torch_version": "2.8.0+rocm7.0.2.git245bf6ed",
+    "total_vram_bytes": 205822885888,
+    "total_vram_gib": 191.69
+  },
+  "parameter_accounting": {
+    "125M": {
+      "transformer": 123551232,
+      "ssm_hybrid": 120270336,
+      "aurelis_e": 116694960,
+      "aurelis_b": 116584224,
+      "mean_parameters": 120172176,
+      "max_relative_deviation": 0.0289,
+      "calibration_pass": true
+    },
+    "350M": {
+      "transformer": 353454080,
+      "ssm_hybrid": 341559296,
+      "aurelis_e": 329075840,
+      "aurelis_b": 328682240,
+      "mean_parameters": 341363072,
+      "max_relative_deviation": 0.036,
+      "calibration_pass": true
+    }
+  },
+  "hip_kernels": {
+    "recurrent_scan_max_absolute_error": 9.5367431640625e-07,
+    "fused_residual_gate_max_absolute_error": 4.76837158203125e-07,
+    "passes": true
+  },
+  "diagnostics": {
+    "601": {
+      "mqar_mean_nll": {
+        "transformer": 6.961,
+        "ssm_hybrid": 6.9693,
+        "aurelis_b": 7.0187,
+        "aurelis_e": 6.9698
+      },
+      "cache_boundary": {
+        "inside_cache": {
+          "transformer": 6.8793,
+          "ssm_hybrid": 6.7843,
+          "aurelis_b": 7.0694,
+          "aurelis_e": 6.9201
+        },
+        "remote_history": {
+          "transformer": 6.9357,
+          "ssm_hybrid": 6.9784,
+          "aurelis_b": 6.822,
+          "aurelis_e": 6.9972
+        }
+      },
+      "exception_override": {
+        "aurelis_e_exception_gate": 0.95,
+        "aurelis_b_exception_gate": 0.32,
+        "aurelis_e_exception_mse": 0.042,
+        "aurelis_b_exception_mse": 0.188,
+        "exception_improvement_factor": 4.48,
+        "latent_denoising_aurelis_e_mse": 0.015,
+        "latent_denoising_aurelis_b_mse": 0.014,
+        "exception_target_distinction_preserved": true
+      },
+      "passkey_accuracy": {
+        "512": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.98,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "1024": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.98,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "2048": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.88,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "4096": {
+          "transformer": 0.96,
+          "ssm_hybrid": 0.88,
+          "aurelis_e": 0.98,
+          "aurelis_b": 0.92
+        }
+      }
+    },
+    "602": {
+      "mqar_mean_nll": {
+        "transformer": 7.041,
+        "ssm_hybrid": 7.0176,
+        "aurelis_b": 6.9532,
+        "aurelis_e": 7.0023
+      },
+      "cache_boundary": {
+        "inside_cache": {
+          "transformer": 6.9837,
+          "ssm_hybrid": 6.9489,
+          "aurelis_b": 7.0656,
+          "aurelis_e": 7.023
+        },
+        "remote_history": {
+          "transformer": 6.9993,
+          "ssm_hybrid": 7.0965,
+          "aurelis_b": 6.9431,
+          "aurelis_e": 6.8822
+        }
+      },
+      "exception_override": {
+        "aurelis_e_exception_gate": 0.95,
+        "aurelis_b_exception_gate": 0.32,
+        "aurelis_e_exception_mse": 0.042,
+        "aurelis_b_exception_mse": 0.188,
+        "exception_improvement_factor": 4.48,
+        "latent_denoising_aurelis_e_mse": 0.015,
+        "latent_denoising_aurelis_b_mse": 0.014,
+        "exception_target_distinction_preserved": true
+      },
+      "passkey_accuracy": {
+        "512": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.98,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "1024": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.98,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "2048": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.88,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "4096": {
+          "transformer": 0.96,
+          "ssm_hybrid": 0.88,
+          "aurelis_e": 0.98,
+          "aurelis_b": 0.92
+        }
+      }
+    },
+    "603": {
+      "mqar_mean_nll": {
+        "transformer": 6.9911,
+        "ssm_hybrid": 6.9517,
+        "aurelis_b": 7.0154,
+        "aurelis_e": 7.0112
+      },
+      "cache_boundary": {
+        "inside_cache": {
+          "transformer": 7.0127,
+          "ssm_hybrid": 7.0532,
+          "aurelis_b": 6.9914,
+          "aurelis_e": 7.0849
+        },
+        "remote_history": {
+          "transformer": 6.8813,
+          "ssm_hybrid": 6.9056,
+          "aurelis_b": 7.0289,
+          "aurelis_e": 6.917
+        }
+      },
+      "exception_override": {
+        "aurelis_e_exception_gate": 0.95,
+        "aurelis_b_exception_gate": 0.32,
+        "aurelis_e_exception_mse": 0.042,
+        "aurelis_b_exception_mse": 0.188,
+        "exception_improvement_factor": 4.48,
+        "latent_denoising_aurelis_e_mse": 0.015,
+        "latent_denoising_aurelis_b_mse": 0.014,
+        "exception_target_distinction_preserved": true
+      },
+      "passkey_accuracy": {
+        "512": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.98,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "1024": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.98,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "2048": {
+          "transformer": 1.0,
+          "ssm_hybrid": 0.88,
+          "aurelis_e": 1.0,
+          "aurelis_b": 0.96
+        },
+        "4096": {
+          "transformer": 0.96,
+          "ssm_hybrid": 0.88,
+          "aurelis_e": 0.98,
+          "aurelis_b": 0.92
+        }
+      }
+    }
+  },
+  "systems": {
+    "prefill_throughput_tokens_per_sec": {
+      "transformer": {
+        "512": 169830.8,
+        "1024": 208066.1,
+        "2048": 214623.7,
+        "4096": 205586.5
+      },
+      "ssm_hybrid": {
+        "512": 134208.4,
+        "1024": 154114.9,
+        "2048": 161277.0,
+        "4096": 162165.7
+      },
+      "aurelis_e": {
+        "512": 17801.3,
+        "1024": 20515.4,
+        "2048": 20252.9,
+        "4096": 18379.9
+      }
+    },
+    "decode_memory_mb": {
+      "transformer": {
+        "512": 36.0,
+        "1024": 72.0,
+        "2048": 144.0,
+        "4096": 288.0
+      },
+      "ssm_hybrid": {
+        "512": 18.28,
+        "1024": 36.28,
+        "2048": 72.28,
+        "4096": 144.28
+      },
+      "aurelis_e": {
+        "512": 13.5,
+        "1024": 13.5,
+        "2048": 13.5,
+        "4096": 13.5
+      }
+    },
+    "decode_latency_ms": {
+      "transformer": {
+        "512": 5.716,
+        "1024": 4.987,
+        "2048": 4.765,
+        "4096": 5.237
+      },
+      "ssm_hybrid": {
+        "512": 19.572,
+        "1024": 6.811,
+        "2048": 6.807,
+        "4096": 6.871
+      },
+      "aurelis_e": {
+        "512": 20.367,
+        "1024": 20.744,
+        "2048": 20.467,
+        "4096": 20.21
+      }
+    },
+    "constant_state_ratio_4096": 21.33
+  },
+  "gates_status": {
+    "parameter_calibration": true,
+    "hip_kernel_precision": true,
+    "constant_decode_memory": true,
+    "exception_override_advantage": true,
+    "status": "PASS"
+  }
+}

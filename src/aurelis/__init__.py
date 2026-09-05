@@ -33,12 +33,29 @@ from .streaming import (
 from .training import vectorized_reference
 from .types import ReadDiagnostics, ReadOutput, SequenceOutput, StreamingState
 
+from .models import (
+    AurelisDecodeCache,
+    AurelisLM,
+    HybridSSMLM,
+    LMConfig,
+    TransformerLM,
+    get_125m_config,
+    get_350m_config,
+    hip_fused_residual_gate,
+    hip_recurrent_scan,
+)
+
 __all__ = [
+    "AurelisDecodeCache",
+    "AurelisLM",
     "AurelisProjectionBlock",
+    "HybridSSMLM",
+    "LMConfig",
     "ReadDiagnostics",
     "ReadOutput",
     "SequenceOutput",
     "StreamingState",
+    "TransformerLM",
     "aurelis_read",
     "baseline_flops",
     "baseline_parameter_count",
@@ -49,7 +66,11 @@ __all__ = [
     "delta_rule_memory",
     "explicit_inverse_read",
     "full_residual_fixed_gate",
+    "get_125m_config",
+    "get_350m_config",
     "global_linear_attention",
+    "hip_fused_residual_gate",
+    "hip_recurrent_scan",
     "historical_oracle",
     "independent_inverse_variance_fusion",
     "initial_state",

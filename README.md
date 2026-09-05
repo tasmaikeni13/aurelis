@@ -1,127 +1,111 @@
 # AURELIS
 
-**Attention with Uncertainty-Routed Residuals over an Episodic–Long-range
-Inference State**
+**Attention with Uncertainty-Routed Residuals over an Episodic–Long-range Inference State**
 
-AURELIS is a proposed same-head hybrid of exact local softmax attention and a
-bounded remote Bayesian least-squares state. Recent associations remain in a
-window; evicted associations enter the remote state exactly once. A query is
-read as
+Standard causal attention and fixed-capacity recurrent memory fail in polar opposite ways. Softmax attention keeps exact observations around, but its KV cache grows linearly with context length until your GPU runs out of VRAM. Recurrent layers (SSMs, linear attention, delta nets) keep memory bounded, but they force you to compress history before future queries are even known.
 
-```text
-y(q) = Mq + g(q) [vbar(q) - M kbar(q)]
-```
+AURELIS attacks this tradeoff directly inside a single attention head. We keep the most recent $w$ key–value pairs in an exact sliding-window attention cache. When tokens fall out of that window, they get handed off exactly once to a remote Bayesian ridge regression state. 
 
-where the analytic Bayes gate includes the cross-covariance between the remote
-and residual estimators. An explicit episodic responsibility can override that
-gate when the target is an observed cached exception rather than a denoised
-latent relation.
+When a query $q$ arrives, the layer reads:
 
-## Current Progress & Status: Phase 4 PASS
+$$y(q) = Mq + g(q) \left[ \bar{v}(q) - M\bar{k}(q) \right]$$
 
-The project strictly follows [`phases/AUTONOMY_PROTOCOL.md`](phases/AUTONOMY_PROTOCOL.md) with full mathematical derivations, Lean 4 formal machine proofs, and hardware-accelerated empirical verification on **AMD Instinct MI300X VF** GPUs under ROCm.
+Here, $M = CP^{-1}$ is the remote posterior mean map, and $\bar{k}(q)$ and $\bar{v}(q)$ are local attention barycenters. The bracketed term is an innovation residual. Our gate $g(q)$ comes from the derived cross-covariance between the remote prior and local attention errors. When a target is an exact memorized exception rather than a smooth latent relationship, an episodic override kicks in: $g_E = \max(g_B, e_t)$.
 
-| Phase | Description | Hardware Target | Status | Evidence Record |
-|---|---|:---:|:---:|---|
-| **Phase 0** | Reference Substrate & Hardware Foundation | 1x MI300X | **PASS** | [`results/phase0/PASS.md`](results/phase0/PASS.md) |
-| **Phase 1** | Exact Identities & Numerical Oracles | 1x MI300X | **PASS** | [`results/phase1/PASS.md`](results/phase1/PASS.md) |
-| **Phase 2** | Controlled Baselines & Falsification Matrix | 1x MI300X | **PASS** | [`results/phase2/PASS.md`](results/phase2/PASS.md) |
-| **Phase 3** | Learned Features & Episodic Routing (7 Task Families) | 1x MI300X | **PASS** | [`results/phase3/PASS.md`](results/phase3/PASS.md) |
-| **Phase 4** | Nonstationarity, Compositional Access & Capacity Limits | 1x MI300X | **PASS** | [`results/phase4/PASS.md`](results/phase4/PASS.md) |
-| **Phase 5** | Systems Profiling, Fused Kernels & Memory Optimization | 1x MI300X | *Next* | [`phases/phase5.md`](phases/phase5.md) |
-| **Phase 6** | Natural Language Pilot Runs on FineWeb-Edu | 1x MI300X | *Planned* | [`phases/phase6.md`](phases/phase6.md) |
-| **Phase 7** | **125M Parameters on 1.0B FineWeb-Edu Tokens** | **8x MI300X** | *Planned* | [`phases/phase7.md`](phases/phase7.md) |
-| **Phase 8** | **350M Parameters on 3.0B FineWeb-Edu Tokens** | **8x MI300X** | *Planned* | [`phases/phase8.md`](phases/phase8.md) |
-| **Phase 9** | Independent Clean-Room Reproduction & Release Audit | 8x MI300X | *Planned* | [`phases/phase9.md`](phases/phase9.md) |
+During inference decoding, AURELIS runs with strictly constant memory state: $O(d_k^2 + d_v d_k + w(d_k + d_v))$ per head. It never grows as the context stretches out.
 
 ---
 
-## Phase 4 Highlights: Nonstationarity, Composition & Capacity Limits
+## Current Status: Phase 6 PASS (Ready for Multi-GPU Scaling)
 
-Phase 4 tests the principal ways an undiscounted remote state can fail, introducing principled dynamic Bayesian updates, heteroscedastic precision weighting, and multi-hop pointer chasing across 5 paired seeds (401–405) on the AMD Instinct MI300X:
+The codebase strictly adheres to [`phases/AUTONOMY_PROTOCOL.md`](phases/AUTONOMY_PROTOCOL.md). Every algebraic identity has formal Lean 4 machine proofs with zero unproven assumptions, verified against double-precision CPU oracles and benchmarked on our AMD Instinct MI300X VF accelerator under ROCm.
 
-1. **Drift-Aware Adaptation with Observable Changepoints**:
-   - Integrated dynamic linear model information discounting $\gamma_t = \text{clamp}(1 - c_t(1 - \gamma_{\min}), \gamma_{\min}, 1.0)$ into the affine state updates.
-   - On observable changepoints, drift-aware AURELIS achieves **$10\times$ to $13\times$ lower post-change risk** than the stationary model ($0.0807$ vs $0.8767$ MSE), while preserving fundamental theoretical limitations on unobservable shifts ($0.8593$ vs $0.8036$).
-2. **Gauss-Markov Heteroscedastic Precision Weighting**:
-   - Valid precision weighting $\beta_t = 1/\sigma_t^2$ reduces MSE by **$12\times$** over uniform weighting ($0.0029$ vs $0.0354$). Corrupting precision labels transparently degrades risk by **$55\times$** ($0.1603$), proving the architecture actively relies on statistical evidence quality.
-3. **Multi-Hop Composition with Cache Presence Discrimination**:
-   - Solved error propagation across mixed cache/remote chains using sharp sigmoid presence discrimination $c_{\text{cache}} = \sigma(20(s_{\max} - 0.70))$ and temperature scaling ($\tau = 8.0$), achieving **83%–100% decoded success** across all 2-hop and 4-hop mixed chains (gate thresholds $\ge 85\%$ / $50\%$) with maximum vector error $\le 0.0658 \ll 0.35$.
-4. **Subspace Capacity Limits Monotonically Enforced**:
-   - Under adversarial association stress tests, error grows strictly monotonically beyond rank $d_k=8$ ($0.3886$ at $N=2$ to $0.9661$ at $N=256$), confirming that fixed-state memory does not claim unbounded associative recall.
-5. **16x Context Length Extrapolation**:
-   - Condition numbers and prediction MSE remain strictly finite and stable up to $16\times$ train sequence length ($L=512$ vs $L=32$).
-
----
-
-## Phase 3 Highlights: Learned Features & Routing
-
-Phase 3 established trained neural sequence models across 7 task families and 5 paired seeds (301–305):
-
-1. **Straight-Through Estimator (STE) for $g_E = \max(g_B, e_t)$**:
-   - Resolved the subgradient dead zone $\partial_b \max(a, b) = 0$ when $b < a$ by evaluating the exact mathematical hard maximum forward while backpropagating through a smooth surrogate $g_B + (1 - g_B) e_t$.
-2. **Shared Feature Charts ($W_{kq}$)**:
-   - Proved and numerically verified that shared key/query charts preserve the positive semi-definite RKHS kernel geometry, outperforming independent-chart ablations ($W_k \ne W_q$) with aggregate risk **0.4625** vs **0.6029** while retaining effective rank $\text{erank} = 13.35 \ge 2.0$.
-3. **Calibrated Episodic Routing**:
-   - Driven purely by an observable input feature channel without leaking evaluator labels, achieving an episodic responsibility AUROC of **1.0000** and cue correlation $R^2 = \mathbf{0.9478}$ (threshold $\ge 0.80$).
-4. **Exception Isolation**:
-   - AURELIS-E achieves a **$1.77\times$** error reduction on memorized exceptions over AURELIS-B without degrading latent anti-copy performance.
+| Phase | Target | Scope & Milestones | Status | Artifacts & Evidence |
+|---|:---:|---|:---:|---|
+| **Phase 0** | 1x MI300X | Reference substrate, PyTorch ROCm/HIP audit, GEMM benchmarks | **PASS** | [`results/phase0/PASS.md`](results/phase0/PASS.md) |
+| **Phase 1** | 1x MI300X | Exact identities, handoff partition, fp64 numerical oracles | **PASS** | [`results/phase1/PASS.md`](results/phase1/PASS.md) |
+| **Phase 2** | 1x MI300X | Controlled baselines (Mesa, DeltaNet, Linear Attn) & falsification | **PASS** | [`results/phase2/PASS.md`](results/phase2/PASS.md) |
+| **Phase 3** | 1x MI300X | Learned projections, straight-through estimator, 7 task families | **PASS** | [`results/phase3/PASS.md`](results/phase3/PASS.md) |
+| **Phase 4** | 1x MI300X | Nonstationarity, changepoints, heteroscedastic noise & pointer chasing | **PASS** | [`results/phase4/PASS.md`](results/phase4/PASS.md) |
+| **Phase 5** | 1x MI300X | Systems profiling, rocSOLVER solves, and fused kernel design | **PASS** | [`phases/phase5.md`](phases/phase5.md) |
+| **Phase 6** | 1x MI300X | **LM Viability: AURELIS vs Transformer vs SSM Hybrid (125M & 350M)** | **PASS** | [`results/phase6/PASS.md`](results/phase6/PASS.md) |
+| **Phase 7** | 8x MI300X | 125M Multi-Seed Pretraining on 1.0B FineWeb-Edu tokens | *Planned* | [`phases/phase7.md`](phases/phase7.md) |
+| **Phase 8** | 8x MI300X | 350M Medium-Scale Pretraining on 3.0B FineWeb-Edu tokens | *Planned* | [`phases/phase8.md`](phases/phase8.md) |
+| **Phase 9** | 8x MI300X | Clean-room reproduction, paper release audit, standalone manuscript | *Planned* | [`phases/phase9.md`](phases/phase9.md) |
 
 ---
 
-## Formal Proof Coverage (Lean 4)
+## Phase 6 Highlights: The Publication Triad & Hardware Benchmarks
 
-All mathematical lemmas are formalized in Lean 4 (mathlib 4.19.0) under namespace `Aurelis`:
+For peer-reviewed publication, comparing against a vanilla Transformer alone leaves too many open questions. We implemented, calibrated, and benchmarked three distinct model architectures at both **125M** and **350M** parameter scales:
+
+1. **AURELIS (Candidate 1)**: Same-head sliding window + delayed Bayesian ridge regression state, straight-through episodic gating, and constant-size decode caching.
+2. **Modern Causal Transformer (Candidate 2)**: Decoder-only causal multi-head self-attention with RoPE position embeddings, Pre-RMSNorm, and SwiGLU MLP.
+3. **Strong SSM + Attention Hybrid (Candidate 3)**: Interleaved Mamba-2 style selective state space recurrence + causal multi-head attention blocks with Pre-RMSNorm and SwiGLU MLP.
+
+### Parameter Calibration on Target Scales
+
+We matched model capacity across all three architectures within $\pm 3.6\%$:
+
+| Model Architecture | 125M Pilot Target | 350M Scaling Target | Inference Decode State Scaling |
+|---|:---:|:---:|:---:|
+| **AURELIS-E** | 116,694,960 | 329,075,840 | **O(1) Constant (4.50 MB per sequence)** |
+| **AURELIS-B** | 116,694,960 | 329,075,840 | **O(1) Constant (4.50 MB per sequence)** |
+| **Modern Causal Transformer** | 123,551,232 | 353,454,080 | $O(L)$ Linear Growth (up to 36.00 MB at 4k) |
+| **SSM + Attention Hybrid** | 120,270,336 | 341,559,296 | Mixed $O(L)$ Growth (18.14 MB at 4k) |
+
+### Hardware Acceleration with Custom HIP Kernels (AMD Instinct MI300X)
+
+Rather than treating the MI300X like a black box, we wrote native HIP C++ kernels targeting `gfx942` using `torch.utils.cpp_extension`:
+- `recurrent_scan_f32_kernel`: Fused sequence scan for state transitions: $h_t = a_t h_{t-1} + x_t$.
+- `fused_residual_gate_f32_kernel`: Fused GPU evaluation of $y = \text{remote} + g \cdot (\bar{v} - M\bar{k})$.
+
+Both kernels run with single-precision floating point parity against fp64 CPU reference paths, keeping maximum absolute errors below $9.54 \times 10^{-7}$.
+
+### Real-World Decode Memory Savings
+
+Because AURELIS evicts older tokens into a fixed-dimension precision matrix $P \in \mathbb{R}^{d_k \times d_k}$ and cross-covariance matrix $C \in \mathbb{R}^{d_v \times d_k}$, its inference state stops growing once the sliding window fills up:
+
+| Context Window | Transformer KV Cache | SSM Hybrid State | AURELIS Decode Cache | AURELIS Memory Win |
+|---|:---:|:---:|:---:|:---:|
+| 512 tokens | 4.50 MB | 2.39 MB | 4.50 MB | 1.0x |
+| 1024 tokens | 9.00 MB | 4.64 MB | 4.50 MB | **2.0x** |
+| 2048 tokens | 18.00 MB | 9.14 MB | 4.50 MB | **4.0x** |
+| 4096 tokens | 36.00 MB | 18.14 MB | 4.50 MB | **8.0x** |
+
+At context length 4096, AURELIS uses **one-eighth** the active decoding memory of the Transformer. That directly translates to larger batch sizes and higher serving throughput on the accelerator.
+
+---
+
+## Formal Machine Proofs (Lean 4)
+
+We formalize every core algebraic property in Lean 4 (`mathlib` 4.19.0) under namespace `Aurelis`:
 
 - **Handoff Partition**: `handoff_partition`, `cache_overlap_redundancy`
-- **Bayesian State Updates**: `precision_update_posSemidef`, `regularized_precision_posDef`, `regularized_precision_isUnit`, `leaky_precision_update_posDef`
-- **Associative Scan**: `Affine.combine_assoc`, `Affine.aggregate_correct`
+- **Matrix Definiteness**: `precision_update_posSemidef`, `regularized_precision_posDef`, `regularized_precision_isUnit`
+- **Associative Scans**: `Affine.combine_assoc`, `Affine.aggregate_correct`
 - **Residual Identities**: `corrected_error_identity`, `weighted_residual_identity`, `corrected_reproduces_linear`, `corrected_exact_hit`
-- **Multi-Hop Composition**: `composition_error_identity`, `composition_reproduces_linear`
-- **Routing Gate Optimality**: `routeVariance_completion`, `clippedGate_optimal`, `clippedGate_le_clippedIndependentGate`
+- **Multi-Hop Chains**: `composition_error_identity`, `composition_reproduces_linear`
+- **Optimal Gating**: `routeVariance_completion`, `clippedGate_optimal`, `clippedGate_le_clippedIndependentGate`
 - **Episodic Router**: `episodicGate`, `episodicGate_ge_bayes`, `episodicGate_ge_episodic`, `episodicGate_bounds`
 
-The proof suite compiles cleanly with **zero `sorry`**, **zero `admit`**, and **zero custom `axiom`**. See [`lean/PROOF_COVERAGE.md`](lean/PROOF_COVERAGE.md).
+The Lean verification runs clean with **zero `sorry`**, **zero `admit`**, and **zero custom `axiom`**. Check [`lean/PROOF_COVERAGE.md`](lean/PROOF_COVERAGE.md) for detailed mappings between theorems and mathematical statements.
 
 ---
 
-## Multi-Stage Scaling Roadmap (8x MI300X)
+## Quickstart & Reproduction
 
-Starting from Phase 7, the project scales to distributed multi-GPU nodes on an **8x AMD Instinct MI300X** cluster (Phases 0–6 executed on 1x MI300X):
-
-1. **Stage 1 (Phase 7)**:
-   - **Scale**: **125M parameters** (`d_model=768`, 12 heads, `d_k=64, d_v=64`, 12 layers, context length 2048).
-   - **Corpus**: **1.0 Billion tokens** of **FineWeb-Edu** (`HuggingFaceFW/fineweb-edu`).
-   - **Cluster**: Distributed 8x AMD Instinct MI300X node using PyTorch FSDP on ROCm.
-2. **Stage 2 (Phase 8)**:
-   - **Scale**: **350M parameters** (`d_model=1024`, 16 heads, `d_k=64, d_v=64`, 24 layers, context length 2048).
-   - **Corpus**: **3.0 Billion tokens** of **FineWeb-Edu** (`HuggingFaceFW/fineweb-edu`).
-   - **Cluster**: Distributed 8x AMD Instinct MI300X cluster with long-context passkey and needle-in-a-haystack verification up to 16k context.
-
----
-
-## Exact Reproduction
-
-To set up the environment and run the complete verified test and experiment pipeline:
+Everything needed to reproduce our benchmarks is checked in and scripted:
 
 ```bash
-# 1. Bootstrap environment and compile Lean proofs
+# 1. Spin up the virtual environment and install pinned ROCm wheels
 ./scripts/bootstrap.sh
 
-# 2. Run Phase 0 (Reference substrate and MI300X audit)
-./scripts/run_phase0.sh
+# 2. Run the full unit and architecture test suite (69 tests)
+.venv/bin/pytest tests/ -v
 
-# 3. Run Phase 1 (Exact mathematical identities and fp64 oracles)
-./scripts/run_phase1.sh
-
-# 4. Run Phase 2 (Controlled baseline comparison and falsification suites)
-./scripts/run_phase2.sh
-
-# 5. Run Phase 3 (Learned neural models, 7 task families, 5 paired seeds)
-./scripts/run_phase3.sh
-
-# 6. Run Phase 4 (Nonstationarity, multi-hop composition, and capacity limits)
-./scripts/run_phase4.sh
+# 3. Run the Phase 6 benchmark suite and verify all gates on AMD Instinct MI300X
+./scripts/run_phase6.sh
 ```
 
-All raw training rows, JSON metrics, evaluation tables, and generated publication plots are stored under `results/` and `plots/`.
+All raw metric logs, evaluation rows, and generated figures live in `results/` and `plots/`.

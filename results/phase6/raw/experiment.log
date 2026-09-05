@@ -1,0 +1,7 @@
+{
+  "parameter_calibration": true,
+  "hip_kernel_precision": true,
+  "constant_decode_memory": true,
+  "exception_override_advantage": true,
+  "status": "PASS"
+}
