@@ -1,99 +1,92 @@
-# AURELIS autonomous phase protocol
+# AURELIS-R v2 research and implementation protocol
 
-Every numbered phase must obey this protocol. A phase prompt plus this file is
-the complete operating instruction; later phases inherit all earlier gates.
+This protocol supersedes v1's requirement to preserve its ridge solver and
+Bayes router. The user's authorized redesign explicitly changes those choices.
+This file instructs future phase implementation; it does not authorize running
+large training jobs during a theory/documentation revision.
 
-## Non-negotiable objective
+## Authority and source of truth
 
-Build and falsify the AURELIS architecture defined in `aurelis.md`. Do not
-replace it with an easier generic local-attention/recurrent hybrid. The defining
-invariants are delayed occurrence-level handoff, disjoint recent and remote
-stores, the read `Mq + g(vbar-Mkbar)`, a cross-covariance-aware Bayes gate, and
-an explicit episodic override.
+Use aurelis.md v2, IMPLEMENTATION_CONTRACT.md, CHANGE_IMPACT_PROTOCOL.md, and
+the numbered phase together.
+Resolve equation inconsistencies before implementation. Preserve historical
+code/results. New executable work implements the new theory; it cannot inherit
+old PASS files, trained quality claims, or TPU claims.
 
-## Evidence hierarchy
+The project is a hypothesis, not a requirement that experiments must succeed.
+Status is one of NOT_STARTED, RUNNING, PASS, FAILED_HYPOTHESIS, or BLOCKED_RESOURCE.
+A Lean build supports only its theorem statements. It is not a model benchmark.
 
-Use current files, raw outputs, checkpoints, and hardware measurements as
-authoritative. Treat prose, expected behavior, and prior success reports as
-hypotheses until reproduced. Prefer primary sources: papers, official
-documentation, source code, and standards. Record URLs, versions, access date,
-assumptions, and the exact design decision each source supports.
+## Adaptive dependency rule
 
-## Mandatory failure-repair loop
+Every phase result is valid only for its recorded theory revision. Before
+starting work, read [CHANGE_IMPACT_PROTOCOL.md](CHANGE_IMPACT_PROTOCOL.md) and
+the current `results/v2/REVISION_MANIFEST.yaml`. If any input, equation,
+theorem premise, state transition, certificate, evaluator, metric, baseline,
+data revision, dtype, device, or service assumption changed, compute the
+invalidation closure before doing new work. Mark the earliest affected phase
+and every dependent descendant `STALE`; mark old results `SUPERSEDED` for
+comparison; preserve their raw artifacts; increment the revision; and rerun
+from the earliest affected phase. A repaired phase passing does not make stale
+descendants valid. Earlier phases may be `RETAINED` only after their direct
+inputs and claims are checked to be independent.
 
-Run this loop whenever any assertion, theorem, numerical tolerance, training
-criterion, performance threshold, or inherited gate fails:
+## Required workflow
 
-1. **Freeze the evidence.** Save the failing config, seed, command, environment,
-   raw trace, metrics, and smallest reproducible case. Never overwrite or hide
-   a failure row.
-2. **Classify the failure.** Choose and justify one or more of: implementation,
-   numerical conditioning, hardware/kernel, optimizer/data, representation,
-   statistical-model misspecification, theorem/assumption, evaluator, or
-   external resource.
-3. **Research before patching.** Search primary literature and official docs
-   for the failure mechanism and viable repairs. Add the sources and extracted
-   mathematics to the phase research log. Do not tune blindly.
-4. **Derive a repair.** State equations, invariants, predicted effect, valid
-   domain, and a counterexample outside that domain. If the original claim is
-   false, correct the paper and claim registry; never silently weaken a theorem
-   or alter a metric.
-5. **Formalize the repair.** Add or update a faithful Lean statement for every
-   new deterministic algebraic claim that is realistically formalizable. Run
-   `lake build`. A proof-script/API failure is not a theorem refutation. A
-   faithful counterexample or missing premise is.
-6. **Implement twice where feasible.** First update an independent fp64/CPU
-   oracle, then the production or optimized path. Do not make two paths call the
-   same helper in a way that creates false agreement.
-7. **Test the mechanism.** Add a regression test that fails before the repair,
-   property/pathology tests, and the phase experiment. Compare predicted and
-   observed effects, not just the final aggregate score.
-8. **Run all inherited gates.** A repair that passes the current test but breaks
-   an earlier phase is rejected.
-9. **Iterate.** Repeat from step 1 until every phase gate passes. Do not cap
-   repair attempts merely for convenience.
+1. Record the tested theory revision, source commit/dirty patch, config, seeds,
+   dataset revisions, environment, actual devices, and raw commands.
+2. Register the hypothesis, primary metric, baselines, tolerances, acceptance
+   margins, and compute limits before evaluation. Preserve the registration.
+3. Implement an independent CPU reference and production path when the phase
+   requires them. Two wrappers around one helper are not independent oracles.
+4. Preserve failures with minimal reproductions. Distinguish implementation,
+   numerical, specification, hardware, evaluation, and scientific failures.
+5. Repair bugs and rerun affected checks. For a false claim, correct the theory,
+   formal scope, registry, phase prompts, and revision manifest, then version
+   the experimental generation and invalidate the full dependent closure.
+6. Never lower a threshold or replace a baseline to make a disappointing run pass.
+   A hypothesis failure ends that scaling branch. Resource failure remains blocked.
+7. Publish all seeds, exclusions, nonfinite jobs, confidence intervals, and raw
+   measurements. Stop at the declared budget; more compute needs existing user
+   authorization or a concrete request, not an endless retry rule.
 
-A gate may change only when preserved evidence proves that its scientific
-claim is false or its evaluator invalid. Version the gate, retain the failed
-claim/result, update `aurelis.md`, `CLAIMS.md`, and Lean coverage, and replace it
-with a stricter faithful test of the corrected claim. Never lower a threshold
-because a run is slow, expensive, or disappointing. If an actual external
-blocker prevents further in-scope work, report it and leave the phase failed;
-do not manufacture PASS.
+When a change is discovered after later phases have run, do not edit their
+reports in place. Preserve them under the parent revision, create the new
+revision manifest, and regenerate affected prompts and reports. The required
+endpoint is PASS, FAILED_HYPOTHESIS, or BLOCKED_RESOURCE for every descendant;
+STALE or NOT_STARTED is incomplete.
 
-## Reproducibility contract
+## Evidence rules
 
-- Pin seeds, dependencies, data revisions/checksums, and configs.
-- Record commit, dirty state, command, UTC time, wall time, device, dtype, peak
-  memory, and exclusions with every run.
-- Use fp64 as the numerical oracle. Reduced precision is always measured
-  against it.
-- Synchronize GPU timing and separate compile/warm-up/tuning time from steady
-  state.
-- Report all configured seeds, including nonfinite and failed jobs.
-- Preserve equal-budget comparisons: parameters, tokens, optimizer, schedule,
-  batch tokens, context, evaluation, and tuning opportunity.
-- Never use a test set to redesign an architecture within the same experimental
-  generation. Increment the generation and rerun all models.
+No hand-assigned accuracy/MSE, randomized proxy scores, invented timing, or
+hard-coded hardware inventory. Estimates are labeled estimates and never
+reported as measurements. Record outputs/targets/checkpoint IDs for task scores.
+Measure actual populated caches and synchronize the backend used for timing.
+Report warmup/compile separately, and count index construction, transfer,
+fallback, padding, and host storage in end-to-end costs.
 
-## Formal-method contract
+Use strong optimized baselines and comparable parameter, token, optimizer,
+context, tuning, KV head, precision, and total-memory budgets. Report both
+equal-token and equal-training-cost comparisons where extra teacher work exists.
+Test data cannot tune the architecture within the same generation.
 
-`lake build` must pass with pinned Lean/mathlib and no `sorry`, `admit`, or
-unreviewed project axioms. `lean/PROOF_COVERAGE.md` must say exactly what each
-theorem proves and what remains analytic or empirical. Do not encode a weaker
-statement and cite it as proof of stronger prose.
+## Formal and numerical rules
 
-## PASS record
+Run the pinned Lean/mathlib build; no admitted goals or new project axioms.
+Standard Lean foundations are allowed and must not be advertised as “no
+assumptions.” PROOF_COVERAGE.md must identify analytic, formal, implementation,
+floating-point, and empirical boundaries.
 
-Each phase ends with a generated `results/phaseN/PASS.md` containing:
+Certification requires a valid disjoint cover, conservative envelopes, and
+accounted arithmetic error. Probabilistic confidence, a learned sigmoid, or
+empirical fp64 agreement is not a deterministic certificate. Budget exhaustion
+and invalid data return explicit statuses. Do not silently downgrade strict mode.
 
-- every gate and direct evidence path;
-- exact reproduction commands;
-- all failed iterations and their disposition;
-- research and mathematical repairs made;
-- Lean theorem/coverage changes;
-- raw/aggregate metric paths and plots;
-- tested commit and environment fingerprint; and
-- remaining limitations that are not part of the phase claim.
+## Required phase record
 
-Only then may the next phase start.
+Write results/v2/phaseN/report.md with equation-to-code mapping, raw evidence
+paths, hypotheses and outcomes, reproduction commands, failures/dispositions,
+resource usage, and next decision. Generate PASS.md only when every registered
+gate passes. Otherwise generate FAILED_HYPOTHESIS.md or BLOCKED_RESOURCE.md.
+Include artifact hashes and tested revision. Earlier v2 correctness gates
+remain dependencies, but old v1 empirical gates are retired.

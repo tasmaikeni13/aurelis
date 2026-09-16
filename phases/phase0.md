@@ -1,103 +1,52 @@
-# Phase 0 — AURELIS migration and Cloud TPU v4 Pod reference substrate
+# Phase 0 — Reset evidence and register the experiment
 
-Read `aurelis.md`, `research/LITERATURE_REVIEW.md`, every file in `lean/`, and
-`phases/AUTONOMY_PROTOCOL.md` completely before acting. Execute the shared
-failure-repair loop until this phase passes.
+Read the v2 paper, AUTONOMY_PROTOCOL.md, IMPLEMENTATION_CONTRACT.md, and
+research/V1_AUDIT.md. This is a new experimental generation. Old PASS files
+do not authorize skipping a phase. Implement new evaluators/scripts as needed;
+the theory revision deliberately left those files untouched.
 
-This phase turns the theory repository into an AURELIS implementation research
-repository. Do not train a language model or claim accelerator superiority.
+## Adaptive start gate
 
-## 0.1 Remove the obsolete identity
+Phase 0 establishes the baseline revision and can be invalidated by any later
+discovery that changes the research question, evidence classification, or
+global resource/metric contract. Before starting, create or update the
+revision manifest and mark inherited v1 evidence as historical. If a later
+phase reports a changed global assumption, return here, increment the revision,
+regenerate the registration, and rerun the affected closure.
 
-Erase the obsolete pre-AURELIS identity from the working tree, not from Git history:
+## Deliver
 
-- rename the Python package and all imports to `aurelis`;
-- replace project metadata, module/class names, docs, configs, scripts, tests,
-  result schemas, plot labels, comments, and environment headers;
-- delete stale experiments/results/plots whose equations or claims do not
-  represent AURELIS; do not cosmetically relabel old data;
-- preserve only reusable mechanisms after proving their equations match the
-  new paper; and
-- make case-insensitive `rg` for the old acronym and expanded name return no
-  tracked-working-tree matches outside an explicitly generated migration audit
-  that quotes the search term. The `.git` directory is out of scope.
+Create results/v2/phase0 with an actual environment/device inventory,
+implementation gap map, resource budget, and preregistration. Record installed
+Lean/mathlib versions without changing their pins. Run the existing formal
+build, mapping theorems to their exact statements.
 
-The authoritative manuscript is `aurelis.md`; there must be no second legacy
-paper.
+Audit old diagnostic, hardware, memory, and decode claims against their
+generating code. Preserve the old artifacts and classify measured, analytical,
+hard-coded, unsupported, or not audited. Do not extrapolate this audit to
+uninspected experiments.
 
-## 0.2 Build independent reference paths
+Register these distinct hypotheses:
 
-Create a transparent fp64 CPU implementation with immutable state for:
+- H1: solve-free bounded execution removes v1's solver/all-prefix bottleneck.
+- H2: recurrent completion lowers measured cost at fixed certified error
+  relative to the best recurrence-free completion.
+- H3: archive mode preserves held-out task quality with acceptable memory,
+  p99 latency, fallback rate, and throughput.
+- H4: trained bounded mode has useful quality at its fixed state budget.
 
-- the delayed FIFO handoff and exact occurrence partition;
-- `P=Lambda+sum beta kk^T`, `C=sum beta vk^T`;
-- Cholesky/solve reads without explicit inversion;
-- local causal softmax with shared key/value weights;
-- remote, full-residual, AURELIS-B, and AURELIS-E outputs;
-- `h,V_R,V_H,K_RH,g_raw,g_B`, plus diagnostic residuals;
-- batched/multi-head shapes and empty/warm-up cache behavior; and
-- autograd through keys, queries, values, evidence, temperature, projections,
-  and any learned episodic responsibility.
+Fix workload/context/batch grids, held-out splits, paired seeds, total compute,
+baseline versions, reference encoding, epsilon grid, and SLO. Set numerical
+and quality noninferiority margins and practical speed/memory improvement
+margins before viewing new results. Suggested pilot defaults: 3 paired seeds,
+quality margin 1% relative validation NLL and 2 percentage points on registered
+recall tasks, and ≥10% measured cost improvement for H2 with a paired 95%
+interval excluding zero. These are research decisions, not observed results;
+replace them before execution if the target application needs different limits.
 
-Create an independently assembled historical oracle from the full prefix. The
-streaming and oracle paths must not share state-update logic. Keep a tiny
-dimension-capped explicit inverse only as a test oracle.
+## Gates
 
-## 0.3 Build the Cloud TPU v4 Pod substrate
-
-The server target is a Google Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores). Inspect and record
-actual state before installation or optimization:
-
-- TPU architecture, TensorCores, TPU pod topology, libtpu/JAX runtime, PyTorch, Python, kernel, host
-  RAM/CPU, and git state;
-- JAX TPU backend, OpenXLA HLO compilation, `jax.devices()`, dtype support, TorchInductor,
-  and profiler availability;
-- bf16/fp16/fp32/fp64 GEMM health checks with synchronized timing; and
-- installed versus officially compatible versions.
-
-Consult current official Google Cloud TPU v4, JAX, OpenXLA, and libtpu documentation before
-choosing versions or kernel paths. Forbidden accelerator dependencies (CUDA/ROCm) are prohibited.
-
-Implement reproducible scripts for:
-
-- non-destructive environment bootstrap and audit;
-- CPU/fp64 reference tests;
-- eager and `torch.compile` AURELIS forward/backward;
-- sequential decode with ring-buffer handoff and stable factor maintenance;
-- vectorized exact training reference;
-- component benchmarks for outer updates, local attention, factorization,
-  triangular solves, routing, and full head; and
-- an optional JAX/XLA TPU prototype only after the eager/Inductor path is
-  correct. A custom kernel is not a phase requirement if measurement shows it
-  is unjustified.
-
-## 0.4 Required repository contract
-
-Create or replace `README.md`, `CLAIMS.md`, `RESEARCH_PLAN.md`,
-`EXPERIMENT_LOG.md`, `environment.txt`, `pyproject.toml`, `requirements.txt`,
-and structured `src/`, `tests/`, `experiments/`, `configs/`, `results/`,
-`plots/`, and `scripts/` content. The claim registry must distinguish theorem,
-Lean coverage, numerical evidence, and pending empirical claims.
-
-Define one command that runs environment audit, Python unit/property tests,
-Lean build, and a small AURELIS reference experiment in fail-fast order.
-
-## PASS gates
-
-- No stale identity remains by the scoped case-insensitive search.
-- The historical oracle and streaming path agree in fp64 over random lengths,
-  windows, dimensions, evidence, empty-cache, handoff-boundary, repeated-key,
-  near-singular, and over-capacity cases.
-- The cache and remote occurrence IDs form a disjoint exhaustive partition at
-  every step.
-- Cholesky, dense solve, and capped inverse agree inside conditioned domains;
-  expected failures outside them are retained.
-- Autograd and gradcheck cover every declared differentiable input.
-- AURELIS-B gate matches dense one-dimensional variance minimization; AURELIS-E
-  exact one-hot hits pass.
-- Eager, compiled, and custom JAX/TPU paths agree with fp64 after dtype-aware
-  tolerances.
-- Cloud TPU v4 Pod is measured, with no NVIDIA/ROCm dependency and no unsupported version
-  assumption.
-- Full Lean build and all Phase 0 tests pass from the documented command.
-- `results/phase0/PASS.md` satisfies the shared PASS record.
+Every claimed device is returned by runtime enumeration. Every metric type has
+a raw-data provenance plan. No legacy claim is inherited by v2. Compute limits
+and stop conditions are explicit. PASS means the audit and registration are
+complete, not that any architecture hypothesis passed.

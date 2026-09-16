@@ -1,57 +1,45 @@
-# Phase 7 — Matched multi-seed scaling study
+# Phase 7 — Serving integration and failure injection
 
-Start only after Phase 6 PASS. Read all prior artifacts and
-`phases/AUTONOMY_PROTOCOL.md`. Execute the failure-repair loop until PASS.
+Depends on phases 0–6. Use a trained surviving checkpoint. Implement the
+serving path and scripts explicitly; “kernel parity” is insufficient.
 
-This phase tests whether the mechanism persists under a distributed Cloud TPU v4 Pod
-(16 v4 TPUs / 32 TensorCores) scaling budget. It may not redefine success around constant state alone.
+## Adaptive start gate
 
-## Frozen design
+Serving discoveries can reach backward: a rollback, prefix-cache, archive, or
+state-layout defect can invalidate Phase 2 semantics and every later result.
+Compute the earliest affected phase before fixing serving code. Preserve old
+load tests as superseded, regenerate the affected correctness contract, and
+rerun all descendants before making a deployment decision.
 
-Preregister one generation with:
+## Deliver
 
-- strongest Transformer, published-style hybrid, Gated DeltaNet or Kimi-style
-  feasible comparator, cumulative least-squares comparator, and strongest
-  AURELIS variant selected without Phase 7 test results;
-- **125M parameters** (`d_model=768`, 12 heads, `d_k=64, d_v=64`, 12 layers), paired seeds, and **1.0 Billion training tokens** per model on the **FineWeb-Edu** corpus (`HuggingFaceFW/fineweb-edu`);
-- identical FineWeb-Edu corpus shards, pinned tokenizer, AdamW optimizer, cosine decay schedule, batch tokens, context length `2048`,
-  precision policy (bf16 with fp32 precision accumulation), checkpoint cadence, and evaluator;
-- parameter/FLOP/state reconciliation; and
-- fixed primary and secondary claims with confidence intervals and multiple
-  comparison treatment.
+Integrate per-request S/ring/archive state with continuous batching, true cached
+decode, prefix sharing, chunked prefill, pause/resume, and cancellation.
+Snapshots include ring gates, positions, archive length/index version, and model
+identity. Implement copy-on-write forks and speculative rejection rollback.
 
-Do not omit a comparator because it was strong in Phase 6. Any post-test
-architecture change creates a new generation and reruns every model/seed.
+Define bounded, strict archive, and permissive archive service policies.
+Strict archive does not emit an uncertified estimate on deadline; it returns
+an explicit failure/escalation. A full read certifies same-Q/K/V attention
+only, not a dense model trajectory. Document exact-checkpoint replay requirements
+if a trajectory-level guarantee is offered.
 
-## Evaluation
+## Failure and security boundaries
 
-Use the Phase 6 diagnostic suite plus natural validation at several contexts,
-long-document subsets, downstream zero/few-shot probes appropriate to scale,
-and generation-time prefill/decode sweeps. Evaluate the same checkpoint at
-trained and extrapolated contexts. Report per-seed and aggregate results,
-throughput, peak VRAM, wall time, energy/power if reliable, checkpoint size,
-live state, and latency distributions.
+Inject lost/stale/corrupt pages, invalid summary intervals, offload failures,
+device reset, cancellation mid-read, memory pressure, and repeated retry.
+Verify no cross-request data disclosure, use-after-free pages, stale certificate,
+duplicate writes, or mutated shared prefix. Model-output factual safety is
+outside the attention proof and needs application evaluation.
 
-## Failure repair
+## Gates
 
-Diagnose divergence, quality loss, or systems regressions from preserved
-traces. Research scaling, optimization, recurrence, attention, and numerical
-solver literature before changing the design. Mathematical repairs must update
-the paper, fp64 oracle, Lean coverage, and all prior experiments. Hyperparameter
-tuning must be symmetric across models or separately budgeted and reported.
+Under the registered arrival/load distribution, report TTFT, inter-token
+p50/p95/p99 latency, throughput within SLO, failure/fallback rates, and peak
+memory in every tier. Include worst-case diffuse attention and high archive
+miss rates. Compare fixed SLO and available resources with modern dense/hybrid
+serving. Include correctness replay and state/checkpoint accounting.
 
-## PASS gates
-
-- All preregistered models and all paired seeds complete the equal token budget
-  or the phase remains failed.
-- AURELIS validation loss is non-inferior within the preregistered margin to
-  the strongest efficient hybrid, with confidence intervals across seeds.
-- AURELIS retains a statistically supported targeted-memory advantage and a
-  context-independent remote-plus-window decode-state advantage.
-- At least one end-to-end quality-qualified throughput/latency Pareto advantage
-  survives at long context; theoretical bytes alone are insufficient.
-- No primary claim depends on one seed, one context, test-driven exclusions,
-  or different data/optimizer budgets.
-- Negative natural/downstream results and all resource costs are retained.
-- All inherited gates and Lean build pass, and
-  `results/phase7/PASS.md` satisfies the shared PASS record.
+PASS requires all invariants, fault outcomes, and registered SLO/quality gates.
+A faster average with unacceptable p99, budget failures, or unsupported state
+operations is not a deployable result.

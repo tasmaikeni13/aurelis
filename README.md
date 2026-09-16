@@ -1,113 +1,54 @@
-# AURELIS
+# AURELIS-R
 
-**Attention with Uncertainty-Routed Residuals over an Episodic–Long-range Inference State**
+Solve-free recurrent memory with residual-certified retrieval.
 
-Standard causal attention and fixed-capacity recurrent memory fail in polar opposite ways. Softmax attention keeps exact observations around, but its KV cache grows linearly with context length until memory runs out. Recurrent layers (SSMs, linear attention, delta nets) keep memory bounded, but they force compression of history before future queries are even known.
+This repository is being revised from the Bayesian ridge architecture (v1) to
+the research specification in [aurelis.md](aurelis.md). The new design combines
+a gated delta state, local residual transport, and an optional exact archive
+whose reads are controlled by a derived error bound.
 
-AURELIS attacks this tradeoff directly inside a single attention head. We keep the most recent $w$ key–value pairs in an exact sliding-window attention cache. When tokens fall out of that window, they get handed off exactly once to a remote Bayesian ridge regression state. 
+**Current status: theory and scoped Lean proofs; v2 implementation and
+performance validation are pending.** Existing Python/JAX code, scripts,
+configs, and results are v1. They were deliberately left unchanged in this
+revision. You must implement the new theory following
+[the implementation handoff](phases/IMPLEMENTATION_CONTRACT.md) and
+[phases 0–9](phases/README.md).
+The [adaptive change-impact protocol](phases/CHANGE_IMPACT_PROTOCOL.md) governs
+theory repairs: it invalidates and regenerates the full dependent phase closure.
 
-When a query $q$ arrives, the layer reads:
+Two operating contracts are explicit:
 
-$$y(q) = Mq + g(q) \left[ \bar{v}(q) - M\bar{k}(q) \right]$$
+- Bounded mode: fixed recurrent state and recent cache; approximate remote memory.
+- Archive mode: growing exact storage, adaptive retrieval, and a local error
+  certificate or explicit budget failure. Full reads recover softmax on the
+  same current Q/K/V, subject to numerical error.
 
-Here, $M = CP^{-1}$ is the remote posterior mean map, and $\bar{k}(q)$ and $\bar{v}(q)$ are local attention barycenters. The bracketed term is an innovation residual. Our gate $g(q)$ comes from the derived cross-covariance between the remote prior and local attention errors. When a target is an exact memorized exception rather than a smooth latent relationship, an episodic override kicks in: $g_E = \max(g_B, e_t)$.
+This is not a claim of bounded-memory unlimited exact recall, established
+novelty, model-level safety, or demonstrated deployment speed. The research
+must show recurrence earns its cost against strong sparse/hybrid baselines.
 
-During inference decoding, AURELIS runs with strictly constant memory state: $O(d_k^2 + d_v d_k + w(d_k + d_v))$ per head. It never grows as the context stretches out.
+## Read first
 
----
+- [Paper and equations](aurelis.md)
+- [Primary-source literature and novelty boundary](research/LITERATURE_REVIEW.md)
+- [V1 bottleneck and evidence audit](research/V1_AUDIT.md)
+- [Claim registry](CLAIMS.md)
+- [Research plan](RESEARCH_PLAN.md)
+- [Revision manifest](results/v2/REVISION_MANIFEST.yaml)
+- [Formal proof scope](lean/PROOF_COVERAGE.md)
 
-## Current Status: Phase 6 PASS (Target: Google Cloud TPU v4 Pod)
+The old Phase 6 evaluator contains assigned diagnostic scores and simulated
+decode measurements; its PASS files do not establish model quality or deployment.
+Historical artifacts remain available but are not current publication evidence.
 
-The codebase strictly adheres to [`phases/AUTONOMY_PROTOCOL.md`](phases/AUTONOMY_PROTOCOL.md). Every algebraic identity has formal Lean 4 machine proofs with zero unproven assumptions, verified against double-precision CPU oracles and benchmarked on our Google Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores).
+## Formal verification
 
-| Phase | Target | Scope & Milestones | Status | Artifacts & Evidence |
-|---|:---:|---|:---:|---|
-| **Phase 0** | Cloud TPU v4 Pod | Reference substrate, JAX/TPU audit, GEMM benchmarks | **PASS** | [`results/phase0/PASS.md`](results/phase0/PASS.md) |
-| **Phase 1** | Cloud TPU v4 Pod | Exact identities, handoff partition, fp64 numerical oracles | **PASS** | [`results/phase1/PASS.md`](results/phase1/PASS.md) |
-| **Phase 2** | Cloud TPU v4 Pod | Controlled baselines (Mesa, DeltaNet, Linear Attn) & falsification | **PASS** | [`results/phase2/PASS.md`](results/phase2/PASS.md) |
-| **Phase 3** | Cloud TPU v4 Pod | Learned projections, straight-through estimator, 7 task families | **PASS** | [`results/phase3/PASS.md`](results/phase3/PASS.md) |
-| **Phase 4** | Cloud TPU v4 Pod | Nonstationarity, changepoints, heteroscedastic noise & pointer chasing | **PASS** | [`results/phase4/PASS.md`](results/phase4/PASS.md) |
-| **Phase 5** | Cloud TPU v4 Pod | Systems profiling, XLA solves, and fused kernel design | **PASS** | [`phases/phase5.md`](phases/phase5.md) |
-| **Phase 6** | Cloud TPU v4 Pod | **LM Viability: AURELIS vs Transformer vs SSM Hybrid (125M & 350M)** | **PASS** | [`results/phase6/PASS.md`](results/phase6/PASS.md) |
-| **Phase 7** | Cloud TPU v4 Pod | 125M Multi-Seed Pretraining on 1.0B FineWeb-Edu tokens | *Planned* | [`phases/phase7.md`](phases/phase7.md) |
-| **Phase 8** | Cloud TPU v4 Pod | 350M Medium-Scale Pretraining on 3.0B FineWeb-Edu tokens | *Planned* | [`phases/phase8.md`](phases/phase8.md) |
-| **Phase 9** | Cloud TPU v4 Pod | Clean-room reproduction, paper release audit, standalone manuscript | *Planned* | [`phases/phase9.md`](phases/phase9.md) |
+Pinned Lean/mathlib: 4.19.0. With the existing dependencies installed:
 
----
+    cd lean
+    lake build
 
-## Phase 6 Highlights: The Publication Triad & Hardware Benchmarks
-
-For peer-reviewed publication, comparing against a vanilla Transformer alone leaves too many open questions. We implemented, calibrated, and benchmarked three distinct model architectures at both **125M** and **350M** parameter scales:
-
-1. **AURELIS (Candidate 1)**: Same-head sliding window + delayed Bayesian ridge regression state, straight-through episodic gating, and constant-size decode caching.
-2. **Modern Causal Transformer (Candidate 2)**: Decoder-only causal multi-head self-attention with RoPE position embeddings, Pre-RMSNorm, and SwiGLU MLP.
-3. **Strong SSM + Attention Hybrid (Candidate 3)**: Interleaved Mamba-2 style selective state space recurrence + causal multi-head attention blocks with Pre-RMSNorm and SwiGLU MLP.
-
-### Parameter Calibration on Target Scales
-
-We matched model capacity across all three architectures within $\pm 3.6\%$:
-
-| Model Architecture | 125M Pilot Target | 350M Scaling Target | Inference Decode State Scaling |
-|---|:---:|:---:|:---:|
-| **AURELIS-E** | 116,694,960 | 329,075,840 | **O(1) Constant (4.50 MB per sequence)** |
-| **AURELIS-B** | 116,694,960 | 329,075,840 | **O(1) Constant (4.50 MB per sequence)** |
-| **Modern Causal Transformer** | 123,551,232 | 353,454,080 | $O(L)$ Linear Growth (up to 36.00 MB at 4k) |
-| **SSM + Attention Hybrid** | 120,270,336 | 341,559,296 | Mixed $O(L)$ Growth (18.14 MB at 4k) |
-
-### Hardware Acceleration with JAX/XLA/HLO Kernels (Google Cloud TPU v4 Pod)
-
-We implemented native accelerated kernels targeting the Google Cloud TPU v4 Pod substrate via JAX and OpenXLA:
-- `jax_recurrent_scan` / `tpu_recurrent_scan`: Fused sequence associative scan for state transitions: $h_t = a_t h_{t-1} + x_t$.
-- `jax_fused_residual_gate` / `tpu_fused_residual_gate`: Fused TPU evaluation of $y = \text{remote} + g \cdot (\bar{v} - M\bar{k})$.
-- `jax_rmsnorm` & `jax_swiglu`: High-performance fused primitives lowering directly into TPU Matrix Multiply Units (MXUs) and Vector Units (VPU).
-- `jax_aurelis_attention_sequence`: Full native JAX/XLA AURELIS block with JIT compilation.
-
-All kernels run with single-precision floating point parity against fp64 reference paths, keeping maximum absolute errors below $10^{-6}$.
-
-### Real-World Decode Memory Savings
-
-Because AURELIS evicts older tokens into a fixed-dimension precision matrix $P \in \mathbb{R}^{d_k \times d_k}$ and cross-covariance matrix $C \in \mathbb{R}^{d_v \times d_k}$, its inference state stops growing once the sliding window fills up:
-
-| Context Window | Transformer KV Cache | SSM Hybrid State | AURELIS Decode Cache | AURELIS Memory Win |
-|---|:---:|:---:|:---:|:---:|
-| 512 tokens | 4.50 MB | 2.39 MB | 4.50 MB | 1.0x |
-| 1024 tokens | 9.00 MB | 4.64 MB | 4.50 MB | **2.0x** |
-| 2048 tokens | 18.00 MB | 9.14 MB | 4.50 MB | **4.0x** |
-| 4096 tokens | 36.00 MB | 18.14 MB | 4.50 MB | **8.0x** |
-
-At context length 4096, AURELIS uses **one-eighth** the active decoding memory of the Transformer. That directly translates to larger batch sizes and higher serving throughput on the accelerator.
-
----
-
-## Formal Machine Proofs (Lean 4)
-
-We formalize every core algebraic property in Lean 4 (`mathlib` 4.19.0) under namespace `Aurelis`:
-
-- **Handoff Partition**: `handoff_partition`, `cache_overlap_redundancy`
-- **Matrix Definiteness**: `precision_update_posSemidef`, `regularized_precision_posDef`, `regularized_precision_isUnit`
-- **Associative Scans**: `Affine.combine_assoc`, `Affine.aggregate_correct`
-- **Residual Identities**: `corrected_error_identity`, `weighted_residual_identity`, `corrected_reproduces_linear`, `corrected_exact_hit`
-- **Multi-Hop Chains**: `composition_error_identity`, `composition_reproduces_linear`
-- **Optimal Gating**: `routeVariance_completion`, `clippedGate_optimal`, `clippedGate_le_clippedIndependentGate`
-- **Episodic Router**: `episodicGate`, `episodicGate_ge_bayes`, `episodicGate_ge_episodic`, `episodicGate_bounds`
-
-The Lean verification runs clean with **zero `sorry`**, **zero `admit`**, and **zero custom `axiom`**. Check [`lean/PROOF_COVERAGE.md`](lean/PROOF_COVERAGE.md) for detailed mappings between theorems and mathematical statements.
-
----
-
-## Quickstart & Reproduction
-
-Everything needed to reproduce our benchmarks is checked in and scripted:
-
-```bash
-# 1. Spin up the virtual environment and install dependencies
-./scripts/bootstrap.sh
-
-# 2. Run the full unit and architecture test suite (72 tests)
-pytest -v
-
-# 3. Run the Phase 6 benchmark suite and verify all gates on Cloud TPU v4 Pod
-./scripts/run_phase6.sh
-```
-
-All raw metric logs, evaluation rows, and generated figures live in `results/` and `plots/`.
+New proofs cover finite-state recall capacity, delta transition stability, and
+the vector residual/normalizer certificate. Formal real arithmetic does not
+prove a floating-point kernel, speed, learned quality, or end-to-end safety.
+See [lean/README.md](lean/README.md) for the exact boundary.

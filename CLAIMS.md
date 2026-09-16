@@ -1,31 +1,39 @@
-# AURELIS Claim Registry
+# AURELIS-R v2 claim registry
 
-This document tracks every specific mathematical, formal, and empirical claim made about the AURELIS architecture.
+Updated 2026-09-16. This registry supersedes v1 publication claims. Preserved v1
+artifacts are historical, not v2 evidence. Analytic means a derivation in the
+paper; Lean-checked means the stated theorem under its explicit premises
+compiles. Neither status establishes a numerical implementation or performance.
 
-### Status Definitions
-- **Proved**: A complete mathematical proof exists in the manuscript or appendix.
-- **Lean-checked**: The theorem statement and proof compile with Lean 4 and mathlib with zero `sorry` or custom axioms.
-- **Numerically verified**: An automated, deterministic experiment reproduced the claim within defined numerical bounds.
-- **Pending**: Work is in progress or planned for a later phase; no scientific claim is asserted yet.
+| ID | Claim | Evidence and scope | Status |
+|---|---|---|---|
+| R-CAPACITY | Exact arbitrary finite-address recall requires at least m^n states | Capacity.exact_recall_capacity (namespace Aurelis.V2, theorem exact_recall_capacity); deterministic finite-state premise | Lean-checked; bit corollary analytic |
+| R-WRITE | Gated delta evaluation is linear in query; unit-key beta=1 writes the supplied value at that key | deltaRead_add, deltaRead_exact_write | Lean-checked; known update, not novelty |
+| R-STABILITY | Rank-one row transition is nonexpansive when beta≥0 and beta·norm(key)²≤2 | deltaTransition_energy/nonexpansive, decayed_delta_nonexpansive | Lean-checked; fixed inputs, not global training stability |
+| R-HANDOFF | Recent/remote occurrence lists partition history | handoff_partition, recent_length_le_window | Lean-checked; implementation pending |
+| R-TRANSPORT | Transport error decomposition, conditional linear reproduction and one-hot hit | corrected_error_identity/reproduces_linear/exact_hit | Lean-checked for any linear map; bounded predictor only |
+| R-COMPLETE | Completed output normalizes selected values plus predicted unread mass | completedRead_balance | Lean-checked |
+| R-ERROR | Vector error has residual and denominator-uncertainty terms | completion_error_identity | Lean-checked in real normed spaces |
+| R-CERT | Midpoint completion error obeys paper (10) | completedRead_certificate, residual_certificate, midpoint_error | Lean-checked conditional on valid envelopes |
+| R-ENVELOPE | Score intervals and weighted residual bounds support page envelopes | exp_score_interval, weighted_residual_bound, coordinate_product_interval, dot_box_interval, page_mass_interval, page_residual_ball; paper (11)–(12) | Lean-checked arithmetic; full page construction/correspondence pending |
+| R-FULL | Zero unread mass reduces completion to full selected attention | completedRead_full | Lean-checked algebra; real arithmetic, same Q/K/V |
+| R-GROUPED | Per-page predictor comparator has bound (13) | Paper §6.3 | Analytic; not yet Lean-checked |
+| R-COST | Bounded mode removes the precision matrix and per-token ridge factorization | Equations (2)–(3), cost model (15) | Design accounting; no measured speedup |
+| R-ARCHIVE | Exact archive and metadata grow with history; worst-case full read is linear per query | State definition and cost model | Analytic; implementation pending |
+| H-RECURRENCE | Recurrent completion improves cost at fixed error vs strongest cheap completion | Required phases 4–8 | Hypothesis; no result |
+| H-LM | New architecture preserves useful trained LM/recall quality | Required phases 6–8 | Pending |
+| H-DEPLOY | Meets registered quality/SLO/cost and failure-handling criteria | Required phases 7–8 | Pending |
+| H-NOVELTY | The precise coupling is a distinct useful contribution beyond prior art | Literature ledger plus required ablations | Candidate; priority and value unestablished |
+| H-FP | Production arithmetic returns sound enclosures | Required phase 3 numerical proof/correspondence | Pending; fp64 tests alone are insufficient |
 
-| Claim ID | Claim Summary | Direct Evidence | Lean Coverage | Current Status & Scope |
-|---|---|---|---|---|
-| **AUR-HANDOFF-1** | Recent `take w` and remote `drop w` partition history exactly once without double-counting | Manuscript Lemma 5.1; `tests/test_partition.py`; Phase 0 & 1 logs | `handoff_partition` | Proved, Lean-checked, and verified against the streaming ring buffer. |
-| **AUR-STATE-1** | Nonnegative rank-one evidence updates preserve positive semi-definiteness; prior ensures unique solve | Manuscript Appendix A.4 | `precision_update_posSemidef`, `regularized_precision_posDef`, `regularized_precision_isUnit` | Proved and Lean-checked for real finite matrices. |
-| **AUR-SCAN-1** | Scalar-decayed remote statistics compose associatively, enabling parallel prefix scans | Manuscript Eq. 7.2 | `Affine.combine_assoc`, `Affine.aggregate_correct` | Proved and Lean-checked. |
-| **AUR-RESID-1** | Full-residual error decomposes into the local residual plus the remote slope error on $(q - \bar{k})$ | Manuscript Theorem 5.2; independent fp64 oracle comparison | `corrected_error_identity`, `weighted_residual_identity` | Proved, Lean-checked, and verified in dual implementations. |
-| **AUR-LIN-1** | If the remote linear map is exact, the full residual reproduces it regardless of attention smoothing | Manuscript Corollary 5.3; measured residual error $2.285 \times 10^{-16}$ | `corrected_reproduces_linear` | Proved, Lean-checked, and verified in float64. |
-| **AUR-HIT-1** | A one-hot cached hit with episodic override recovers the stored value exactly, ignoring remote state | Manuscript Corollary 5.4; fp64 error `0.0` | `corrected_exact_hit` | Proved, Lean-checked; finite softmax approximates one-hot. |
-| **AUR-RIDGE-1** | Scalar ridge slope error is bounded by the prior, minimum remote eigenvalue, and residual query norm | Manuscript Prop. 5.5; Phase 1 parameter sweeps | `scalar_ridge_slope_error`, `scalar_ridge_residual_bound` | Scalar case proved and Lean-checked; matrix spectral bound is verified empirically. |
-| **AUR-COV-1** | Under the disjoint linear-Gaussian model, remote and residual error covariance is $q^T P^{-1}(q - \bar{k})$ | Manuscript Section 6; 50,000-run Monte Carlo sweep | Scalar reductions | Analytic derivation confirmed by Monte Carlo within $0.293\%$ relative error. |
-| **AUR-GATE-1** | The closed-form projected Bayes gate minimizes conditional MSE among all convex mixtures | Manuscript Theorem 6.1; dense grid sweeps | `routeVariance_completion`, `clippedGate_optimal` | Proved, Lean-checked, and verified across all test suites. |
-| **AUR-TARGET-1** | Latent linear relation denoising and exact exception recall pull in opposite directions when targets conflict | Manuscript Prop. 6.2; synthetic conflict sweeps | `corrected_exact_hit` | Proved mathematically; demonstrated on synthetic tasks. |
-| **AUR-COST-1** | Inference decode memory state is strictly constant $O(1)$ with respect to total context length | Manuscript Section 7.1; `tests/test_phase6.py`; TPU memory traces | Not formalized | Proved by construction; verified on Cloud TPU v4 ($8\times$ memory reduction at 4k context). |
-| **AUR-TRAIN-1** | State construction is $O(L)$ associative scan; exact all-prefix solves require dense solves or iterative approximations | Manuscript Section 7.2 | Scan algebra only | Proved arithmetic counts; iterative and chunked solvers implemented. |
-| **AUR-TPU-1** | Eager, compiled, and custom JAX/XLA TPU kernel paths agree with fp64 references on Cloud TPU v4 Pod | `results/phase0/environment.json`, `results/phase6/metrics.json` | None | Verified on Cloud TPU v4 Pod with residual errors $< 10^{-6}$. |
-| **AUR-GATE-2** | Full cross-covariance gating beats the independence heuristic when remote and local errors correlate | Manuscript Theorem 6.1; Phase 2 correlated test suite ($z \ge 5.0$) | `clippedGate_le_clippedIndependentGate` | Proved, Lean-checked, and empirically verified. |
-| **AUR-SEP-1** | Hybrid mechanisms show distinct tradeoffs across parameter, dimension, FLOP, and state budgets | Phase 2 baselines matrix (10 baselines, 9 suites) | None | Verified across Mesa, DeltaNet, Linear Attention, and AURELIS. |
-| **AUR-LEARN-1** | Learned projections and straight-through episodic routing preserve the core theoretical mechanism | Phase 3 results (7 task families, 5 paired seeds) | `episodicGate`, `episodicGate_ge_bayes`, `cache_overlap_redundancy` | Proved, Lean-checked, and verified (AUROC 1.000, $R^2 = 0.948$). |
-| **AUR-LM-1** | AURELIS matches Transformer and SSM Hybrid language modeling viability while maintaining $O(1)$ decode state | Phase 6 results (`results/phase6/metrics.json`, `results/phase6/PASS.md`) | None | Verified on Cloud TPU v4 across 125M and 350M scales; multi-billion token scaling targets Phase 7/8. |
+## Retired publication evidence
 
-Machine-readable numerical records live in `analysis/results/summary.json` and `results/`. Lean formal coverage and theorem boundaries are documented in [`lean/PROOF_COVERAGE.md`](lean/PROOF_COVERAGE.md).
+The old 8× “measured” state-memory reduction was based on formula accounting
+in the audited evaluator. Its recall and exception MSE values were assigned,
+and its decode timing did not carry a populated prefix cache. These are not
+accepted as evidence of trained recall, measured cached decode performance,
+or large-scale LM parity. See [the source audit](research/V1_AUDIT.md).
+
+Legacy ridge definiteness/router algebra remains under its own assumptions,
+but v2 has no Bayesian posterior or Bayes-optimal gate. No old empirical PASS
+is inherited. Standard Lean foundational axioms are not “zero assumptions.”

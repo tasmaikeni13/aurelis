@@ -4,3 +4,7 @@ import Aurelis.MatrixState
 import Aurelis.ResidualCorrection
 import Aurelis.Router
 import Aurelis.Softmax
+import Aurelis.DeltaMemory
+import Aurelis.CertifiedRead
+import Aurelis.Capacity
+import Aurelis.PageEnvelope

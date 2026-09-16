@@ -1,71 +1,40 @@
-# Phase 2 — Hybrid mechanism separation and matched baselines
+# Phase 2 — Streaming semantics and exact archive reference
 
-Start only after Phase 1 PASS. Read the paper, literature review, all prior
-evidence, and `phases/AUTONOMY_PROTOCOL.md`. Execute the failure-repair loop
-until every gate passes.
+Depends on phases 0–1. Implement state/types/model interfaces in the migration
+map, plus new scripts/tests/configs. This is correctness-first implementation.
 
-The purpose is not to force AURELIS to win. It is to identify regimes in which
-each defining component changes the answer under fair state and compute
-budgets.
+## Adaptive start gate
 
-## Baselines and ablations
+This phase consumes the Phase 1 equations and formal correspondence. If any
+later discovery changes causality, state layout, write order, snapshot
+contents, or the meaning of an archive observation, invalidate Phase 2 and all
+descendants. Regenerate this semantic reference first and rerun the closure.
 
-Implement equation-tested versions of:
+## Deliver
 
-- local softmax attention only;
-- remote Bayesian ridge only;
-- global positive-feature linear attention;
-- delta-rule/Gated-Delta-style memory;
-- cumulative least-squares/Mesa-style remote memory;
-- simple learned sum or concatenation of local and remote outputs;
-- inverse-variance fusion that incorrectly assumes endpoint independence;
-- full-residual output with fixed `g=1`;
-- AURELIS-B and AURELIS-E; and
-- if feasible, a Native-Hybrid-like recurrent-slot plus recent-token softmax.
+Implement S, recent ring with source-position gates, exactly-once eviction
+writes, bounded read (3), and append-only raw archive. Archive data retains
+causal occurrence IDs and original encoding. Build exact selected sums and
+full-history softmax reference; implement midpoint completion (8).
+Reference archive mode may read everything. Do not claim retrieval speed yet.
 
-Verify each baseline equation on tiny hand-computable cases. Compare in four
-views: same feature dimension, same parameter count, same live-state bytes,
-and approximately same measured FLOPs. Do not collapse them into one ranking.
+Expose reset/snapshot/restore/fork/cancel and read statuses from the contract.
+Implement actual populated-cache autoregressive decode. Make token-by-token
+execution, multi-token prefill, and continuation agree for both modes under
+the same math and precision. Use per-query causal masks in partial pages;
+index construction may not leak later observations.
 
-## Falsification suites
+## Gates
 
-Include at minimum:
+Exercise t below/equal/above w, empty remote state, multiple page boundaries,
+duplicate content with distinct IDs, packed examples, variable lengths, and
+interleaved requests. Verify no cross-request state contamination.
+Reading pages never writes S; retrying a read never duplicates an observation.
+Prefix snapshots restore the complete state tuple. Rejected speculative tokens
+can be rolled back by a correctness reference before optimizing it.
 
-- exact linear maps with diffuse attention;
-- nonlinear maps where remote linear transport should fail;
-- recent exceptions and remote exceptions;
-- correlated keys and convex-hull/first-moment failures;
-- denoising with known and corrupted evidence;
-- cache-boundary queries;
-- arbitrary associative recall below/above rank and window capacity;
-- adversarial distractors and confidently wrong local matches; and
-- context-length/state-byte/latency sweeps.
-
-For every row retain endpoint errors, routed error, gate, attention entropy,
-selected-key margin, `||q-kbar||`, posterior quadratic forms, rank,
-conditioning, state bytes, FLOPs, and synchronized prepared latency.
-
-## Research repair requirement
-
-When a baseline or AURELIS regime contradicts the paper, research the closest
-primary literature and derive the mechanism. If the residual formula requires
-a new premise, add the premise and a counterexample to the paper and Lean where
-formalizable. If a baseline is stronger than expected, preserve that result and
-promote it to later phases.
-
-## PASS gates
-
-- Every baseline passes its own equation tests and receives a fair budget.
-- Linear reproduction benefit is isolated from temperature, parameter, and
-  state-size confounds.
-- AURELIS-B's advantage in matched Gaussian regimes survives across every seed
-  and agrees with its predicted variance within uncertainty.
-- AURELIS-E's recent exception benefit is isolated from the Bayes objective;
-  neither is marketed as universal.
-- At least one nonlinear/misspecified regime with no AURELIS advantage is
-  retained and explained.
-- Capacity failures remain visible and agree with rank/window limits.
-- The full covariance gate outperforms or equals the independence heuristic on
-  a constructed correlated-endpoint suite.
-- All inherited tests and Lean proofs pass, and
-  `results/phase2/PASS.md` satisfies the shared PASS record.
+Measure live tensor state as context grows; bounded state must plateau after
+the window fills. Archive bytes must grow as predicted and be labeled by tier.
+A wrong archive length/index version must fail rather than return a certificate.
+PASS requires streaming/history agreement and true cached decode, not isolated
+one-token forward timings.

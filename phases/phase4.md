@@ -1,45 +1,47 @@
-# Phase 4 — Nonstationarity, compositional access, and capacity limits
+# Phase 4 — Falsification and novelty-critical comparisons
 
-Start only after Phase 3 PASS. Read all prior artifacts and
-`phases/AUTONOMY_PROTOCOL.md`. Apply the failure-repair loop until PASS.
+Depends on phases 0–3. This phase decides whether the recurrent-completion
+idea merits accelerator/training investment.
 
-This phase tests the principal ways an undiscounted remote relation can become
-wrong. Extensions are allowed only after deriving their changed semantics.
+## Adaptive start gate
 
-## Required suites
+This phase tests whether the current mechanism earns its cost. If a comparator,
+metric, certificate, or evaluator is found invalid, mark the earliest affected
+phase and this phase STALE; preserve old comparisons under their parent
+revision. Re-preregister changed gates and rerun the complete comparison
+matrix after the repair.
 
-- abrupt and gradual operator drift with observable and unobservable changes;
-- heterogeneous write precision, corrupted precision labels, outliers,
-  Student-like noise, and nonlinear misspecification;
-- repeated updates, overrides, many-to-one mappings, and state pollution;
-- pointer chasing and multi-hop composition at hops `{1,2,4,8,16}`;
-- cache/remote mixed-hop chains in every order;
-- rank, state-byte, and adversarial-association capacity sweeps; and
-- sequences at least 16 times longer than training length.
+## Required comparators
 
-Compare the undiscounted state with researched extensions such as tempered
-evidence, observable-cue decay, run-length beliefs, protected memory, or sparse
-fallback. Do not call a learned forget action a changepoint posterior unless an
-explicit probabilistic state supports that claim. Any decay changes the scan,
-posterior, variance, and gate equations; update theory, numerical oracle, Lean
-coverage, and tests before using its results.
+Use identical Q/K/V, archive pages, encoding, epsilon, and accounting for:
+local-value completion; zero completion; summary-based global completion;
+per-page center completion (13); recurrence with simple additive/gated fusion;
+sparse attention with no completion; value-blind mass selection; and AURELIS-R.
+Retain full softmax and historical ridge as references. Compare at equal total
+state/index budgets as well as equal fetched-KV budgets.
 
-For multi-hop reads, distinguish adaptive round count, vector error, decoded
-success, operator norm, confidence, and actual latency. One attention read and
-`H` adaptive reads are different computational budgets.
+## Experiments
 
-## PASS gates
+Sweep known structured linear relations mixed with rare exceptions; random
+incompressible associations; diffuse attention; large value outliers; repeated
+keys with different values; near-collisions; delayed disambiguation; abrupt
+drift; multi-hop queries; and retrieval at window/page boundaries.
+Include contexts where certificate metadata costs more than dense reads.
 
-- The stationary method retains its Phase 3 behavior on stationary controls.
-- A drift-aware variant improves post-change risk on every paired seed when an
-  observable signal exists, and unobservable-change limitations are retained.
-- Evidence weighting improves heteroscedastic risk when precision is valid and
-  degrades transparently when precision is corrupted.
-- Mixed cache/remote multi-hop chains meet preregistered vector and decoded
-  gates through the declared hop count, with error-propagation diagnostics.
-- Rank/state lower-bound failures remain present; no fixed-state unlimited
-  recall claim appears.
-- Every extension has updated mathematics, a faithful formalization where
-  feasible, a regression test, and an ablation against the base head.
-- All inherited gates and Lean proofs pass, and
-  `results/phase4/PASS.md` satisfies the shared PASS record.
+Ablate delayed versus immediate writes, transport versus local values,
+recurrence dimension, mass correction, residual-sensitive selection, and
+summary quality. Charge index build/write, predictor compute, summary scans,
+sorting, and transfers. Error≤bound alone is not a useful research outcome.
+
+## Decision
+
+Evaluate H2 at the preregistered tolerance/quality budgets. If recurrence does
+not beat the strongest cheap completion, record FAILED_HYPOTHESIS and retire
+the claim that it makes certified retrieval cheaper. Do not scale merely because
+AURELIS beats a weak zero-predictor baseline. A bounded-mode result may be
+reported separately, with its own H4 outcome.
+
+PASS requires a distinct surviving mechanism with paired uncertainty estimates,
+reproducible counterexamples outside its useful regime, and an updated novelty
+comparison against ResKV, Quest, certified quantized attention, and hybrid memory.
+Synthetic results justify further experiments, not industry readiness.
