@@ -11,7 +11,7 @@ from torch import Tensor, nn
 import torch.nn.functional as F
 
 from .config import LMConfig
-from .hip_kernels import hip_fused_residual_gate
+from .tpu_kernels import tpu_fused_residual_gate
 from .transformer import RMSNorm, RotaryEmbedding, SwiGLUMLP, apply_rotary_pos_emb
 
 
@@ -164,7 +164,7 @@ class AurelisAttentionBlock(nn.Module):
             g = g_B
 
         # Fused residual gate
-        y = hip_fused_residual_gate(remote, vbar, mapped_kbar, g)
+        y = tpu_fused_residual_gate(remote, vbar, mapped_kbar, g)
         out = y.transpose(1, 2).contiguous().view(B, L, H * D_v)
 
         # Save decode cache from end of sequence
@@ -244,7 +244,7 @@ class AurelisAttentionBlock(nn.Module):
         else:
             g = g_B
 
-        y = hip_fused_residual_gate(remote, vbar, mapped_kbar, g)
+        y = tpu_fused_residual_gate(remote, vbar, mapped_kbar, g)
         out = y.transpose(1, 2).contiguous().view(B, 1, H * D_v)
 
         new_cache = AurelisDecodeCache(

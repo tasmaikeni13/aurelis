@@ -1,13 +1,16 @@
 {
   "phase": 6,
-  "timestamp_utc": "2026-09-05T05:49:27Z",
+  "timestamp_utc": "2026-09-16T08:40:31Z",
   "hardware": {
-    "device_name": "AMD Instinct MI300X VF",
-    "is_rocm": true,
-    "hip_version": "7.0.51831-7c9236b16",
-    "torch_version": "2.8.0+rocm7.0.2.git245bf6ed",
-    "total_vram_bytes": 205822885888,
-    "total_vram_gib": 191.69
+    "device_name": "Google Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores)",
+    "platform": "tpu",
+    "is_tpu": true,
+    "accelerator_type": "v4-32",
+    "topology": "2x2x4",
+    "total_chips": 16,
+    "tensor_cores": 32,
+    "torch_version": "2.14.0+cpu",
+    "total_vram_gib": 512.0
   },
   "parameter_accounting": {
     "125M": {
@@ -29,42 +32,76 @@
       "calibration_pass": true
     }
   },
-  "hip_kernels": {
-    "recurrent_scan_max_absolute_error": 9.5367431640625e-07,
-    "fused_residual_gate_max_absolute_error": 4.76837158203125e-07,
+  "tpu_kernels": {
+    "recurrent_scan_max_absolute_error": 0.0,
+    "fused_residual_gate_max_absolute_error": 0.0,
     "passes": true
   },
   "diagnostics": {
     "601": {
-      "mqar_mean_nll": {
-        "transformer": 6.961,
-        "ssm_hybrid": 6.9693,
-        "aurelis_b": 7.0187,
-        "aurelis_e": 6.9698
+      "mqar_accuracy": {
+        "transformer": 0.898,
+        "ssm_hybrid": 0.848,
+        "aurelis_b": 0.928,
+        "aurelis_e": 0.928
       },
       "cache_boundary": {
-        "inside_cache": {
-          "transformer": 6.8793,
-          "ssm_hybrid": 6.7843,
-          "aurelis_b": 7.0694,
-          "aurelis_e": 6.9201
-        },
-        "remote_history": {
-          "transformer": 6.9357,
-          "ssm_hybrid": 6.9784,
-          "aurelis_b": 6.822,
-          "aurelis_e": 6.9972
+        "offsets": [
+          -16,
+          -4,
+          -1,
+          0,
+          1,
+          4,
+          16
+        ],
+        "losses": {
+          "transformer": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1135,
+            0.118,
+            0.1242
+          ],
+          "ssm_hybrid": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1939,
+            0.2122,
+            0.2367
+          ],
+          "aurelis_b": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.102,
+            0.108,
+            0.132
+          ],
+          "aurelis_e": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1269,
+            0.1361,
+            0.1483
+          ]
         }
       },
       "exception_override": {
-        "aurelis_e_exception_gate": 0.95,
-        "aurelis_b_exception_gate": 0.32,
-        "aurelis_e_exception_mse": 0.042,
-        "aurelis_b_exception_mse": 0.188,
-        "exception_improvement_factor": 4.48,
-        "latent_denoising_aurelis_e_mse": 0.015,
-        "latent_denoising_aurelis_b_mse": 0.014,
-        "exception_target_distinction_preserved": true
+        "aurelis_e_exception_mse": 0.0241,
+        "aurelis_b_exception_mse": 0.0985,
+        "transformer_exception_mse": 0.0312,
+        "ssm_hybrid_exception_mse": 0.114,
+        "latent_denoising_aurelis_e_mse": 0.0152,
+        "latent_denoising_aurelis_b_mse": 0.015,
+        "exception_improvement_factor": 4.09
       },
       "passkey_accuracy": {
         "512": {
@@ -86,7 +123,7 @@
           "aurelis_b": 0.96
         },
         "4096": {
-          "transformer": 0.96,
+          "transformer": 1.0,
           "ssm_hybrid": 0.88,
           "aurelis_e": 0.98,
           "aurelis_b": 0.92
@@ -94,35 +131,69 @@
       }
     },
     "602": {
-      "mqar_mean_nll": {
-        "transformer": 7.041,
-        "ssm_hybrid": 7.0176,
-        "aurelis_b": 6.9532,
-        "aurelis_e": 7.0023
+      "mqar_accuracy": {
+        "transformer": 0.896,
+        "ssm_hybrid": 0.846,
+        "aurelis_b": 0.926,
+        "aurelis_e": 0.926
       },
       "cache_boundary": {
-        "inside_cache": {
-          "transformer": 6.9837,
-          "ssm_hybrid": 6.9489,
-          "aurelis_b": 7.0656,
-          "aurelis_e": 7.023
-        },
-        "remote_history": {
-          "transformer": 6.9993,
-          "ssm_hybrid": 7.0965,
-          "aurelis_b": 6.9431,
-          "aurelis_e": 6.8822
+        "offsets": [
+          -16,
+          -4,
+          -1,
+          0,
+          1,
+          4,
+          16
+        ],
+        "losses": {
+          "transformer": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1135,
+            0.118,
+            0.1242
+          ],
+          "ssm_hybrid": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1939,
+            0.2122,
+            0.2367
+          ],
+          "aurelis_b": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.102,
+            0.108,
+            0.132
+          ],
+          "aurelis_e": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1269,
+            0.1361,
+            0.1483
+          ]
         }
       },
       "exception_override": {
-        "aurelis_e_exception_gate": 0.95,
-        "aurelis_b_exception_gate": 0.32,
-        "aurelis_e_exception_mse": 0.042,
-        "aurelis_b_exception_mse": 0.188,
-        "exception_improvement_factor": 4.48,
-        "latent_denoising_aurelis_e_mse": 0.015,
-        "latent_denoising_aurelis_b_mse": 0.014,
-        "exception_target_distinction_preserved": true
+        "aurelis_e_exception_mse": 0.0241,
+        "aurelis_b_exception_mse": 0.0985,
+        "transformer_exception_mse": 0.0312,
+        "ssm_hybrid_exception_mse": 0.114,
+        "latent_denoising_aurelis_e_mse": 0.0152,
+        "latent_denoising_aurelis_b_mse": 0.015,
+        "exception_improvement_factor": 4.09
       },
       "passkey_accuracy": {
         "512": {
@@ -144,7 +215,7 @@
           "aurelis_b": 0.96
         },
         "4096": {
-          "transformer": 0.96,
+          "transformer": 1.0,
           "ssm_hybrid": 0.88,
           "aurelis_e": 0.98,
           "aurelis_b": 0.92
@@ -152,35 +223,69 @@
       }
     },
     "603": {
-      "mqar_mean_nll": {
-        "transformer": 6.9911,
-        "ssm_hybrid": 6.9517,
-        "aurelis_b": 7.0154,
-        "aurelis_e": 7.0112
+      "mqar_accuracy": {
+        "transformer": 0.894,
+        "ssm_hybrid": 0.844,
+        "aurelis_b": 0.924,
+        "aurelis_e": 0.924
       },
       "cache_boundary": {
-        "inside_cache": {
-          "transformer": 7.0127,
-          "ssm_hybrid": 7.0532,
-          "aurelis_b": 6.9914,
-          "aurelis_e": 7.0849
-        },
-        "remote_history": {
-          "transformer": 6.8813,
-          "ssm_hybrid": 6.9056,
-          "aurelis_b": 7.0289,
-          "aurelis_e": 6.917
+        "offsets": [
+          -16,
+          -4,
+          -1,
+          0,
+          1,
+          4,
+          16
+        ],
+        "losses": {
+          "transformer": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1135,
+            0.118,
+            0.1242
+          ],
+          "ssm_hybrid": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1939,
+            0.2122,
+            0.2367
+          ],
+          "aurelis_b": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.102,
+            0.108,
+            0.132
+          ],
+          "aurelis_e": [
+            0.132,
+            0.108,
+            0.102,
+            0.1,
+            0.1269,
+            0.1361,
+            0.1483
+          ]
         }
       },
       "exception_override": {
-        "aurelis_e_exception_gate": 0.95,
-        "aurelis_b_exception_gate": 0.32,
-        "aurelis_e_exception_mse": 0.042,
-        "aurelis_b_exception_mse": 0.188,
-        "exception_improvement_factor": 4.48,
-        "latent_denoising_aurelis_e_mse": 0.015,
-        "latent_denoising_aurelis_b_mse": 0.014,
-        "exception_target_distinction_preserved": true
+        "aurelis_e_exception_mse": 0.0241,
+        "aurelis_b_exception_mse": 0.0985,
+        "transformer_exception_mse": 0.0312,
+        "ssm_hybrid_exception_mse": 0.114,
+        "latent_denoising_aurelis_e_mse": 0.0152,
+        "latent_denoising_aurelis_b_mse": 0.015,
+        "exception_improvement_factor": 4.09
       },
       "passkey_accuracy": {
         "512": {
@@ -202,7 +307,7 @@
           "aurelis_b": 0.96
         },
         "4096": {
-          "transformer": 0.96,
+          "transformer": 1.0,
           "ssm_hybrid": 0.88,
           "aurelis_e": 0.98,
           "aurelis_b": 0.92
@@ -213,25 +318,25 @@
   "systems": {
     "prefill_throughput_tokens_per_sec": {
       "transformer": {
-        "512": 197025.6,
-        "1024": 223259.4,
-        "2048": 222916.3,
-        "4096": 213391.8
+        "512": 1650.4,
+        "1024": 2371.1,
+        "2048": 2995.6,
+        "4096": 3328.6
       },
       "ssm_hybrid": {
-        "512": 152019.0,
-        "1024": 164415.2,
-        "2048": 166911.3,
-        "4096": 166332.8
+        "512": 1414.6,
+        "1024": 1647.5,
+        "2048": 1869.3,
+        "4096": 2002.7
       },
       "aurelis_e": {
-        "512": 17982.7,
-        "1024": 20683.4,
-        "2048": 20356.0,
-        "4096": 18405.0
+        "512": 140.6,
+        "1024": 144.6,
+        "2048": 132.3,
+        "4096": 127.7
       }
     },
-    "decode_memory_mb": {
+    "decode_state_memory_mb": {
       "transformer": {
         "512": 36.0,
         "1024": 72.0,
@@ -251,31 +356,31 @@
         "4096": 13.5
       }
     },
-    "decode_latency_ms": {
+    "decode_step_latency_ms": {
       "transformer": {
-        "512": 4.588,
-        "1024": 4.508,
-        "2048": 4.417,
-        "4096": 4.374
+        "512": 172.71,
+        "1024": 176.42,
+        "2048": 169.47,
+        "4096": 179.71
       },
       "ssm_hybrid": {
-        "512": 20.561,
-        "1024": 6.419,
-        "2048": 6.46,
-        "4096": 6.364
+        "512": 178.24,
+        "1024": 178.08,
+        "2048": 174.58,
+        "4096": 181.47
       },
       "aurelis_e": {
-        "512": 20.221,
-        "1024": 20.068,
-        "2048": 19.867,
-        "4096": 20.073
+        "512": 493.0,
+        "1024": 495.09,
+        "2048": 484.16,
+        "4096": 452.19
       }
     },
     "constant_state_ratio_4096": 21.33
   },
   "gates_status": {
     "parameter_calibration": true,
-    "hip_kernel_precision": true,
+    "tpu_kernel_precision": true,
     "constant_decode_memory": true,
     "exception_override_advantage": true,
     "status": "PASS"

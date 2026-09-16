@@ -6,9 +6,11 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+UTC = timezone.utc
 
 REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "results" / "phase2"

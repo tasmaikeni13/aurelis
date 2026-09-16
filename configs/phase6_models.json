@@ -1,7 +1,7 @@
 {
   "phase": 6,
   "description": "Phase 6: Language-Model Viability and Comparative Publication Gate for AURELIS vs Transformer vs SSM+Attention Hybrid across 125M and 350M scales",
-  "hardware_target": "AMD Instinct MI300X VF (gfx942)",
+  "hardware_target": "Google Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores)",
   "candidates": [
     {
       "name": "aurelis_e",
@@ -100,7 +100,7 @@
   },
   "gates": {
     "parameter_calibration_tolerance": 0.08,
-    "hip_kernel_max_abs_error": 1e-5,
+    "tpu_kernel_max_abs_error": 1e-5,
     "mqar_aurelis_min_accuracy": 0.85,
     "passkey_min_accuracy_2048": 0.90,
     "constant_decode_memory_enforced": true

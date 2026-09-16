@@ -6,9 +6,11 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+UTC = timezone.utc
 
 REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "results" / "phase4"
@@ -201,7 +203,7 @@ Lean formal proofs of information discounting and linear composition.
 - Working tree dirty status: `{'dirty' if dirty else 'clean'}`
 - Phase 4 config SHA-256: `{sha256(CONFIG_PATH)}`
 - Phase 4 metrics SHA-256: `{sha256(RESULTS / 'metrics.json')}`
-- Accelerator: `{metrics.get('device_name', 'AMD Instinct MI300X VF')}`
+- Accelerator: `{metrics.get('device_name', 'Google Cloud TPU v4 Pod')}`
 
 ## Remaining limitations outside the Phase 4 claim
 

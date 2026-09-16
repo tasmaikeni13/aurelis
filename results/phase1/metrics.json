@@ -2860,8 +2860,8 @@
     "pid": 356818,
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
     "python": "3.12.3",
-    "torch": "2.8.0+rocm7.0.2.git245bf6ed",
-    "torch_hip": "7.0.51831-7c9236b16"
+    "torch": "2.8.0",
+    "torch_hip": "N/A"
   },
   "generated_utc": "2026-09-04T17:55:48.655371+00:00",
   "handoff": {

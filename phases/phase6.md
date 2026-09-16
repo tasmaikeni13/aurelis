@@ -49,7 +49,7 @@ medium-scale scaling readiness:
 
 Parameters across all three candidates must be calibrated within $\pm 3\%$ at each scale.
 
-## Implementations & ROCm/HIP Optimizations
+## Implementations & Cloud TPU v4 Pod Optimizations
 
 Provide complete, self-contained modular implementations in `src/aurelis/models/`:
 
@@ -58,9 +58,10 @@ Provide complete, self-contained modular implementations in `src/aurelis/models/
 - `hybrid_ssm.py`: Strong SSM + Attention Hybrid with selective scan and attention blocks.
 - `aurelis_lm.py`: Full AURELIS Language Model with sliding cache, delayed Bayesian state,
   innovation residual routing, Pre-RMSNorm, SwiGLU, and constant-state decoding.
-- `hip_kernels.py`: Accelerated HIP / ROCm kernels and fused operators targeting AMD Instinct
-  MI300X (`gfx942`) for recurrent state updates, fast associative scans, and fused gating,
-  with transparent PyTorch eager/Triton fallback.
+- `tpu_kernels.py`: Accelerated JAX/XLA/HLO kernels and fused operators targeting Cloud TPU v4 Pod
+  for recurrent state updates, fast associative scans, fused RMSNorm/SwiGLU, and fused gating,
+  with transparent PyTorch eager fallback.
+- `jax_aurelis.py`: Native JAX/XLA implementation of AURELIS attention block with JIT compilation.
 
 ## Diagnostic & Natural Language Benchmark Suite
 
@@ -73,17 +74,17 @@ Evaluate all three candidates at both scales across:
 5. **Multi-Hop Pointer Chains**: Mixed recent/remote pointer chasing.
 6. **Passkey Retrieval / Needle-In-A-Haystack**: Needle retrieval at extended contexts (up to 4096).
 7. **FineWeb-Edu Language Modeling**: Validation perplexity and loss convergence.
-8. **Systems Profiling (AMD Instinct MI300X)**:
+8. **Systems Profiling (Google Cloud TPU v4 Pod)**:
    - Prefill throughput (tokens/second) across sequence lengths $\{512, 1024, 2048, 4096\}$.
    - Per-token decode latency (ms/token).
-   - Peak VRAM allocation during training and inference.
+   - Peak HBM allocation during training and inference.
    - Active decoding memory footprint ($O(1)$ constant state for AURELIS vs $O(L)$ for Transformer).
 
 ## PASS Gates
 
 - All three architectures (AURELIS, Transformer, SSM + Attention Hybrid) are fully implemented,
   calibrated at both 125M and 350M scales, and pass all parameter accounting and gradient checks.
-- Accelerated HIP/ROCm kernels compile and pass numerical validation against CPU/fp64 references
+- Accelerated JAX/XLA/HLO kernels compile and pass numerical validation against CPU/fp64 references
   with maximum absolute error $< 10^{-5}$ in float32.
 - AURELIS achieves competitive validation perplexity on FineWeb-Edu token distributions within
   the preregistered margin of the Transformer and SSM-Attention Hybrid.
@@ -94,4 +95,3 @@ Evaluate all three candidates at both scales across:
   demonstrating a decisive memory advantage over Transformer at context lengths $\ge 2048$.
 - All unit, regression, and property tests pass cleanly (`pytest`).
 - Generated `results/phase6/PASS.md` satisfies the shared PASS record with full reproduction logs.
-

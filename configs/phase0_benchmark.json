@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "experiment": "aurelis_phase0_mi300x_substrate",
+  "experiment": "aurelis_phase0_tpu_substrate",
   "seed": 20260829,
   "batch": 2,
   "heads": 4,

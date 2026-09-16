@@ -1,4 +1,4 @@
-"""AURELIS transparent reference and ROCm research substrate."""
+"""AURELIS transparent reference and Cloud TPU v4 Pod research substrate."""
 
 from .baselines import (
     baseline_flops,
@@ -41,8 +41,12 @@ from .models import (
     TransformerLM,
     get_125m_config,
     get_350m_config,
-    hip_fused_residual_gate,
-    hip_recurrent_scan,
+    get_tpu_pod_info,
+    init_tpu_pod,
+    tpu_fused_residual_gate,
+    tpu_recurrent_scan,
+    tpu_rmsnorm,
+    tpu_swiglu,
 )
 
 __all__ = [
@@ -68,11 +72,11 @@ __all__ = [
     "full_residual_fixed_gate",
     "get_125m_config",
     "get_350m_config",
+    "get_tpu_pod_info",
     "global_linear_attention",
-    "hip_fused_residual_gate",
-    "hip_recurrent_scan",
     "historical_oracle",
     "independent_inverse_variance_fusion",
+    "init_tpu_pod",
     "initial_state",
     "learned_local_remote_concat",
     "learned_local_remote_sum",
@@ -83,6 +87,9 @@ __all__ = [
     "prepared_aurelis_head",
     "read",
     "remote_bayes_ridge",
+    "tpu_fused_residual_gate",
+    "tpu_recurrent_scan",
+    "tpu_rmsnorm",
+    "tpu_swiglu",
     "vectorized_reference",
 ]
-

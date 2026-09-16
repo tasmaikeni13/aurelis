@@ -20,5 +20,5 @@ The following properties remain outside formal proof and are established experim
 - Dynamic operator drift adaptation speeds and post-change risk convergence under finite training data.
 - Empirical error propagation curves and decoded success rates across multi-hop pointer chasing chains of lengths $\{1, 2, 4, 8, 16\}$.
 - Heteroscedastic noise resilience under empirical Student-$t$ ($\nu=3$) and outlier distributions.
-- Measured accelerator wall-clock latency (ms) scaling as a function of adaptive hop count on AMD Instinct MI300X VF.
+- Measured accelerator wall-clock latency (ms) scaling as a function of adaptive hop count on Google Cloud TPU v4 Pod.
 - Monotonic recall degradation on adversarial dictionary sweeps exceeding subspace rank capacity ($N > d_k$).

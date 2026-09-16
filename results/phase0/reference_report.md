@@ -5,8 +5,8 @@ Status: **PASS**
 | Measure | Observed |
 |---|---:|
 | Random cases | 112 |
-| Maximum streaming/oracle absolute error | 7.105e-14 |
-| Maximum Cholesky/dense/inverse error | 1.776e-15 |
+| Maximum streaming/oracle absolute error | 1.066e-13 |
+| Maximum Cholesky/dense/inverse error | 3.997e-15 |
 | Partition failures | 0 |
 
 The experiment uses CPU/fp64 and independently reconstructs every remote

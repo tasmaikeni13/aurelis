@@ -28,7 +28,7 @@ class LMConfig:
     tie_word_embeddings: bool = True
     ssm_state_dim: int = 16  # For SSM block in hybrid
     ssm_conv_kernel: int = 4  # 1D causal convolution in SSM block
-    use_hip_kernels: bool = True  # Utilize accelerated HIP kernels when on ROCm
+    use_tpu_kernels: bool = True  # Utilize accelerated JAX/HLO kernels when on Cloud TPU v4
 
     @property
     def head_dim(self) -> int:

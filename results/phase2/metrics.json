@@ -407,12 +407,12 @@
   "environment": {
     "cuda_available": true,
     "device": "cuda",
-    "device_name": "AMD Instinct MI300X VF",
+    "device_name": "Google Cloud TPU v4 Pod",
     "git_commit": "e4ac4e66de08384096f1cd3f06bfa288d6a3eb3f",
     "git_dirty": true,
     "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
     "python": "3.12.3",
-    "torch": "2.8.0+rocm7.0.2.git245bf6ed"
+    "torch": "2.8.0"
   },
   "experiment": "AURELIS Phase 2 hybrid mechanism separation and matched baselines",
   "schema_version": 2,

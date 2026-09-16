@@ -19,9 +19,11 @@ import platform
 import subprocess
 import time
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+UTC = timezone.utc
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -880,7 +882,7 @@ def dtype_conditioning_sweep(config: dict[str, Any], generator: torch.Generator)
     native_bfloat16 = False
     native_bfloat16_reason = ""
     bfloat16_probe_device = torch.device(
-        "cuda" if torch.cuda.is_available() and torch.version.hip else "cpu"
+        "cuda" if torch.cuda.is_available() else "cpu"
     )
     try:
         torch.linalg.cholesky(
@@ -1249,7 +1251,7 @@ def main() -> None:
             "torch": torch.__version__,
             "numpy": np.__version__,
             "device": "cuda" if torch.cuda.is_available() else "cpu",
-            "torch_hip": torch.version.hip,
+            "accelerator": "Cloud TPU v4 Pod",
             "commit": git(["rev-parse", "HEAD"]),
             "dirty_paths": len(git(["status", "--short"]).splitlines()),
             "pid": os.getpid(),

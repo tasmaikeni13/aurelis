@@ -10,7 +10,7 @@ from torch import Tensor, nn
 import torch.nn.functional as F
 
 from .config import LMConfig
-from .hip_kernels import hip_recurrent_scan
+from .tpu_kernels import tpu_recurrent_scan
 from .transformer import CausalSelfAttention, RMSNorm, RotaryEmbedding, SwiGLUMLP
 
 
@@ -96,7 +96,7 @@ class SelectiveSSMBlock(nn.Module):
             dBx_scan = dBx_flat.transpose(2, 3)
             dA_scan = dA_flat.transpose(2, 3)
 
-            h_scan = hip_recurrent_scan(dBx_scan, dA_scan)
+            h_scan = tpu_recurrent_scan(dBx_scan, dA_scan)
             h_all = h_scan.squeeze(1).view(B, L, self.d_inner, self.d_state)
             new_prev_h = h_all[:, -1, :, :]
             y = torch.einsum("bldn,bln->bld", h_all, C_proj)

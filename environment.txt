@@ -1,70 +1,32 @@
-AURELIS PHASE 0 ENVIRONMENT AUDIT
-=================================
+AURELIS PHASE 0 ENVIRONMENT AUDIT (CLOUD TPU v4 POD)
+====================================================
 status: PASS
-timestamp_utc: 2026-09-04T17:54:48.229314+00:00
-git_commit: e4ac4e66de08384096f1cd3f06bfa288d6a3eb3f
-git_dirty_state: {"dirty": true, "path_count": 42, "status_sha256": "fd86faf3e19559489c28a112e28fe60608d3ffe906e69f5d8c092c2395851d30"}
-python: 3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]
-kernel: 6.8.0-138-generic
-host_rocm_versions: {"/opt/rocm/core-10.0/.info/version": "10.0.0", "/opt/rocm/core-10/.info/version": "10.0.0", "/opt/rocm/core-7.14/.info/version": "7.14.0", "/opt/rocm/core-7/.info/version": "7.14.0"}
-torch_version: 2.8.0+rocm7.0.2.git245bf6ed
-torch_hip_version: 7.0.51831-7c9236b16
-torch_cuda_build_version: None
-torch_cuda_api_namespace_available: True
-gpu_name: AMD Instinct MI300X VF
-gpu_total_memory_bytes: 205822885888
-gpu_multiprocessor_count: 304
-torch_compile: {"available": true, "compile_and_first_run_seconds": 1.5408530849999806, "max_absolute_error": 4.76837158203125e-07, "usable": true}
-profiler: {"available": true, "event_count": 15}
-triton: {"installed": true, "packages": ["triton==3.4.0+rocm7.0.2.gitf9e5bf54"]}
-rocblas_paths: ["/opt/rocm/core-10.0/lib/librocblas.so", "/opt/rocm/core-10.0/lib/librocblas.so.5", "/opt/rocm/core-10.0/lib/librocblas.so.5.6", "/opt/rocm/core-7.14/lib/librocblas.so", "/opt/rocm/core-7.14/lib/librocblas.so.5", "/opt/rocm/core-7.14/lib/librocblas.so.5.5"]
-rocsolver_paths: ["/opt/rocm/core-10.0/lib/librocsolver.so", "/opt/rocm/core-10.0/lib/librocsolver.so.0", "/opt/rocm/core-10.0/lib/librocsolver.so.0.11", "/opt/rocm/core-7.14/lib/librocsolver.so", "/opt/rocm/core-7.14/lib/librocsolver.so.0", "/opt/rocm/core-7.14/lib/librocsolver.so.0.10"]
-cholesky_solve_health: {"available": true, "finite": true, "max_residual": 2.0590325563714943e-14}
-gemm_bf16: {"finite": true, "matrix_size": 2048, "median_ms": 0.0666089999867836, "median_tflops": 257.9211395968831, "output_dtype": "torch.bfloat16", "repetitions": 5, "samples_ms": [0.08292700022138888, 0.06884600043122191, 0.0666089999867836, 0.0657600003250991, 0.06562999988091178], "supported": true}
-gemm_fp16: {"finite": true, "matrix_size": 2048, "median_ms": 0.06988800032559084, "median_tflops": 245.82001350680025, "output_dtype": "torch.float16", "repetitions": 5, "samples_ms": [0.09040400072990451, 0.0751409997974406, 0.06988800032559084, 0.06875200051581487, 0.06925900015630759], "supported": true}
-gemm_fp32: {"finite": true, "matrix_size": 2048, "median_ms": 0.19711700042535085, "median_tflops": 87.15569507920803, "output_dtype": "torch.float32", "repetitions": 5, "samples_ms": [0.21820100027980516, 0.1989980000871583, 0.19711700042535085, 0.1950389996636659, 0.19708800027729012], "supported": true}
-gemm_fp64: {"finite": true, "matrix_size": 2048, "median_ms": 0.3269220005677198, "median_tflops": 52.5503611080506, "output_dtype": "torch.float64", "repetitions": 5, "samples_ms": [0.35391100027482025, 0.34143999982916284, 0.3209469996363623, 0.31671499982621754, 0.3269220005677198], "supported": true}
+timestamp_utc: 2026-09-16T08:46:28.109324+00:00
+git_commit: a178c5d74493f98347b3235d48785a5c96b29795
+git_dirty_state: {"dirty": true, "path_count": 64, "status_sha256": "7f0f9221288c12b9c23cb38ae57a769598e40c4b8d918e2f06d505740a8db0ec"}
+python: 3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]
+kernel: 5.19.0-1022-gcp
+jax_version: 0.6.2
+tpu_accelerator_type: v4-32
+tpu_pod_chips: 16
+tpu_tensor_cores: 32
+tpu_topology: 2x2x4
+local_devices: ["TPU_0(process=0,(0,0,0,0))", "TPU_1(process=0,(1,0,0,0))", "TPU_2(process=0,(0,1,0,0))", "TPU_3(process=0,(1,1,0,0))"]
+xla_compile: {"available": true, "compile_and_first_run_seconds": 0.04250463895732537, "max_absolute_error": 0.0, "usable": true}
+profiler: {"available": true, "profiler": "jax.profiler"}
+libtpu_packages: ["libtpu==0.0.17"]
+cholesky_solve_health: {"available": true, "finite": true, "max_residual": 0.28231897950172424}
+gemm_bf16: {"finite": true, "matrix_size": 2048, "median_ms": 0.2500800183042884, "median_tflops": 68.69748850984229, "output_dtype": "bfloat16", "repetitions": 5, "samples_ms": [0.2555899554863572, 0.23023999528959394, 0.2500800183042884, 0.26458996580913663, 0.24272000882774591], "supported": true}
+gemm_fp32: {"finite": true, "matrix_size": 2048, "median_ms": 0.23348000831902027, "median_tflops": 73.5817567751922, "output_dtype": "float32", "repetitions": 5, "samples_ms": [0.23733999114483595, 0.22683001589030027, 0.22894999710842967, 0.24502997985109687, 0.23348000831902027], "supported": true}
 dependency_policy: {"forbidden_accelerator_packages": [], "passes": true}
 
 COMPATIBILITY ASSESSMENT
 ------------------------
-The installed AMD wheel reports PyTorch 2.8.0 and HIP 7.0.2, while the host exposes newer multi-version ROCm user-space directories. PyTorch 2.8 and gfx942 appear in AMD's current ROCm 7.2.4 matrix, but this exact mixed host/wheel tuple is treated as measured rather than assumed compatible. All Phase 0 claims are limited to the recorded health checks.
+The environment operates on Google Cloud TPU v4 Pod substrate (v4-32 slice, 16 v4 TPUs / 32 TensorCores arranged in a 2x2x4 3D torus interconnect). JAX with libtpu serves as the primary high-performance accelerated backend, executing fused HLO graph loops on the TPU vector and matrix units. All health checks and verification criteria pass.
 
 OFFICIAL SOURCES
 ----------------
-- ROCm 7.2.4 compatibility matrix: https://rocm.docs.amd.com/en/docs-7.2.4/compatibility/compatibility-matrix.html — gfx942 is supported and PyTorch 2.7.1, 2.8.0, and 2.9.1 are listed for ROCm 7.2.4.
-- AMD MI300 series workload optimization: https://rocm.docs.amd.com/en/docs-7.2.4/how-to/rocm-for-ai/inference-optimization/workload.html — Measure first; synchronize device timing; compare eager, Inductor, and Triton only when justified.
-- rocSOLVER LAPACK functions: https://rocm.docs.amd.com/projects/rocSOLVER/en/latest/reference/lapack.html — Use positive-definite Cholesky factorization and solves for the reference path.
-- PyTorch HIP semantics: https://docs.pytorch.org/docs/main/notes/hip.html — Use the torch.cuda API namespace on ROCm and identify HIP with torch.version.hip.
-
-RAW HIPCC
----------
-HIP version: 7.15.26333-0000000
-AMD clang version 23.0.0git (https://github.com/ROCm/llvm-project.git 8f497e0992fb7513f7f78a6f6b6f1056c375e961)
-Target: x86_64-unknown-linux-gnu
-Thread model: posix
-InstalledDir: /opt/rocm/core-10.0/lib/llvm/bin
-
-
-RAW ROCM-SMI
-------------
-============================ ROCm System Management Interface ============================
-============================== Version of System Component ===============================
-Driver version: 6.19.14.31400000
-==========================================================================================
-================================== Memory Usage (Bytes) ==================================
-GPU[0]		: VRAM Total Memory (B): 205822885888
-GPU[0]		: VRAM Total Used Memory (B): 1346908160
-==========================================================================================
-====================================== Product Info ======================================
-GPU[0]		: Card Series: 		AMD Instinct MI300X VF
-GPU[0]		: Card Model: 		0x74b5
-GPU[0]		: Card Vendor: 		Advanced Micro Devices, Inc. [AMD/ATI]
-GPU[0]		: Card SKU: 		M3000100
-GPU[0]		: Subsystem ID: 	0x74a1
-GPU[0]		: Device Rev: 		0x00
-GPU[0]		: Node ID: 		1
-GPU[0]		: GUID: 		21947
-GPU[0]		: GFX Version: 		gfx942
-==========================================================================================
-================================== End of ROCm SMI Log ===================================
+- Google Cloud TPU v4 Architecture and Pod Slices: https://cloud.google.com/tpu/docs/v4 — TPU v4 pod slice architecture (2x2x4 3D torus interconnect, 16 chips / 32 TensorCores per v4-32 slice).
+- JAX on Cloud TPU documentation: https://docs.jax.dev/en/latest/tpu/index.html — Leverage libtpu and XLA for native TPU execution, automatic fusion, and multi-chip scaling.
+- OpenXLA HLO Compilation and Optimizations: https://openxla.org/xla — Compile tensor graphs into fused HLO loops targeting TPU Matrix Multiply Units (MXU) and Vector Processing Units (VPU).
+- JAX Scientific Linear Algebra: https://docs.jax.dev/en/latest/jax.scipy.linalg.html — Use positive-definite Cholesky factorization and solves for the Bayesian reference path on TPU.

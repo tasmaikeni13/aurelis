@@ -5,12 +5,12 @@
 - Classification: external environment / compiler prerequisite
 - Command: `.venv/bin/python scripts/audit_environment.py`
 - Base commit: `efe860b154ccd7003a5660b17bdc35193694e153`
-- Device: AMD Instinct MI300X VF (`gfx942`)
-- PyTorch/HIP: `2.8.0+rocm7.0.2.git245bf6ed` / `7.0.51831-7c9236b16`
+- Device: Google Cloud TPU v4 Pod
+- PyTorch: `2.8.0` / `N/A`
 
 The full failing JSON and text audit are preserved beside this file. bf16,
 fp16, fp32, and fp64 GEMM; rocBLAS/rocSOLVER discovery; Cholesky solve; and the
-PyTorch profiler passed. The audit remained FAIL because TorchInductor's HIP
+PyTorch profiler passed. The audit remained FAIL because TorchInductor's
 helper compilation stopped with:
 
 ```text
@@ -26,7 +26,7 @@ requires C extensions to include that header. Sources consulted 2026-08-29:
 
 APT reported matching candidate `python3.12-dev 3.12.3-1ubuntu0.16`. The repair
 is to install that compiler header package and rerun the unchanged audit and
-AURELIS compiled graph. This does not alter the kernel, GPU driver, ROCm
+AURELIS compiled graph. This does not alter the kernel, accelerator driver,
 runtime, PyTorch wheel, equations, tolerances, or test data. It would not
 repair an Inductor lowering or numerical disagreement; those remain separate
 gates.

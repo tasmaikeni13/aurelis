@@ -4,7 +4,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO"
 
-echo "=== Running Phase 6 Benchmark Experiment on AMD Instinct MI300X ==="
+echo "=== Running Phase 6 Benchmark Experiment on Cloud TPU v4 Pod ==="
 .venv/bin/python experiments/phase6_benchmarks.py
 
 echo "=== Verifying Phase 6 PASS Gates ==="

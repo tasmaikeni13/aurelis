@@ -10,11 +10,11 @@ from torch import Tensor, nn
 import torch.nn.functional as F
 
 from .config import LMConfig
-from .hip_kernels import hip_rmsnorm, hip_swiglu
+from .tpu_kernels import tpu_rmsnorm, tpu_swiglu
 
 
 class RMSNorm(nn.Module):
-    """Root Mean Square Layer Normalization with accelerated HIP kernel."""
+    """Root Mean Square Layer Normalization with accelerated Cloud TPU v4 kernel."""
 
     def __init__(self, dim: int, eps: float = 1e-6) -> None:
         super().__init__()
@@ -22,7 +22,7 @@ class RMSNorm(nn.Module):
         self.weight = nn.Parameter(torch.ones(dim))
 
     def forward(self, x: Tensor) -> Tensor:
-        return hip_rmsnorm(x, self.weight, self.eps)
+        return tpu_rmsnorm(x, self.weight, self.eps)
 
 
 class RotaryEmbedding(nn.Module):
@@ -61,7 +61,7 @@ def apply_rotary_pos_emb(q: Tensor, k: Tensor, cos: Tensor, sin: Tensor) -> Tupl
 
 
 class SwiGLUMLP(nn.Module):
-    """SwiGLU Feedforward Network with accelerated HIP kernel."""
+    """SwiGLU Feedforward Network with accelerated Cloud TPU v4 kernel."""
 
     def __init__(self, d_model: int, d_ffn: int, bias: bool = False) -> None:
         super().__init__()
@@ -70,7 +70,7 @@ class SwiGLUMLP(nn.Module):
         self.down_proj = nn.Linear(d_ffn, d_model, bias=bias)
 
     def forward(self, x: Tensor) -> Tensor:
-        return self.down_proj(hip_swiglu(self.gate_proj(x), self.up_proj(x)))
+        return self.down_proj(tpu_swiglu(self.gate_proj(x), self.up_proj(x)))
 
 
 class CausalSelfAttention(nn.Module):

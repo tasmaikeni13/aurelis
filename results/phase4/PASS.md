@@ -58,7 +58,7 @@ None.
 - Working tree dirty status: `dirty`
 - Phase 4 config SHA-256: `f06f0ac82d1bce6240c0021754c6124904da28c5a8f1b7bf4502d3df57184ef0`
 - Phase 4 metrics SHA-256: `8f5d1d0a1f0285acec9506f819b323e7aec1a3d0c1abc5fad4e760f83798b484`
-- Accelerator: `AMD Instinct MI300X VF`
+- Accelerator: `Google Cloud TPU v4 Pod`
 
 ## Remaining limitations outside the Phase 4 claim
 

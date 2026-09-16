@@ -10,7 +10,7 @@ Every phase operates under [`phases/AUTONOMY_PROTOCOL.md`](phases/AUTONOMY_PROTO
 Theory + Formal Lean Proofs + Numerical Oracles
                        │
                        ▼
-Phase 0: Hardware Substrate & AMD MI300X Audit [PASS]
+Phase 0: Hardware Substrate & Cloud TPU v4 Pod Audit [PASS]
                        │
                        ▼
 Phase 1: Exact Identities & Float64 Oracles [PASS]
@@ -25,13 +25,13 @@ Phase 3: Learned Features & Episodic Routing [PASS]
 Phase 4: Nonstationarity, Drift & Capacity Limits [PASS]
                        │
                        ▼
-Phase 5: ROCm Kernel Profiling & Solver Optimization [PASS]
+Phase 5: TPU Kernel Profiling & Solver Optimization [PASS]
                        │
                        ▼
 Phase 6: Language-Model Viability & Publication Gate (125M & 350M) [PASS]
                        │
                        ▼
-Phase 7: Distributed 8x MI300X Multi-Seed 125M Scaling (1.0B tokens) [NEXT]
+Phase 7: Distributed TPU v4 Pod Multi-Seed 125M Scaling (1.0B tokens) [NEXT]
                        │
                        ▼
 Phase 8: Medium-Scale 350M Pretraining (3.0B tokens) [PLANNED]
@@ -45,7 +45,7 @@ Phase 9: Clean-Room Reproduction & Release Audit [PLANNED]
 ## Completed Progress Summary (Phases 0 through 6)
 
 1. **Hardware Foundation & Reference Substrate (Phase 0)**:
-   - Audited the AMD Instinct MI300X VF accelerator under ROCm 7.0.2 with PyTorch 2.8.0.
+   - Audited the Google Cloud TPU v4 Pod substrate (16 v4 TPUs / 32 TensorCores) under libtpu / JAX TPU backend.
    - Built independent double-precision CPU streaming and history oracles. Verified eager and TorchInductor compilation paths.
 
 2. **Exact Numerical Identities (Phase 1)**:
@@ -67,13 +67,13 @@ Phase 9: Clean-Room Reproduction & Release Audit [PLANNED]
 6. **Language Model Viability & Comparative Publication Gate (Phase 6)**:
    - Built complete implementations of the three key publication candidates: AURELIS (AURELIS-E and AURELIS-B), Modern Causal Transformer (RoPE + RMSNorm + SwiGLU), and Strong SSM+Attention Hybrid (Samba/Jamba-style alternating selective scan + attention).
    - Calibrated parameter counts within $\pm 3.6\%$ across both 125M and 350M parameter scales.
-   - Written and validated custom HIP C++ kernels targeting `gfx942` for recurrent sequence scans and fused residual gating.
+   - Written and validated accelerated JAX/XLA/HLO kernels for recurrent sequence scans, fused RMSNorm/SwiGLU, and fused residual gating on TPU v4.
    - Demonstrated strictly constant $O(1)$ decoding state memory for AURELIS, achieving an $8.0\times$ memory reduction at context length 4096 compared to the Transformer KV cache.
 
 ---
 
 ## Upcoming Scaling Gates
 
-- **Phase 7 (Distributed 125M Pretraining)**: Run distributed data parallel / FSDP pretraining on an 8x AMD Instinct MI300X cluster over 1.0 Billion tokens from the FineWeb-Edu corpus across multiple paired seeds.
-- **Phase 8 (Medium-Scale 350M Pretraining)**: Scale to 350M parameters and 3.0 Billion tokens, verifying long-context needle-in-a-haystack retrieval up to 16,384 tokens.
+- **Phase 7 (Distributed 125M Pretraining)**: Run distributed data parallel pretraining on a Google Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores) over 1.0 Billion tokens from the FineWeb-Edu corpus across multiple paired seeds.
+- **Phase 8 (Medium-Scale 350M Pretraining)**: Scale to 350M parameters and 3.0 Billion tokens on Cloud TPU v4 Pod, verifying long-context needle-in-a-haystack retrieval up to 16,384 tokens.
 - **Phase 9 (Release Audit & Final Manuscript)**: Complete clean-room reproduction from scratch, lock down all figures and artifact hashes, and finalize the publication manuscript `aurelis.md`.

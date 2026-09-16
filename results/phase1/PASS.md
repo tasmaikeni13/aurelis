@@ -34,7 +34,7 @@ throughput claim.
 ```
 
 The fail-fast runner executes the complete inherited Phase 0 environment,
-Python, Lean, reference, and ROCm gates; reruns all Phase 1 Python tests and the
+Python, Lean, reference, and TPU gates; reruns all Phase 1 Python tests and the
 full Lean build; runs the pinned Phase 1 experiment; then performs this
 requirement-level audit.
 

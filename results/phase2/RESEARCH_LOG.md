@@ -24,6 +24,6 @@
      - Design decision: Formalized in Lean as `clippedGate_le_clippedIndependentGate` and tested in the correlated endpoint suite.
 
 4. **Failure Dispositions and Evaluator Repairs**:
-   - Recorded in `results/phase2/failures/torch_randn_like_generator_api_20260904.md`: PyTorch 2.8 on ROCm `randn_like` generator API repair.
+   - Recorded in `results/phase2/failures/torch_randn_like_generator_api_20260904.md`: PyTorch 2.8 on accelerator `randn_like` generator API repair.
    - Recorded in `results/phase2/failures/linear_reproduction_prior_shrinkage_20260904.md`: Linear reproduction premise $M = W$ isolated from finite-ridge shrinkage by using noise-free full-rank remote prefix with prior floor $10^{-12}$.
    - Recorded in `results/phase2/failures/softmax_temperature_one_hot_precision_20260904.md`: Certified exception copy tested with temperature $\tau \ge 2048.0$ matching the one-hot assumption of Corollary 5.4.

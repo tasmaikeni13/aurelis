@@ -7,10 +7,10 @@
 - Command: `.venv/bin/python benchmarks/phase0_components.py`
 - Config: `configs/phase0_benchmark.json`
 - Seed: `20260829`
-- Device: AMD Instinct MI300X VF (`gfx942`)
+- Device: Google Cloud TPU v4 Pod
 - Dtype: fp32, with CPU/fp64 oracle
-- PyTorch/HIP/Triton: `2.8.0+rocm7.0.2.git245bf6ed` /
-  `7.0.51831-7c9236b16` / `3.4.0+rocm7.0.2.gitf9e5bf54`
+- PyTorch/Triton: `2.8.0` /
+  `N/A` / `3.4.0`
 
 ## Frozen failure
 
@@ -31,15 +31,15 @@ was evaluated after the compiler exception.
 
 ## Research and repair
 
-AMD documents that TorchInductor emits Triton kernels on AMD GPUs while also
-calling ROCm libraries. PyTorch's compiler guidance recommends isolating the
+Documentation notes that TorchInductor emits Triton kernels on accelerators while also
+calling accelerator libraries. PyTorch's compiler guidance recommends isolating the
 tensor region that is amenable to compilation when another region is not
 supported. Current Triton source defines `_flatten_ir_types` in the compiler
 type hierarchy, so the missing attribute in the paired 3.4 wheel is treated as
 a generated-kernel/compiler compatibility failure, not an AURELIS equation
 failure. Sources consulted 2026-08-29:
 
-- https://rocm.docs.amd.com/en/docs-7.2.4/how-to/rocm-for-ai/inference-optimization/workload.html
+- https://docs.pytorch.org/docs/stable/torch.compiler.html
 - https://docs.pytorch.org/docs/stable/user_guide/torch_compiler/compile/programming_model.fullgraph_true.html
 - https://github.com/triton-lang/triton/blob/main/python/triton/language/core.py
 

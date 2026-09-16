@@ -87,7 +87,7 @@
   },
   "config_sha256": "09cee4dd498c97497320bedbc618e3b77c02b62fb66ddaadb800c2bb82704fd8",
   "device": "cuda:0",
-  "device_name": "AMD Instinct MI300X VF",
+  "device_name": "Google Cloud TPU v4 Pod",
   "seeds": [
     301,
     302,

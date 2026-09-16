@@ -12,9 +12,11 @@ import platform
 import subprocess
 import time
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+UTC = timezone.utc
 
 import matplotlib.pyplot as plt
 import numpy as np

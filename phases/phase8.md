@@ -1,11 +1,11 @@
-# Phase 8 — 350M Medium-Scale Pretraining Study (3.0B FineWeb-Edu tokens on 8x MI300X)
+# Phase 8 — 350M Medium-Scale Pretraining Study (3.0B FineWeb-Edu tokens on Cloud TPU v4 Pod)
 
 Start only after Phase 7 PASS. Read all prior artifacts and
 `phases/AUTONOMY_PROTOCOL.md`. Execute the failure-repair loop until PASS.
 
 This phase tests whether the AURELIS architecture scales effectively to medium model
 capacity (350M parameters) and a multi-billion token pretraining regime (3.0 Billion
-FineWeb-Edu tokens) on an 8x AMD Instinct MI300X cluster. It evaluates whether the
+FineWeb-Edu tokens) on a Google Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores). It evaluates whether the
 dual-memory mechanism (recent cache + discounted remote state) retains its quality,
 stability, and inference advantages over standard Transformer and linear recurrent baselines.
 
@@ -15,13 +15,13 @@ Preregister one experimental generation with:
 
 - **Architecture scale**: **350M parameters** (`d_model=1024`, 16 heads, `d_k=64, d_v=64`, 24 layers, vocabulary size 50257 / standard tiktoken/GPT-2 tokenizer);
 - **Dataset & token budget**: **3.0 Billion training tokens** on the **FineWeb-Edu** corpus (`HuggingFaceFW/fineweb-edu`) per model;
-- **Distributed hardware**: **8x AMD Instinct MI300X** (PyTorch DDP / FSDP with ROCm);
+- **Distributed hardware**: **Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores)**;
 - **Comparators**:
   - Standard Transformer baseline (causal self-attention with RoPE / RMSNorm);
   - Published-style hybrid comparator (Gated DeltaNet / Kimi-style linear attention);
   - Cumulative least-squares baseline;
   - Strongest learned AURELIS variant (AURELIS-E with shared charts and observable cue discounting);
-- **Training protocol**: Identical FineWeb-Edu corpus shards, AdamW optimizer, cosine decay schedule, batch tokens, context length `2048`, precision policy (bf16 with fp32 precision accumulation), checkpoint cadence, and validation harness;
+- **Training protocol**: Identical FineWeb-Edu corpus shards, AdamW optimizer, cosine decay schedule, batch tokens, context length `2048`, precision policy (bfloat16 with fp32 precision accumulation), checkpoint cadence, and validation harness;
 - Parameter, FLOP, and memory state reconciliation across all comparators;
 - Fixed primary and secondary claims with confidence intervals across paired seeds.
 
@@ -36,8 +36,8 @@ Preregister one experimental generation with:
    - Associative memory recall and multi-hop pointer chasing at extended scale.
 
 3. **Systems & inference Pareto efficiency**:
-   - Prefill throughput (tokens/sec) and decoding throughput (tokens/sec per sequence) on 8x MI300X;
-   - Peak VRAM allocation and active decoding state footprint (AURELIS constant-size state vs Transformer KV-cache linear growth).
+   - Prefill throughput (tokens/sec) and decoding throughput (tokens/sec per sequence) on Cloud TPU v4 Pod;
+   - Peak HBM allocation and active decoding state footprint (AURELIS constant-size state vs Transformer KV-cache linear growth).
 
 ## Failure repair
 
@@ -56,5 +56,5 @@ If a run diverges, suffers quality degradation, or fails to produce competitive 
 - AURELIS validation loss is non-inferior within the preregistered margin to the strongest hybrid comparator.
 - AURELIS demonstrates a statistically significant long-context retrieval advantage on multi-needle tests at contexts >= 4096 tokens.
 - AURELIS achieves an end-to-end decoding throughput and memory Pareto advantage at context lengths >= 4096 tokens due to eliminating the $O(L)$ KV cache.
-- Zero nonfinite loss spikes or unhandled gradient explosions during distributed 8x MI300X training.
+- Zero nonfinite loss spikes or unhandled gradient explosions during distributed Cloud TPU v4 Pod training.
 - All inherited gates and Lean build pass, and `results/phase8/PASS.md` satisfies the shared PASS record.

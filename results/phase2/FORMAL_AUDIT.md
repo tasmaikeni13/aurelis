@@ -14,4 +14,4 @@ experiment with their actual Lean statement.
 Remaining empirical boundaries:
 - The advantage in the linear-Gaussian regime across multiple seeds is a statistical property of the Gaussian distribution and is verified via Monte Carlo and multi-seed sweeps.
 - Capacity limits (window $w$ and rank $d_k$) are structural properties of finite state representation and are demonstrated via sequence recall sweeps.
-- Kernel execution latency and GPU timing are hardware-measured on AMD Instinct MI300X.
+- Kernel execution latency and GPU timing are hardware-measured on Google Cloud TPU v4 Pod.

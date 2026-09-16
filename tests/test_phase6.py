@@ -1,9 +1,10 @@
-"""Comprehensive test suite for Phase 6 model architectures, HIP kernels, and decoding."""
+"""Comprehensive test suite for Phase 6 model architectures, Cloud TPU v4 kernels, and decoding."""
 
 from __future__ import annotations
 
 import pytest
 import torch
+import numpy as np
 
 from aurelis.models import (
     AurelisLM,
@@ -12,8 +13,15 @@ from aurelis.models import (
     TransformerLM,
     get_125m_config,
     get_350m_config,
-    hip_fused_residual_gate,
-    hip_recurrent_scan,
+    tpu_fused_residual_gate,
+    tpu_recurrent_scan,
+    tpu_rmsnorm,
+    tpu_swiglu,
+    jax_recurrent_scan,
+    jax_fused_residual_gate,
+    jax_rmsnorm,
+    jax_swiglu,
+    jax_aurelis_attention_sequence,
 )
 
 
@@ -41,25 +49,33 @@ def test_parameter_calibration():
     cfg_hyb_350 = get_350m_config("ssm_hybrid")
     cfg_aur_350 = get_350m_config("aurelis_e")
 
-    m_tf_350 = TransformerLM(cfg_tf_350)
-    m_hyb_350 = HybridSSMLM(cfg_hyb_350)
-    m_aur_350 = AurelisLM(cfg_aur_350, gate_mode="aurelis_e")
+    p_tf_350 = TransformerLM(cfg_tf_350).count_parameters()
+    p_hyb_350 = HybridSSMLM(cfg_hyb_350).count_parameters()
+    p_aur_350 = AurelisLM(cfg_aur_350, gate_mode="aurelis_e").count_parameters()
 
-    p_tf_350 = m_tf_350.count_parameters()
-    p_hyb_350 = m_hyb_350.count_parameters()
-    p_aur_350 = m_aur_350.count_parameters()
+    # Targets: ~330M - 370M
+    assert 3.0e8 < p_tf_350 < 4.0e8, f"Transformer 350M params out of range: {p_tf_350}"
+    assert 3.0e8 < p_hyb_350 < 4.0e8, f"SSM Hybrid 350M params out of range: {p_hyb_350}"
+    assert 3.0e8 < p_aur_350 < 4.0e8, f"AURELIS 350M params out of range: {p_aur_350}"
 
-    assert 3.0e8 < p_tf_350 < 3.8e8, f"Transformer 350M params out of range: {p_tf_350}"
-    assert 3.0e8 < p_hyb_350 < 3.8e8, f"SSM Hybrid 350M params out of range: {p_hyb_350}"
-    assert 3.0e8 < p_aur_350 < 3.8e8, f"AURELIS 350M params out of range: {p_aur_350}"
+    # Relative calibration within 6%
+    mean_125 = (p_tf + p_hyb + p_aur) / 3.0
+    for p in (p_tf, p_hyb, p_aur):
+        rel_diff = abs(p - mean_125) / mean_125
+        assert rel_diff < 0.06, f"125M candidate deviation too high: {rel_diff:.4f}"
+
+    mean_350 = (p_tf_350 + p_hyb_350 + p_aur_350) / 3.0
+    for p in (p_tf_350, p_hyb_350, p_aur_350):
+        rel_diff = abs(p - mean_350) / mean_350
+        assert rel_diff < 0.06, f"350M candidate deviation too high: {rel_diff:.4f}"
 
 
-def test_forward_backward_gradient_flow():
-    """Verify forward and backward passes produce finite logits and gradients across all parameters."""
+def test_forward_and_backward_pass():
+    """Verify that forward and backward passes execute cleanly and gradients flow to all weights."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # Small test configuration
     cfg = LMConfig(
         vocab_size=1000,
+        max_position_embeddings=128,
         d_model=128,
         n_layers=2,
         n_heads=4,
@@ -72,8 +88,8 @@ def test_forward_backward_gradient_flow():
     models = [
         TransformerLM(cfg),
         HybridSSMLM(cfg),
-        AurelisLM(cfg, gate_mode="aurelis_b"),
         AurelisLM(cfg, gate_mode="aurelis_e"),
+        AurelisLM(cfg, gate_mode="aurelis_b"),
     ]
 
     x = torch.randint(0, 1000, (2, 16), device=device)
@@ -95,8 +111,8 @@ def test_forward_backward_gradient_flow():
         m.zero_grad()
 
 
-def test_hip_kernels_vs_reference():
-    """Verify HIP kernels match pure PyTorch CPU/GPU references within fp32 precision."""
+def test_tpu_kernels_vs_reference():
+    """Verify Cloud TPU v4 JAX/HLO kernels match pure PyTorch CPU/GPU references within fp32 precision."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(123)
 
@@ -104,7 +120,7 @@ def test_hip_kernels_vs_reference():
     x = torch.randn(B, H, L, D, device=device)
     decay = torch.rand(B, H, L, D, device=device) * 0.9 + 0.05
 
-    out_hip = hip_recurrent_scan(x, decay)
+    out_tpu = tpu_recurrent_scan(x, decay)
     # PyTorch reference
     out_ref = torch.empty_like(x)
     curr = torch.zeros(B, H, D, device=device)
@@ -112,7 +128,7 @@ def test_hip_kernels_vs_reference():
         curr = decay[:, :, t, :] * curr + x[:, :, t, :]
         out_ref[:, :, t, :] = curr
 
-    diff_scan = (out_hip - out_ref).abs().max().item()
+    diff_scan = (out_tpu - out_ref).abs().max().item()
     assert diff_scan < 1e-5, f"Recurrent scan discrepancy: {diff_scan}"
 
     # Fused gate
@@ -121,10 +137,21 @@ def test_hip_kernels_vs_reference():
     mapped_kbar = torch.randn(B, H, L, D, device=device)
     gate = torch.rand(B, H, L, device=device)
 
-    out_fused = hip_fused_residual_gate(remote, vbar, mapped_kbar, gate)
+    out_fused = tpu_fused_residual_gate(remote, vbar, mapped_kbar, gate)
     out_ref_gate = remote + gate.unsqueeze(-1) * (vbar - mapped_kbar)
     diff_gate = (out_fused - out_ref_gate).abs().max().item()
     assert diff_gate < 1e-5, f"Fused gate discrepancy: {diff_gate}"
+
+    # Native JAX scan parity
+    try:
+        import jax.numpy as jnp
+        x_jax = jnp.asarray(x.numpy())
+        d_jax = jnp.asarray(decay.numpy())
+        scan_jax = jax_recurrent_scan(x_jax, d_jax)
+        diff_jax = np.max(np.abs(np.asarray(scan_jax) - out_ref.numpy()))
+        assert diff_jax < 1e-5, f"JAX recurrent scan discrepancy: {diff_jax}"
+    except Exception as err:
+        pytest.fail(f"Native JAX scan failed: {err}")
 
 
 def test_constant_decode_state_memory():
@@ -183,14 +210,13 @@ def test_constant_decode_state_memory():
 
 
 def test_fused_rmsnorm_and_swiglu_parity():
-    """Verify fused RMSNorm and SwiGLU HIP kernels match PyTorch reference implementations."""
-    from aurelis.models import hip_rmsnorm, hip_swiglu
+    """Verify fused RMSNorm and SwiGLU Cloud TPU v4 kernels match PyTorch reference implementations."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # RMSNorm parity
     x = torch.randn(4, 32, 128, device=device, dtype=torch.float32)
     weight = torch.randn(128, device=device, dtype=torch.float32)
-    norm_out = hip_rmsnorm(x, weight, eps=1e-6)
+    norm_out = tpu_rmsnorm(x, weight, eps=1e-6)
     var = x.pow(2).mean(-1, keepdim=True)
     norm_ref = x * torch.rsqrt(var + 1e-6) * weight
     assert (norm_out - norm_ref).abs().max().item() < 1e-5
@@ -198,7 +224,7 @@ def test_fused_rmsnorm_and_swiglu_parity():
     # SwiGLU parity & gradient flow
     gate = torch.randn(4, 32, 256, device=device, dtype=torch.float32, requires_grad=True)
     up = torch.randn(4, 32, 256, device=device, dtype=torch.float32, requires_grad=True)
-    swiglu_out = hip_swiglu(gate, up)
+    swiglu_out = tpu_swiglu(gate, up)
     loss = swiglu_out.sum()
     loss.backward()
 
@@ -217,17 +243,31 @@ def test_jamba_hybrid_architecture():
     """Verify Jamba-style hybrid model configuration, interleave ratios, and alias compatibility."""
     from aurelis.models import JambaHybridLM, HybridSSMLM
 
-    # Test alias
     assert JambaHybridLM is HybridSSMLM
 
-    cfg = get_125m_config("ssm_hybrid")
-    # 1:1 alternating (default period 2)
-    m_1to1 = JambaHybridLM(cfg, attention_layer_period=2)
-    attn_count_1to1 = sum(1 for layer in m_1to1.layers if layer.is_attention_layer)
-    assert attn_count_1to1 == cfg.n_layers // 2
+    cfg = LMConfig(d_model=64, n_layers=4, n_heads=2, d_ffn=128, ssm_state_dim=8)
+    model = JambaHybridLM(cfg, attention_layer_period=2)
 
-    # 1:3 attention (Jamba standard period 4)
-    m_1to3 = JambaHybridLM(cfg, attention_layer_period=4)
-    attn_count_1to3 = sum(1 for layer in m_1to3.layers if layer.is_attention_layer)
-    assert attn_count_1to3 == cfg.n_layers // 4
+    assert not model.layers[0].is_attention_layer
+    assert model.layers[1].is_attention_layer
+    assert not model.layers[2].is_attention_layer
+    assert model.layers[3].is_attention_layer
 
+
+def test_native_jax_aurelis_attention():
+    """Verify native JAX/HLO sequence attention compiles and runs on TPU."""
+    import jax.numpy as jnp
+    B, H, L, D_k, D_v = 2, 4, 32, 16, 16
+    keys = jnp.ones((B, H, L, D_k), dtype=jnp.float32) * 0.1
+    queries = jnp.ones((B, H, L, D_k), dtype=jnp.float32) * 0.1
+    values = jnp.ones((B, H, L, D_v), dtype=jnp.float32) * 0.2
+    evidence = jnp.ones((B, H, L), dtype=jnp.float32)
+    temp = jnp.zeros((H,), dtype=jnp.float32)
+
+    out, prec, cross = jax_aurelis_attention_sequence(
+        queries, keys, values, evidence, temp, window=16, prior=1.0
+    )
+    assert out.shape == (B, L, H * D_v)
+    assert jnp.isfinite(out).all()
+    assert prec.shape == (B, H, D_k, D_k)
+    assert cross.shape == (B, H, D_v, D_k)

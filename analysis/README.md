@@ -2,7 +2,7 @@
 
 This directory contains deterministic, CPU/fp64 numerical checks for the
 AURELIS head.  It is intentionally separate from the legacy implementation:
-the implementation migration and MI300X/ROCm kernels are the job of Phase 0.
+the implementation migration and Cloud TPU v4 Pod kernels are the job of Phase 0.
 
 Run:
 

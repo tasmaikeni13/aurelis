@@ -1,25 +1,25 @@
-# Phase 5 — MI300X/ROCm optimization and systems gate
+# Phase 5 — Cloud TPU v4 Pod / XLA optimization and systems gate
 
-Start only after Phase 4 PASS. Read all prior artifacts, current official AMD
-ROCm/MI300X and PyTorch HIP documentation, and
+Start only after Phase 4 PASS. Read all prior artifacts, current official Google
+Cloud TPU v4, JAX, OpenXLA, and libtpu documentation, and
 `phases/AUTONOMY_PROTOCOL.md`. Execute the failure-repair loop until PASS.
 
-This phase optimizes the proven mechanism on the actual one-GPU AMD server. A
+This phase optimizes the proven mechanism on the actual Google Cloud TPU v4 Pod substrate (16 v4 TPUs / 32 TensorCores). A
 faster numerically different mechanism is a failure.
 
 ## Paths to evaluate
 
 Compare, on identical quantized inputs:
 
-- fp64 CPU and GPU reference;
-- eager PyTorch ROCm;
-- `torch.compile`/Inductor with documented modes;
-- rocBLAS/hipBLASLt and rocSOLVER-backed primitives;
+- fp64 CPU and TPU reference;
+- eager PyTorch / JAX TPU;
+- OpenXLA `jax.jit` / TorchInductor with documented modes;
+- XLA-backed matrix and triangular solve primitives;
 - sequential rank-one factor maintenance versus refactorization;
 - batched dense exact training solves;
 - fixed-step and residual-stopped conjugate gradient;
 - chunkwise/Woodbury construction where derived; and
-- Triton/ROCm or Composable Kernel fusion only when profiling identifies a
+- JAX/XLA TPU kernel and Pallas/HLO fusion only when profiling identifies a
   fusible bottleneck.
 
 Profile complete heads and components over:
@@ -34,12 +34,12 @@ Profile complete heads and components over:
 
 Measure wall time with synchronization, tokens/s, latency distribution, HBM
 traffic, achieved bandwidth/FLOPs where profiler support is reliable, launch
-count, occupancy, peak VRAM, live decode state, solve iterations/residuals,
+count, peak HBM, live decode state, solve iterations/residuals,
 forward error, gradient error, and nonfinite rate.
 
 ## Matched systems baselines
 
-Include full attention using the strongest available ROCm backend, sliding
+Include full attention using the strongest available TPU backend, sliding
 window attention, positive-feature linear attention, Gated DeltaNet, and the
 best cumulative least-squares remote implementation. Compare same dimensions,
 parameters, state bytes, and quality-qualified configurations separately.
@@ -57,8 +57,8 @@ throughput or exclude compile/tuning costs without also reporting them.
 
 - Every retained optimized path meets dtype- and condition-aware forward,
   backward, state, gate, and handoff tolerances versus fp64.
-- No CUDA/NVIDIA package or device assumption is present; ROCm is detected via
-  HIP even though PyTorch uses `torch.cuda` APIs.
+- No CUDA/NVIDIA or ROCm package or device assumption is present; Cloud TPU v4
+  is detected via libtpu / JAX TPU backend.
 - The best exact and approximate training paths have a declared accuracy/cost
   frontier; iterative stopping error is linked to output error.
 - At least one quality-valid long-context regime demonstrates both lower live

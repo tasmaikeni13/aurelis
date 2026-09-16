@@ -6,7 +6,7 @@ failure-repair loop for every discrepancy until all gates pass.
 
 ## Clean-room reproduction
 
-From a fresh clone and clean environment on the target MI300X server:
+From a fresh clone and clean environment on the target Cloud TPU v4 Pod server:
 
 - bootstrap without undocumented system state;
 - run unit/property/pathology tests and `lake build`;
@@ -51,7 +51,7 @@ from an authoritative source and check the rendered pages.
 ## Completion audit
 
 Create a requirement-by-requirement matrix for the paper, code, math, Lean,
-all phase gates, MI300X/ROCm support, reproducibility, and public repository.
+all phase gates, Cloud TPU v4 Pod support, reproducibility, and public repository.
 For each item cite direct evidence and classify it proved, contradicted,
 incomplete, or missing. Continue working on every non-proved required item.
 

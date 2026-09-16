@@ -1,4 +1,4 @@
-# Phase 0 — AURELIS migration and ROCm reference substrate
+# Phase 0 — AURELIS migration and Cloud TPU v4 Pod reference substrate
 
 Read `aurelis.md`, `research/LITERATURE_REVIEW.md`, every file in `lean/`, and
 `phases/AUTONOMY_PROTOCOL.md` completely before acting. Execute the shared
@@ -43,23 +43,20 @@ Create an independently assembled historical oracle from the full prefix. The
 streaming and oracle paths must not share state-update logic. Keep a tiny
 dimension-capped explicit inverse only as a test oracle.
 
-## 0.3 Build the ROCm/MI300X substrate
+## 0.3 Build the Cloud TPU v4 Pod substrate
 
-The server target is one AMD Instinct MI300X under ROCm. Inspect and record
+The server target is a Google Cloud TPU v4 Pod (16 v4 TPUs / 32 TensorCores). Inspect and record
 actual state before installation or optimization:
 
-- GPU name/architecture, VRAM, ROCm/HIP, driver, PyTorch, Python, kernel, host
+- TPU architecture, TensorCores, TPU pod topology, libtpu/JAX runtime, PyTorch, Python, kernel, host
   RAM/CPU, and git state;
-- `torch.version.hip`, `torch.cuda.is_available()`, dtype support, rocBLAS,
-  rocSOLVER, TorchInductor, Triton/ROCm, and profiler availability;
+- JAX TPU backend, OpenXLA HLO compilation, `jax.devices()`, dtype support, TorchInductor,
+  and profiler availability;
 - bf16/fp16/fp32/fp64 GEMM health checks with synchronized timing; and
 - installed versus officially compatible versions.
 
-PyTorch deliberately reuses `torch.cuda` on ROCm. This API name is allowed;
-NVIDIA libraries, CUDA wheels, CUDA toolkit assumptions, `nvcc`, and
-NVIDIA-only kernels are not. Detect ROCm with `torch.version.hip`. Consult
-current official AMD ROCm, rocSOLVER, and PyTorch HIP documentation before
-choosing versions or kernel paths.
+Consult current official Google Cloud TPU v4, JAX, OpenXLA, and libtpu documentation before
+choosing versions or kernel paths. Forbidden accelerator dependencies (CUDA/ROCm) are prohibited.
 
 Implement reproducible scripts for:
 
@@ -70,7 +67,7 @@ Implement reproducible scripts for:
 - vectorized exact training reference;
 - component benchmarks for outer updates, local attention, factorization,
   triangular solves, routing, and full head; and
-- an optional Triton/ROCm prototype only after the eager/Inductor path is
+- an optional JAX/XLA TPU prototype only after the eager/Inductor path is
   correct. A custom kernel is not a phase requirement if measurement shows it
   is unjustified.
 
@@ -98,9 +95,9 @@ Lean build, and a small AURELIS reference experiment in fail-fast order.
 - Autograd and gradcheck cover every declared differentiable input.
 - AURELIS-B gate matches dense one-dimensional variance minimization; AURELIS-E
   exact one-hot hits pass.
-- Eager, compiled, and any custom ROCm paths agree with fp64 after dtype-aware
+- Eager, compiled, and custom JAX/TPU paths agree with fp64 after dtype-aware
   tolerances.
-- MI300X/ROCm is measured, with no NVIDIA dependency and no unsupported version
+- Cloud TPU v4 Pod is measured, with no NVIDIA/ROCm dependency and no unsupported version
   assumption.
 - Full Lean build and all Phase 0 tests pass from the documented command.
 - `results/phase0/PASS.md` satisfies the shared PASS record.

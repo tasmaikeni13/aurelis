@@ -8,7 +8,7 @@ from aurelis import prepared_aurelis_head
 
 @pytest.mark.skipif(not hasattr(torch, "compile"), reason="torch.compile unavailable")
 def test_eager_and_compiled_forward_backward_agree() -> None:
-    device = torch.device("cuda" if torch.cuda.is_available() and torch.version.hip else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dtype = torch.float32 if device.type == "cuda" else torch.float64
     matrix = torch.randn(1, 2, 4, 4, device=device, dtype=dtype)
     precision = matrix @ matrix.mT + 0.5 * torch.eye(4, device=device, dtype=dtype)

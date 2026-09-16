@@ -3,9 +3,8 @@
 Start only after Phase 6 PASS. Read all prior artifacts and
 `phases/AUTONOMY_PROTOCOL.md`. Execute the failure-repair loop until PASS.
 
-This phase tests whether the mechanism persists under a distributed 8x AMD Instinct MI300X
-scaling budget (Phases 0 through 6 are completed on 1x MI300X; distributed 8x MI300X training
-begins in Phase 7). It may not redefine success around constant state alone.
+This phase tests whether the mechanism persists under a distributed Cloud TPU v4 Pod
+(16 v4 TPUs / 32 TensorCores) scaling budget. It may not redefine success around constant state alone.
 
 ## Frozen design
 

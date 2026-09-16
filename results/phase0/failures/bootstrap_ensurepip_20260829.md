@@ -29,7 +29,7 @@ Failing command: /root/aurelis/.venv/bin/python3
 Ubuntu splits `venv`/`ensurepip` into `python3.12-venv`. The package was absent;
 APT reported candidate `3.12.3-1ubuntu0.16`. The repair is to install that
 matching distribution package, remove only the incomplete repository-local
-`.venv`, and rerun the non-destructive bootstrap. No ROCm, driver, kernel, or
+.venv, and rerun the non-destructive bootstrap. No accelerator runtime, driver, kernel, or
 system Python version is changed.
 
 ## Invariants and predicted effect
@@ -37,5 +37,5 @@ system Python version is changed.
 The repair only supplies Python's standard virtual-environment bootstrap. It
 does not change AURELIS equations or numerical behavior. It should make
 `python3 -m venv .venv` produce a local interpreter with pip. It would not
-repair an incompatible Python wheel or a GPU runtime failure; those remain
+repair an incompatible Python wheel or an accelerator runtime failure; those remain
 separate gates.
