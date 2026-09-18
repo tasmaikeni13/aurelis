@@ -1,0 +1,72 @@
+{
+  "module_map": [
+    {
+      "equations_covered": "Eq. (2), (3), (7), (8), (9), (10), (11), (12)",
+      "existing_v1_status": "Standard path calls Cholesky factorization of dense key-space precision matrix P = \u03bbI + K\u1d40K and computes M = C P\u207b\u00b9; Bayes router computes scalar gate g_B.",
+      "gap_severity": "High (Complete redesign required)",
+      "migration_action": "Preserve v1 functions under legacy names; write clean v2 fp64 independent oracles in Phase 1.",
+      "module": "src/aurelis/functional.py / oracle.py",
+      "v2_requirement": "Independent fp64 references for Eq. (2) gated delta recurrence, Eq. (3) bounded read r(q) = v\u0304_L + S_t(q - k\u0304_L), Eq. (7)-(8) normalized archive completion, Eq. (10) deterministic certificate, and Eq. (11)-(12) page box envelopes."
+    },
+    {
+      "equations_covered": "Eq. (2), (3), (8), (10)",
+      "existing_v1_status": "Defines BayesianState with C, P, inv_P tensors; HandoffState; read results without error certificates or unread mass tracking.",
+      "gap_severity": "High (New state schema and return contracts required)",
+      "migration_action": "Implement v2 state classes and read result contracts in Phase 2.",
+      "module": "src/aurelis/types.py / streaming.py",
+      "v2_requirement": "DeltaState with S \u2208 \u211d^{d_v \u00d7 d_k}, ring buffer of recent keys/values and write gates (\u03b1, \u03b2), causal occurrence IDs, archive page descriptors, and explicit read result types with status ('approximate', 'certified', 'full_read', 'budget_exhausted', 'invalid_state', 'archive_error')."
+    },
+    {
+      "equations_covered": "Eq. (2), (3), (8), (14)",
+      "existing_v1_status": "Neural modules with Bayesian ridge solvers, straight-through maximum episodic router, and heteroscedastic weighting.",
+      "gap_severity": "High (Retire Bayesian router; implement solve-free recurrence)",
+      "migration_action": "Implement clean nn modules for bounded and archive modes in Phase 3 & 4.",
+      "module": "src/aurelis/nn.py / nn_phase3.py / nn_phase4.py",
+      "v2_requirement": "Shared query/key coordinate projection conventions, delayed gated delta recurrence, solve-free bounded read, and archive forward paths with log-sum-exp shift."
+    },
+    {
+      "equations_covered": "Eq. (2), (3), (8), (15)",
+      "existing_v1_status": "Constructs full L \u00d7 L attention scores then applies causal mask; materializes prefix precision matrices; lacks populated-cache continuation decode.",
+      "gap_severity": "High (Quadratic intermediates must be completely removed)",
+      "migration_action": "Re-implement LM architectures and true cached decode in Phase 5 & 6.",
+      "module": "src/aurelis/models/aurelis_lm.py / jax_aurelis.py",
+      "v2_requirement": "Actual cached step decode, true local window attention without quadratic score materialization, structured chunk delta training with backward recomputation."
+    },
+    {
+      "equations_covered": "Eq. (2), (11), (12)",
+      "existing_v1_status": "Kernel stubs; precision checks executed on CPU fallback.",
+      "gap_severity": "Medium (Backend-specific kernel implementation)",
+      "migration_action": "Implement verified CPU and accelerator kernels in Phase 5.",
+      "module": "src/aurelis/models/tpu_kernels.py",
+      "v2_requirement": "Explicit actual backend implementation; chunk delta scan, local attention, page gathers/reductions, and interval evaluations."
+    },
+    {
+      "equations_covered": "Eq. (7), (13), \u00a78, \u00a79",
+      "existing_v1_status": "10 synthetic baselines tuned for v1 Bayesian ridge comparison; simplified architectures.",
+      "gap_severity": "Medium (Need strong competitive baselines)",
+      "migration_action": "Implement updated baselines in Phase 2 & 4.",
+      "module": "src/aurelis/baselines.py / models/hybrid_ssm.py",
+      "v2_requirement": "Modern dense GQA Transformer (RoPE, RMSNorm, SwiGLU), recurrence-free archive completion, per-page predictor comparator (Eq. 13), and Mamba-2 style SSM baseline."
+    },
+    {
+      "equations_covered": "\u00a77, \u00a78, \u00a79",
+      "existing_v1_status": "Diagnostic routines with formula-assigned scores and single-step decode latency without prefix caches.",
+      "gap_severity": "High (Rewrite benchmark scripts with real measurements)",
+      "migration_action": "Write new v2 experiment scripts in Phase 6, 7, and 8.",
+      "module": "experiments/ and benchmarks/",
+      "v2_requirement": "Real token evaluation on held-out tasks, populated prefix cache latency benchmarks, measured cache bytes, and explicit certificate violation audits."
+    },
+    {
+      "equations_covered": "AUTONOMY_PROTOCOL.md, IMPLEMENTATION_CONTRACT.md",
+      "existing_v1_status": "Scripts verify legacy metrics and check for retired project name strings; tests check Cholesky solvers.",
+      "gap_severity": "Medium (New test suites for v2 contracts)",
+      "migration_action": "Implement v2 test suites alongside each phase.",
+      "module": "scripts/ and tests/",
+      "v2_requirement": "V2 verification gates, real data provenance checks, formal proof coverage checks, and unit tests for delta recurrence, certificate bounds, and page intervals."
+    }
+  ],
+  "modules_audited": 8,
+  "summary": "Current implementation reflects legacy v1 Bayesian ridge architecture. All production model code, streaming state, baselines, and evaluators require rewrite in downstream phases to implement v2 equations (2)-(12).",
+  "theory_revision": "v2.0",
+  "timestamp_utc": "2026-09-18T06:45:55.318559+00:00"
+}

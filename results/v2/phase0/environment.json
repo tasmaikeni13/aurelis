@@ -1,0 +1,875 @@
+{
+  "enumeration_integrity": {
+    "active_devices": [
+      "CPU: AMD EPYC 7B12 (240 vCPUs, 400 GiB RAM)"
+    ],
+    "all_claimed_devices_runtime_enumerated": true,
+    "no_hardcoded_hardware_labels": true,
+    "status": "PASS"
+  },
+  "git": {
+    "dirty": true,
+    "dirty_count": 2,
+    "dirty_files": [
+      "?? scripts/run_phase0_v2.py",
+      "?? scripts/run_phase0_v2.sh"
+    ],
+    "head": "9921cfb207c7712102d2a02439a77b49dbecf74a"
+  },
+  "pip_packages": [
+    {
+      "name": "absl-py",
+      "version": "2.5.0"
+    },
+    {
+      "name": "aiofiles",
+      "version": "25.1.0"
+    },
+    {
+      "name": "aioprocessing",
+      "version": "2.0.1"
+    },
+    {
+      "name": "ansicolors",
+      "version": "1.1.8"
+    },
+    {
+      "name": "arrow",
+      "version": "1.4.0"
+    },
+    {
+      "name": "asgiref",
+      "version": "3.12.1"
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0"
+    },
+    {
+      "editable_project_location": "/home/tas_ken_rt25/aurelis",
+      "name": "aurelis",
+      "version": "0.1.0"
+    },
+    {
+      "name": "Automat",
+      "version": "20.2.0"
+    },
+    {
+      "name": "Babel",
+      "version": "2.8.0"
+    },
+    {
+      "name": "backports-datetime-fromisoformat",
+      "version": "2.0.3"
+    },
+    {
+      "name": "backports.zstd",
+      "version": "1.7.0"
+    },
+    {
+      "name": "bcrypt",
+      "version": "3.2.0"
+    },
+    {
+      "name": "bidict",
+      "version": "0.23.1"
+    },
+    {
+      "name": "blinker",
+      "version": "1.4"
+    },
+    {
+      "name": "boltons",
+      "version": "26.2.0"
+    },
+    {
+      "name": "brotli",
+      "version": "1.2.0"
+    },
+    {
+      "name": "cachebox",
+      "version": "5.2.3"
+    },
+    {
+      "editable_project_location": "/home/tas_ken_rt25/carve",
+      "name": "carve",
+      "version": "0.1.0"
+    },
+    {
+      "name": "case-converter",
+      "version": "1.2.0"
+    },
+    {
+      "name": "certifi",
+      "version": "2020.6.20"
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.1"
+    },
+    {
+      "name": "chardet",
+      "version": "4.0.0"
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.1.0"
+    },
+    {
+      "name": "click",
+      "version": "8.0.3"
+    },
+    {
+      "name": "cloud-init",
+      "version": "26.1"
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.4"
+    },
+    {
+      "name": "comicbox-pdffile",
+      "version": "0.5.1"
+    },
+    {
+      "name": "comicfn2dict",
+      "version": "0.3.2"
+    },
+    {
+      "name": "command-not-found",
+      "version": "0.3"
+    },
+    {
+      "name": "configobj",
+      "version": "5.0.6"
+    },
+    {
+      "name": "confuse",
+      "version": "2.1.0"
+    },
+    {
+      "name": "constantly",
+      "version": "15.1.0"
+    },
+    {
+      "name": "contourpy",
+      "version": "1.3.2"
+    },
+    {
+      "name": "cryptography",
+      "version": "3.4.8"
+    },
+    {
+      "name": "cycler",
+      "version": "0.12.1"
+    },
+    {
+      "name": "Cython",
+      "version": "0.29.28"
+    },
+    {
+      "name": "dateparser",
+      "version": "1.4.3"
+    },
+    {
+      "name": "dbus-python",
+      "version": "1.2.18"
+    },
+    {
+      "name": "deepdiff",
+      "version": "9.1.0"
+    },
+    {
+      "name": "distlib",
+      "version": "0.3.6"
+    },
+    {
+      "name": "distro",
+      "version": "1.7.0"
+    },
+    {
+      "name": "distro-info",
+      "version": "1.1+ubuntu0.2"
+    },
+    {
+      "name": "djangorestframework-camel-case",
+      "version": "1.4.2"
+    },
+    {
+      "name": "elementpath",
+      "version": "5.1.4"
+    },
+    {
+      "name": "etils",
+      "version": "1.13.0"
+    },
+    {
+      "name": "exceptiongroup",
+      "version": "1.3.1"
+    },
+    {
+      "name": "face",
+      "version": "26.0.1"
+    },
+    {
+      "name": "filelock",
+      "version": "3.12.0"
+    },
+    {
+      "name": "filetype",
+      "version": "1.2.0"
+    },
+    {
+      "name": "flax",
+      "version": "0.10.7"
+    },
+    {
+      "name": "fnvhash",
+      "version": "0.2.1"
+    },
+    {
+      "name": "fonttools",
+      "version": "4.65.0"
+    },
+    {
+      "name": "fqdn",
+      "version": "1.5.1"
+    },
+    {
+      "name": "fsspec",
+      "version": "2026.7.0"
+    },
+    {
+      "name": "glom",
+      "version": "25.12.0"
+    },
+    {
+      "name": "gyp",
+      "version": "0.1"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0"
+    },
+    {
+      "name": "h2",
+      "version": "4.4.1"
+    },
+    {
+      "name": "hpack",
+      "version": "4.2.0"
+    },
+    {
+      "name": "httplib2",
+      "version": "0.20.2"
+    },
+    {
+      "name": "humanfriendly",
+      "version": "10.0"
+    },
+    {
+      "name": "humanize",
+      "version": "4.16.0"
+    },
+    {
+      "name": "hyperframe",
+      "version": "6.1.0"
+    },
+    {
+      "name": "hyperlink",
+      "version": "21.0.0"
+    },
+    {
+      "name": "idna",
+      "version": "3.3"
+    },
+    {
+      "name": "importlib-metadata",
+      "version": "4.6.4"
+    },
+    {
+      "name": "importlib_resources",
+      "version": "7.1.0"
+    },
+    {
+      "name": "incremental",
+      "version": "21.3.0"
+    },
+    {
+      "name": "inflate64",
+      "version": "1.0.4"
+    },
+    {
+      "name": "inflection",
+      "version": "0.5.1"
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.0"
+    },
+    {
+      "name": "isoduration",
+      "version": "20.11.0"
+    },
+    {
+      "name": "jax",
+      "version": "0.6.2"
+    },
+    {
+      "name": "jaxlib",
+      "version": "0.6.2"
+    },
+    {
+      "name": "jeepney",
+      "version": "0.7.1"
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.0.3"
+    },
+    {
+      "name": "jsonpatch",
+      "version": "1.32"
+    },
+    {
+      "name": "jsonpointer",
+      "version": "2.0"
+    },
+    {
+      "name": "jsonschema",
+      "version": "3.2.0"
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1"
+    },
+    {
+      "name": "keyring",
+      "version": "23.5.0"
+    },
+    {
+      "name": "kiwisolver",
+      "version": "1.5.1"
+    },
+    {
+      "name": "launchpadlib",
+      "version": "1.10.16"
+    },
+    {
+      "name": "lazr.restfulclient",
+      "version": "0.14.4"
+    },
+    {
+      "name": "lazr.uri",
+      "version": "1.0.6"
+    },
+    {
+      "name": "libtpu",
+      "version": "0.0.17"
+    },
+    {
+      "name": "loguru",
+      "version": "0.7.3"
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.2.0"
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "2.0.1"
+    },
+    {
+      "name": "marshmallow",
+      "version": "4.3.1"
+    },
+    {
+      "name": "marshmallow-jsonschema-2",
+      "version": "0.1.0"
+    },
+    {
+      "name": "marshmallow-union",
+      "version": "0.1.15.post1"
+    },
+    {
+      "name": "matplotlib",
+      "version": "3.10.9"
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2"
+    },
+    {
+      "name": "ml_dtypes",
+      "version": "0.6.0"
+    },
+    {
+      "name": "more-itertools",
+      "version": "8.10.0"
+    },
+    {
+      "name": "mpmath",
+      "version": "1.3.0"
+    },
+    {
+      "name": "msgpack",
+      "version": "1.2.2"
+    },
+    {
+      "name": "multivolumefile",
+      "version": "0.2.3"
+    },
+    {
+      "name": "netifaces",
+      "version": "0.11.0"
+    },
+    {
+      "name": "networkx",
+      "version": "3.4.2"
+    },
+    {
+      "name": "nh3",
+      "version": "0.3.7"
+    },
+    {
+      "name": "numpy",
+      "version": "2.2.6"
+    },
+    {
+      "name": "oauthlib",
+      "version": "3.2.0"
+    },
+    {
+      "name": "opt_einsum",
+      "version": "3.4.0"
+    },
+    {
+      "name": "optax",
+      "version": "0.2.8"
+    },
+    {
+      "name": "orbax-checkpoint",
+      "version": "0.11.39"
+    },
+    {
+      "name": "orderly-set",
+      "version": "5.5.0"
+    },
+    {
+      "name": "packaging",
+      "version": "26.3"
+    },
+    {
+      "name": "pexpect",
+      "version": "4.8.0"
+    },
+    {
+      "name": "pillow",
+      "version": "12.3.0"
+    },
+    {
+      "name": "pip",
+      "version": "26.2.1"
+    },
+    {
+      "name": "platformdirs",
+      "version": "3.5.0"
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0"
+    },
+    {
+      "name": "priority",
+      "version": "2.0.0"
+    },
+    {
+      "name": "protobuf",
+      "version": "7.36.1"
+    },
+    {
+      "name": "psutil",
+      "version": "7.2.2"
+    },
+    {
+      "name": "ptyprocess",
+      "version": "0.7.0"
+    },
+    {
+      "name": "py7zr",
+      "version": "1.1.3"
+    },
+    {
+      "name": "pyasn1",
+      "version": "0.4.8"
+    },
+    {
+      "name": "pyasn1-modules",
+      "version": "0.2.1"
+    },
+    {
+      "name": "pybcj",
+      "version": "1.0.8"
+    },
+    {
+      "name": "pycountry",
+      "version": "26.2.16"
+    },
+    {
+      "name": "pycparser",
+      "version": "3.0"
+    },
+    {
+      "name": "pycryptodomex",
+      "version": "3.23.0"
+    },
+    {
+      "name": "Pygments",
+      "version": "2.21.0"
+    },
+    {
+      "name": "PyGObject",
+      "version": "3.42.1"
+    },
+    {
+      "name": "PyHamcrest",
+      "version": "2.0.2"
+    },
+    {
+      "name": "PyJWT",
+      "version": "2.3.0"
+    },
+    {
+      "name": "pylsqpack",
+      "version": "0.3.24"
+    },
+    {
+      "name": "pymupdf",
+      "version": "1.28.2"
+    },
+    {
+      "name": "pyOpenSSL",
+      "version": "21.0.0"
+    },
+    {
+      "name": "pyparsing",
+      "version": "3.3.2"
+    },
+    {
+      "name": "pyppmd",
+      "version": "1.3.1"
+    },
+    {
+      "name": "pyrsistent",
+      "version": "0.18.1"
+    },
+    {
+      "name": "pyserial",
+      "version": "3.5"
+    },
+    {
+      "name": "pytest",
+      "version": "9.1.1"
+    },
+    {
+      "name": "python-apt",
+      "version": "2.4.0+ubuntu4.1"
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0"
+    },
+    {
+      "name": "python-debian",
+      "version": "0.1.43+ubuntu1.1"
+    },
+    {
+      "name": "python-magic",
+      "version": "0.4.24"
+    },
+    {
+      "name": "pytz",
+      "version": "2026.3.post1"
+    },
+    {
+      "name": "PyYAML",
+      "version": "5.4.1"
+    },
+    {
+      "name": "rarfile",
+      "version": "4.5"
+    },
+    {
+      "name": "referencing",
+      "version": "0.37.0"
+    },
+    {
+      "name": "regex",
+      "version": "2026.9.10"
+    },
+    {
+      "name": "requests",
+      "version": "2.29.0"
+    },
+    {
+      "name": "rfc3339-validator",
+      "version": "0.1.4"
+    },
+    {
+      "name": "rfc3987",
+      "version": "1.3.8"
+    },
+    {
+      "name": "rich",
+      "version": "15.0.0"
+    },
+    {
+      "name": "rpds-py",
+      "version": "0.30.0"
+    },
+    {
+      "name": "ruamel.yaml",
+      "version": "0.19.1"
+    },
+    {
+      "name": "scipy",
+      "version": "1.15.3"
+    },
+    {
+      "name": "SecretStorage",
+      "version": "3.3.1"
+    },
+    {
+      "name": "service-identity",
+      "version": "18.1.0"
+    },
+    {
+      "name": "setuptools",
+      "version": "78.1.0"
+    },
+    {
+      "name": "simplejson",
+      "version": "3.20.2"
+    },
+    {
+      "name": "six",
+      "version": "1.16.0"
+    },
+    {
+      "name": "sos",
+      "version": "4.10.2"
+    },
+    {
+      "name": "sqlparse",
+      "version": "0.6.0"
+    },
+    {
+      "name": "ssh-import-id",
+      "version": "5.11"
+    },
+    {
+      "name": "sympy",
+      "version": "1.14.0"
+    },
+    {
+      "name": "systemd-python",
+      "version": "234"
+    },
+    {
+      "name": "taskgroup",
+      "version": "0.2.2"
+    },
+    {
+      "name": "tensorstore",
+      "version": "0.1.78"
+    },
+    {
+      "name": "texttable",
+      "version": "1.7.0"
+    },
+    {
+      "name": "tomli",
+      "version": "2.4.1"
+    },
+    {
+      "name": "torch",
+      "version": "2.14.0+cpu"
+    },
+    {
+      "name": "torchvision",
+      "version": "0.29.0+cpu"
+    },
+    {
+      "name": "treescope",
+      "version": "0.1.10"
+    },
+    {
+      "name": "Twisted",
+      "version": "22.1.0"
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.4"
+    },
+    {
+      "name": "tzlocal",
+      "version": "5.4.4"
+    },
+    {
+      "name": "ubuntu-pro-client",
+      "version": "8001"
+    },
+    {
+      "name": "ufw",
+      "version": "0.36.1"
+    },
+    {
+      "name": "unattended-upgrades",
+      "version": "0.1"
+    },
+    {
+      "name": "uri-template",
+      "version": "1.3.0"
+    },
+    {
+      "name": "uritemplate",
+      "version": "4.2.0"
+    },
+    {
+      "name": "urllib3",
+      "version": "1.26.5"
+    },
+    {
+      "name": "urnparse",
+      "version": "0.2.2"
+    },
+    {
+      "name": "uvloop",
+      "version": "0.22.1"
+    },
+    {
+      "name": "Versio",
+      "version": "0.5.0"
+    },
+    {
+      "name": "virtualenv",
+      "version": "20.23.0"
+    },
+    {
+      "name": "wadllib",
+      "version": "1.3.6"
+    },
+    {
+      "name": "watchdog",
+      "version": "6.0.0"
+    },
+    {
+      "name": "webcolors",
+      "version": "25.10.0"
+    },
+    {
+      "name": "websocket-client",
+      "version": "1.9.2"
+    },
+    {
+      "name": "wheel",
+      "version": "0.37.1"
+    },
+    {
+      "name": "whitenoise",
+      "version": "6.12.0"
+    },
+    {
+      "name": "wsproto",
+      "version": "1.3.2"
+    },
+    {
+      "name": "xmlschema",
+      "version": "4.3.2"
+    },
+    {
+      "name": "xmltodict",
+      "version": "1.0.4"
+    },
+    {
+      "name": "zipp",
+      "version": "1.0.0"
+    },
+    {
+      "name": "zipremove",
+      "version": "0.10.0"
+    },
+    {
+      "name": "zipstream-ng",
+      "version": "1.9.3"
+    },
+    {
+      "name": "zope.interface",
+      "version": "5.4.0"
+    }
+  ],
+  "runtimes": {
+    "cpu_gemm_benchmark": {
+      "dtype": "float32",
+      "finite": true,
+      "gflops": 28.07,
+      "size": 1024,
+      "time_ms": 76.5
+    },
+    "jax": {
+      "available": true,
+      "devices": [
+        "TFRT_CPU_0"
+      ],
+      "local_device_count": 1,
+      "platform": "cpu",
+      "process_count": 1,
+      "version": "0.6.2"
+    },
+    "lean": {
+      "lake_version": "Lake version 5.0.0-6caaee8 (Lean version 4.19.0)",
+      "lean_toolchain": "leanprover/lean4:v4.19.0",
+      "lean_version": "Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)",
+      "mathlib_pin": {
+        "inputRev": "v4.19.0",
+        "name": "mathlib",
+        "rev": "c44e0c8ee63ca166450922a373c7409c5d26b00b",
+        "url": "https://github.com/leanprover-community/mathlib4.git"
+      }
+    },
+    "python": {
+      "executable": "/usr/bin/python3",
+      "version": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]"
+    },
+    "pytorch": {
+      "available": true,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "cuda_device_name": null,
+      "default_device": "cpu",
+      "version": "2.14.0+cpu"
+    }
+  },
+  "system": {
+    "accel_device_nodes": [
+      "/dev/accel0",
+      "/dev/accel1",
+      "/dev/accel2",
+      "/dev/accel3"
+    ],
+    "free": "total        used        free      shared  buff/cache   available\nMem:           400Gi       5.5Gi       320Gi       2.0Mi        74Gi       392Gi\nSwap:             0B          0B          0B",
+    "lscpu": "Architecture:                    x86_64\nCPU op-mode(s):                  32-bit, 64-bit\nAddress sizes:                   48 bits physical, 48 bits virtual\nByte Order:                      Little Endian\nCPU(s):                          240\nOn-line CPU(s) list:             0-239\nVendor ID:                       AuthenticAMD\nModel name:                      AMD EPYC 7B12\nCPU family:                      23\nModel:                           49\nThread(s) per core:              2\nCore(s) per socket:              60\nSocket(s):                       2\nStepping:                        0\nBogoMIPS:                        4500.00\nFlags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nHypervisor vendor:               KVM\nVirtualization type:             full\nL1d cache:                       3.8 MiB (120 instances)\nL1i cache:                       3.8 MiB (120 instances)\nL2 cache:                        60 MiB (120 instances)\nL3 cache:                        480 MiB (30 instances)\nNUMA node(s):                    2\nNUMA node0 CPU(s):               0-59,120-179\nNUMA node1 CPU(s):               60-119,180-239\nVulnerability Itlb multihit:     Not affected\nVulnerability L1tf:              Not affected\nVulnerability Mds:               Not affected\nVulnerability Meltdown:          Not affected\nVulnerability Mmio stale data:   Not affected\nVulnerability Retbleed:          Mitigation; untrained return thunk; SMT enabled with STIBP protection\nVulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:        Mitigation; Retpolines, IBPB conditional, STIBP always-on, RSB filling, PBRSB-eIBRS Not affected\nVulnerability Srbds:             Not affected\nVulnerability Tsx async abort:   Not affected",
+    "lspci": "00:00.0 Host bridge: Intel Corporation 440FX - 82441FX PMC [Natoma] (rev 02)\n00:01.0 ISA bridge: Intel Corporation 82371AB/EB/MB PIIX4 ISA (rev 03)\n00:01.3 Bridge: Intel Corporation 82371AB/EB/MB PIIX4 ACPI (rev 03)\n00:03.0 Non-VGA unclassified device: Red Hat, Inc. Virtio SCSI\n00:04.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:05.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:06.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:07.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:08.0 Ethernet controller: Red Hat, Inc. Virtio network device\n00:09.0 Unclassified device [00ff]: Red Hat, Inc. Virtio RNG",
+    "machine": "x86_64",
+    "os": "Linux",
+    "os_release": "5.19.0-1022-gcp",
+    "tpu_cluster_note": "Host contains /dev/accel nodes from GCP TPU VM instance, but TPU slice coordinator is unreachable/inactive; libtpu cannot initialize local TPU runtime. Valid runtime execution is strictly CPU.",
+    "tpu_cluster_reachable": false,
+    "uname": "Linux t1v-n-49ba2866-w-0 5.19.0-1022-gcp #24~22.04.1-Ubuntu SMP Sun Apr 23 09:51:08 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux"
+  },
+  "timestamp_utc": "2026-09-18T06:45:54.083436+00:00"
+}

@@ -1,0 +1,156 @@
+{
+  "baselines": {
+    "gated_deltanet": "Gated DeltaNet recurrence baseline without archive.",
+    "legacy_v1_ridge": "Historical Bayesian ridge solver (mechanism ablation).",
+    "per_page_midpoint_comparator": "Equation (13) per-page completion with p_j = c_j and B_j = U_j \u03c1_j.",
+    "recurrence_free_archive": "Sparse/archive attention without recurrent prediction (using r=0 or local barycenter predictor).",
+    "ssm_hybrid": "Alternating Mamba-2 / SSD selective state-space scan and local attention.",
+    "transformer_gqa": "Modern causal Transformer with RoPE rotary embeddings, Pre-RMSNorm, SwiGLU MLP, GQA grouped-query attention."
+  },
+  "compute_limits": {
+    "max_cpu_core_hours_pilot": 100,
+    "max_memory_rss_gib": 32.0,
+    "max_runtime_per_job_seconds": 1800,
+    "stop_conditions": [
+      "NaN or Inf detected in loss, gradients, or recurrent state",
+      "Loss divergence (> 100.0 on standard LM cross-entropy)",
+      "Process timeout exceeding per-job limit",
+      "Memory allocation exceeding 32 GiB RSS",
+      "Evaluation non-convergence or zero backward gradient"
+    ]
+  },
+  "data_provenance_plan": {
+    "accuracy_and_recall": "Computed by exact string/token match on test sequences; raw model logits and predictions logged to JSONL; commit hash and checkpoint ID attached to every output.",
+    "error_certificate": "Evaluated by computing ||y_* - y_hat||_2 against fp64 full softmax truth; certificate bound correctness checked for 100% enclosure.",
+    "latency": "Timed using high-resolution perf_counter(); JAX block_until_ready() or PyTorch synchronize() called before and after; warmups recorded separately; measurements run with populated cache tensors.",
+    "loss_and_nll": "Calculated directly via cross-entropy loss over held-out tokens; per-batch loss arrays serialized to disk; no smoothed or synthetic proxies.",
+    "memory": "Measured via psutil resident set size (RSS) and tensor allocation counters; page table and index metadata explicitly accounted."
+  },
+  "epsilon_grid": [
+    0.001,
+    0.005,
+    0.01,
+    0.05,
+    0.1,
+    0.25,
+    0.5
+  ],
+  "held_out_splits": {
+    "language_modeling": {
+      "dataset": "WikiText-103",
+      "eval_tokens": 500000,
+      "max_train_tokens": 10000000,
+      "splits": "Standard train, validation, test splits"
+    },
+    "multi_hop_pointer": {
+      "description": "2-hop and 4-hop mixed cache/remote pointer chasing chains",
+      "test_chains": 1000
+    },
+    "passkey_retrieval": {
+      "description": "Needle-in-a-haystack passkey insertion at depths 0.1, 0.25, 0.5, 0.75, 0.9",
+      "eval_contexts": [
+        512,
+        1024,
+        2048,
+        4096,
+        8192,
+        16384
+      ],
+      "trials_per_depth": 50
+    },
+    "synthetic_mqar": {
+      "description": "Multi-Query Associative Recall with variable key-value pairs and distractor tokens",
+      "test_samples": 2000,
+      "train_samples": 10000,
+      "val_samples": 1000,
+      "vocab_size": 4096
+    }
+  },
+  "hypotheses": {
+    "H1": {
+      "falsification_criterion": "Per-step bounded decode time scales super-linearly with context length, or exceeds v1 ridge decode time at matched dimensions.",
+      "name": "Solve-free bounded execution removes v1 solver/all-prefix bottleneck",
+      "primary_phase": "Phase 2 & Phase 5",
+      "statement": "Solve-free bounded execution removes v1's solver and all-prefix intermediate bottleneck, achieving constant-per-token decode complexity O(d_v d_k + w(d_k + d_v)) without Cholesky factorizations."
+    },
+    "H2": {
+      "falsification_criterion": "Measured cost improvement < 10% or paired 95% confidence interval includes zero at registered epsilon values on held-out tasks.",
+      "name": "Recurrent completion lowers measured cost at fixed certified error",
+      "primary_phase": "Phase 3 & Phase 4",
+      "statement": "Recurrent completion (Eq. 8, using r(q) = v\u0304_L + S(q - k\u0304_L)) lowers measured retrieval cost (pages/bytes fetched) at fixed certified error tolerance \u03b5 relative to the best recurrence-free completion (r = 0, r = barycenter, or Eq. 13 per-page completion)."
+    },
+    "H3": {
+      "falsification_criterion": "Fallback rate > 5.0%, or p99 latency > 25 ms, or validation NLL degradation > 1.0% relative to dense Transformer baseline.",
+      "name": "Archive mode preserves held-out task quality with acceptable systems metrics",
+      "primary_phase": "Phase 6 & Phase 7",
+      "statement": "Archive mode preserves held-out task quality (MQAR, Passkey, LM validation NLL) while meeting registered SLOs: p99 decode latency \u2264 25 ms, fallback rate \u2264 5.0%, and acceptable memory footprint."
+    },
+    "H4": {
+      "falsification_criterion": "Validation NLL degradation > 5.0% relative to matched SSM Hybrid baseline, or complete failure on short-to-medium recall tasks within the state capacity.",
+      "name": "Trained bounded mode has useful quality at its fixed state budget",
+      "primary_phase": "Phase 6 & Phase 8",
+      "statement": "Trained bounded mode (without archive) retains competitive quality on language modeling and associative recall within its fixed recurrent state budget O(d_v d_k + w(d_k + d_v))."
+    }
+  },
+  "margins": {
+    "bounded_mode_memory_reduction_factor": 2.0,
+    "fp64_numerical_atol": 1e-10,
+    "fp64_numerical_rtol": 1e-09,
+    "practical_cost_improvement_confidence_level": 0.95,
+    "practical_cost_improvement_h2_percent": 10.0,
+    "quality_noninferiority_recall_percentage_points": 2.0,
+    "quality_noninferiority_relative_nll_percent": 1.0
+  },
+  "paired_seeds": [
+    42,
+    137,
+    2026
+  ],
+  "preregistration_version": "v2.0-phase0",
+  "reference_encoding": {
+    "mathematical_reference": "Float64 independent oracle in pure Python/NumPy",
+    "model_activations": "BFloat16 / Float32 with declared numerical allowance delta_num",
+    "recurrent_state_accumulation": "Float32 accumulation baseline for state S"
+  },
+  "service_level_objectives": {
+    "max_fallback_rate_percent": 5.0,
+    "min_throughput_tokens_per_sec": 40.0,
+    "target_p99_decode_latency_ms": 25.0
+  },
+  "timestamp_utc": "2026-09-18T06:45:55.318757+00:00",
+  "workload_grids": {
+    "batch_sizes": [
+      1,
+      4,
+      8,
+      16
+    ],
+    "context_lengths": [
+      512,
+      1024,
+      2048,
+      4096,
+      8192,
+      16384
+    ],
+    "key_value_dimensions": [
+      32,
+      64,
+      128
+    ],
+    "local_window_sizes": [
+      64,
+      128,
+      256
+    ],
+    "page_sizes": [
+      32,
+      64,
+      128
+    ],
+    "training_chunk_lengths": [
+      64,
+      128
+    ]
+  }
+}

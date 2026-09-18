@@ -2,7 +2,7 @@ revision_id: v2.0
 parent_revision: v1
 created_utc: 2026-09-16T00:00:00Z
 kind: semantic_theory_revision
-status: documentation_complete_implementation_pending
+status: phase0_complete_phase1_pending
 source_commit_before_push: working_tree
 change_summary:
   - replaced the Bayesian ridge read and posterior gate with solve-free gated delta transport
@@ -22,7 +22,7 @@ changed_inputs:
 earliest_affected_phase: 0
 affected_descendants: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 phase_status:
-  phase0: NOT_STARTED
+  phase0: PASS
   phase1: NOT_STARTED
   phase2: NOT_STARTED
   phase3: NOT_STARTED
