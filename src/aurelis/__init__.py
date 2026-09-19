@@ -20,6 +20,21 @@ from .oracles import (
     TensorOracle,
     TensorStreamingOracle,
 )
+from .certificate import (
+    compute_numerical_allowance,
+    compute_outward_page_envelope,
+    compute_outward_score_interval,
+    evaluate_certified_bound,
+    gamma,
+    get_unit_roundoff,
+    validate_intervals,
+    validate_page_summary,
+    validate_unread_cover,
+)
+from .policy import (
+    CandidateState,
+    RetrievalPolicy,
+)
 from .session import AurelisSession
 from .streaming import (
     consume,
@@ -44,12 +59,14 @@ __all__ = [
     "Archive",
     "ArchiveEntry",
     "AurelisSession",
+    "CandidateState",
     "CertificateBound",
     "DeltaState",
     "MemoryProfile",
     "PageDescriptor",
     "ReadResult",
     "ReadStatus",
+    "RetrievalPolicy",
     "ScalarOracle",
     "ScalarStreamingOracle",
     "StateSnapshot",
@@ -58,11 +75,17 @@ __all__ = [
     "archive_reference_read",
     "bounded_read",
     "completed_read",
+    "compute_numerical_allowance",
+    "compute_outward_page_envelope",
+    "compute_outward_score_interval",
     "compute_page_envelope",
     "consume",
     "create_snapshot",
+    "evaluate_certified_bound",
     "full_history_softmax",
+    "gamma",
     "gated_delta_update",
+    "get_unit_roundoff",
     "initial_state",
     "local_attention",
     "occurrence_partition",
@@ -70,4 +93,7 @@ __all__ = [
     "read",
     "residual_certificate",
     "restore_from_snapshot",
+    "validate_intervals",
+    "validate_page_summary",
+    "validate_unread_cover",
 ]

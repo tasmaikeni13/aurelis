@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import torch
 from torch import Tensor
@@ -15,6 +15,7 @@ from .functional import (
     local_attention,
     residual_certificate,
 )
+from .policy import RetrievalPolicy
 from .types import ArchiveEntry, CertificateBound, PageDescriptor, ReadResult, ReadStatus
 
 
@@ -282,9 +283,16 @@ def archive_reference_read(
     kappa: float = 1.0,
     epsilon: float = 1e-3,
     max_pages: Optional[int] = None,
+    max_bytes: Optional[int] = None,
     read_all_pages: bool = False,
     expected_archive_length: Optional[int] = None,
     expected_index_version: Optional[int] = None,
+    cost_fn: Optional[Callable[[PageDescriptor], float]] = None,
+    timeout_seconds: Optional[float] = None,
+    simulate_timeout: bool = False,
+    inject_corrupt_bounds: bool = False,
+    inject_missing_page: bool = False,
+    inject_unsound_scale: float = 1.0,
 ) -> ReadResult:
     """Execute exact archive reference read with deterministic certification or full read.
 
@@ -293,8 +301,31 @@ def archive_reference_read(
     2. Retrying a read NEVER duplicates an observation.
     3. Wrong archive length / index version fails with 'invalid_state' rather than returning a certificate.
     4. Reading all observations recovers full softmax on current query/keys/values.
+    5. Nonfinite inputs (NaN, Inf) return 'invalid_interval'.
+    6. Timeouts return 'archive_unavailable'.
     """
     d_v = S.shape[0]
+
+    # Nonfinite tensor check
+    if (
+        torch.isnan(query).any()
+        or torch.isinf(query).any()
+        or torch.isnan(recent_keys).any()
+        or torch.isinf(recent_keys).any()
+        or torch.isnan(recent_values).any()
+        or torch.isinf(recent_values).any()
+        or torch.isnan(S).any()
+        or torch.isinf(S).any()
+    ):
+        return ReadResult(
+            output=torch.zeros(d_v, dtype=query.dtype, device=query.device),
+            mode="archive",
+            status="invalid_interval",
+            certificate=None,
+            pages_read=0,
+            bytes_read=0,
+            details={"error": "NaN or Inf detected in input tensors"},
+        )
 
     # Gate: Integrity checks
     if archive is not None:
@@ -344,200 +375,40 @@ def archive_reference_read(
             certificate=None,
             pages_read=0,
             bytes_read=0,
+            details={"summary_visits": 0, "selection_cost_ops": 0},
         )
 
-    dt = query.dtype
-    rk = recent_keys.to(dtype=dt, device=query.device)
-    rv = recent_values.to(dtype=dt, device=query.device)
-    S_dt = S.to(dtype=dt, device=query.device)
+    # Delegate to validated retrieval policy
+    policy = RetrievalPolicy(cost_fn=cost_fn, timeout_seconds=timeout_seconds)
 
-    # Compute prior r(q) = vbar_L + S (q - kbar_L) (Eq. 3)
-    # Note: S is strictly read, NEVER mutated!
-    _, kbar, vbar = local_attention(rk, rv, query, kappa=kappa)
-    diff = query - kbar
-    prior = vbar + torch.einsum("vk,k->v", S_dt, diff)
-
-    # Get valid remote pages under per-query causal mask
-    remote_pages: list[PageDescriptor] = []
+    entries = []
+    descriptors = []
     if archive is not None and len(archive) > 0:
-        remote_pages = archive.get_pages_and_partial(causal_cutoff=causal_position)
+        entries = archive.get_entries(causal_cutoff=causal_position)
+        descriptors = archive.get_pages_and_partial(causal_cutoff=causal_position)
 
-    # Case: Empty remote set (all history is in the recent window)
-    if not remote_pages:
-        exact_out = full_history_softmax(rk, rv, query, kappa=kappa)
-        return ReadResult(
-            output=exact_out,
-            mode="archive",
-            status="full_read",
-            certificate=None,
-            pages_read=0,
-            bytes_read=0,
-        )
+    def get_entries_fn(pid: int) -> list[ArchiveEntry]:
+        if archive is None:
+            return []
+        return archive.get_page_entries(pid, causal_cutoff=causal_position)
 
-    # Compute score bounds and residual bounds for all remote pages
-    # Use log-sum-exp shift m = max(recent_scores, page_u) for numerical stability
-    recent_scores = kappa * torch.einsum("d,kd->k", query, rk)
-    max_recent_s = float(torch.max(recent_scores).item()) if len(recent_scores) > 0 else -1e9
-
-    page_envelopes = []
-    max_u = -1e9
-    for p in remote_pages:
-        qk_min = query * p.key_min.to(dtype=dt, device=query.device)
-        qk_max = query * p.key_max.to(dtype=dt, device=query.device)
-        coord_min = torch.minimum(qk_min, qk_max)
-        coord_max = torch.maximum(qk_min, qk_max)
-        ell_j = float((kappa * torch.sum(coord_min)).item())
-        u_j = float((kappa * torch.sum(coord_max)).item())
-        max_u = max(max_u, u_j)
-
-        diff_r = float(torch.linalg.vector_norm(p.value_center.to(dtype=dt, device=query.device) - prior).item())
-        page_envelopes.append({
-            "page": p,
-            "ell": ell_j,
-            "u": u_j,
-            "diff_r": diff_r,
-            "radius": p.value_radius,
-            "count": p.count,
-        })
-
-    m_shift = max(max_recent_s, max_u)
-
-    # Selected set initially contains all recent tokens in window w
-    shifted_recent_scores = recent_scores - m_shift
-    recent_weights = torch.exp(shifted_recent_scores)
-    Z_A = float(torch.sum(recent_weights).item())
-    N_A = torch.sum(recent_weights[:, None] * rv, dim=0)
-
-    # Unread remote sums
-    L_O = 0.0
-    U_O = 0.0
-    B_O = 0.0
-    for env in page_envelopes:
-        Lj = float(env["count"]) * math.exp(env["ell"] - m_shift)
-        Uj = float(env["count"]) * math.exp(env["u"] - m_shift)
-        bj = Uj * (env["diff_r"] + env["radius"])
-        env["Lj"] = Lj
-        env["Uj"] = Uj
-        env["bj"] = bj
-        L_O += Lj
-        U_O += Uj
-        B_O += bj
-
-    Z_hat_O = (L_O + U_O) / 2.0
-    eta = (U_O - L_O) / 2.0
-
-    # Eq. (8) Normalized midpoint completion
-    y_hat_A = completed_read(Z_A, Z_hat_O, N_A, prior)
-
-    # Eq. (10) Deterministic residual certificate
-    cert = residual_certificate(
-        selected_mass=Z_A,
-        unread_lower=L_O,
-        unread_upper=U_O,
-        residual_bound=B_O,
-        prior=prior,
-        completed=y_hat_A,
-    )
-
-    # Check if stopping condition met without fetching remote pages
-    if not read_all_pages and cert.bound <= epsilon:
-        return ReadResult(
-            output=y_hat_A,
-            mode="archive",
-            status="certified",
-            certificate=cert,
-            pages_read=0,
-            bytes_read=0,
-        )
-
-    # Refine by reading pages
-    pages_read = 0
-    bytes_read = 0
-    # Priority heuristic: bj + eta_j * ||r - y_hat||
-    prior_diff = float(torch.linalg.vector_norm(prior - y_hat_A).item())
-    page_envelopes.sort(key=lambda env: env["bj"] + ((env["Uj"] - env["Lj"]) / 2.0) * prior_diff, reverse=True)
-
-    unread_envelopes = list(page_envelopes)
-
-    while unread_envelopes:
-        if max_pages is not None and pages_read >= max_pages:
-            return ReadResult(
-                output=y_hat_A,
-                mode="archive",
-                status="budget_exhausted",
-                certificate=cert,
-                pages_read=pages_read,
-                bytes_read=bytes_read,
-            )
-
-        target_env = unread_envelopes.pop(0)
-        p = target_env["page"]
-
-        # Fetch observations from archive (reading NEVER writes S)
-        assert archive is not None
-        p_entries = archive.get_page_entries(p.page_id, causal_cutoff=causal_position)
-        if not p_entries:
-            continue
-
-        p_keys = torch.stack([e.key.to(dtype=dt, device=query.device) for e in p_entries])
-        p_vals = torch.stack([e.value.to(dtype=dt, device=query.device) for e in p_entries])
-
-        p_scores = kappa * torch.einsum("d,kd->k", query, p_keys)
-        shifted_p_scores = p_scores - m_shift
-        p_exp = torch.exp(shifted_p_scores)
-
-        # Update selected sums
-        Z_A += float(torch.sum(p_exp).item())
-        N_A = N_A + torch.sum(p_exp[:, None] * p_vals, dim=0)
-
-        # Remove from unread bounds
-        L_O = max(0.0, L_O - target_env["Lj"])
-        U_O = max(0.0, U_O - target_env["Uj"])
-        B_O = max(0.0, B_O - target_env["bj"])
-        Z_hat_O = (L_O + U_O) / 2.0
-        eta = (U_O - L_O) / 2.0
-
-        pages_read += 1
-        bytes_read += len(p_entries) * (p_keys.shape[-1] + p_vals.shape[-1]) * p_keys.element_size()
-
-        # Recompute completed read and certificate
-        if not unread_envelopes:
-            # All pages read! Recovers exact full softmax in real arithmetic
-            exact_out = N_A / Z_A
-            return ReadResult(
-                output=exact_out,
-                mode="archive",
-                status="full_read",
-                certificate=None,
-                pages_read=pages_read,
-                bytes_read=bytes_read,
-            )
-
-        y_hat_A = completed_read(Z_A, Z_hat_O, N_A, prior)
-        cert = residual_certificate(
-            selected_mass=Z_A,
-            unread_lower=L_O,
-            unread_upper=U_O,
-            residual_bound=B_O,
-            prior=prior,
-            completed=y_hat_A,
-        )
-
-        if not read_all_pages and cert.bound <= epsilon:
-            return ReadResult(
-                output=y_hat_A,
-                mode="archive",
-                status="certified",
-                certificate=cert,
-                pages_read=pages_read,
-                bytes_read=bytes_read,
-            )
-
-    return ReadResult(
-        output=N_A / Z_A,
-        mode="archive",
-        status="full_read",
-        certificate=None,
-        pages_read=pages_read,
-        bytes_read=bytes_read,
+    return policy.execute_retrieval(
+        query=query,
+        recent_keys=recent_keys,
+        recent_values=recent_values,
+        S=S,
+        archive_entries=entries,
+        page_descriptors=descriptors,
+        get_page_entries_fn=get_entries_fn,
+        causal_position=causal_position,
+        kappa=kappa,
+        epsilon=epsilon,
+        max_pages=max_pages,
+        max_bytes=max_bytes,
+        read_all_pages=read_all_pages,
+        dtype=query.dtype,
+        inject_corrupt_bounds=inject_corrupt_bounds,
+        inject_missing_page=inject_missing_page,
+        inject_unsound_scale=inject_unsound_scale,
+        simulate_timeout=simulate_timeout,
     )

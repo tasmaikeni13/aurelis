@@ -1,0 +1,85 @@
+{
+  "total_stress_cases": 11,
+  "all_passed": true,
+  "cases": [
+    {
+      "case": "Underflow (extreme negative scores)",
+      "expected_status": "full_read",
+      "observed_status": "full_read",
+      "certified": false,
+      "finite_output": true,
+      "pass": true
+    },
+    {
+      "case": "Overflow (extreme positive scores)",
+      "expected_status": "full_read",
+      "observed_status": "full_read",
+      "certified": false,
+      "finite_output": true,
+      "pass": true
+    },
+    {
+      "case": "Nearly cancelled numerators",
+      "expected_status": "full_read",
+      "observed_status": "full_read",
+      "certified": false,
+      "finite_output": true,
+      "pass": true
+    },
+    {
+      "case": "Zero unread mass (no remote archive)",
+      "expected_status": "full_read",
+      "observed_status": "full_read",
+      "certified": false,
+      "pass": true
+    },
+    {
+      "case": "Partial pages at tail (9 items with page_size=4)",
+      "expected_status": "full_read",
+      "observed_status": "full_read",
+      "pages_read": 3,
+      "pass": true
+    },
+    {
+      "case": "Negative query coordinates",
+      "expected_status": "full_read",
+      "observed_status": "full_read",
+      "pass": true
+    },
+    {
+      "case": "Deliberately injected unsound bounds (L > U)",
+      "expected_status": "invalid_interval",
+      "observed_status": "invalid_interval",
+      "certified": false,
+      "pass": true
+    },
+    {
+      "case": "Missing archive page from storage",
+      "expected_status": "archive_error",
+      "observed_status": "archive_error",
+      "certified": false,
+      "pass": true
+    },
+    {
+      "case": "NaN detected in inputs",
+      "expected_status": "invalid_interval",
+      "observed_status": "invalid_interval",
+      "certified": false,
+      "pass": true
+    },
+    {
+      "case": "Simulated I/O timeout",
+      "expected_status": "archive_unavailable",
+      "observed_status": "archive_unavailable",
+      "certified": false,
+      "pass": true
+    },
+    {
+      "case": "Budget exhaustion (max_pages=1)",
+      "expected_status": "budget_exhausted",
+      "observed_status": "budget_exhausted",
+      "certified": false,
+      "pass": true
+    }
+  ]
+}

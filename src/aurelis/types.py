@@ -13,6 +13,8 @@ ReadStatus = Literal[
     "full_read",
     "budget_exhausted",
     "invalid_state",
+    "invalid_interval",
+    "archive_unavailable",
     "archive_error",
 ]
 
@@ -28,6 +30,16 @@ class CertificateBound:
     unread_mass_upper: float
     residual_bound: float
     denominator_floor: float
+    delta_num: float = 0.0
+    approximation_bound: float = 0.0
+    total_bound: float = 0.0
+    bound_valid: bool = True
+
+    def __post_init__(self) -> None:
+        if self.approximation_bound == 0.0 and self.bound > 0.0:
+            object.__setattr__(self, "approximation_bound", self.bound)
+        if self.total_bound == 0.0 and self.bound > 0.0:
+            object.__setattr__(self, "total_bound", self.bound)
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,71 @@
+{
+  "gates": [
+    {
+      "gate_id": "Gate 1",
+      "criterion": "Computable page envelopes (key boxes, value centers, radii, partial pages)",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_envelopes.py & certificate_validation.json"
+    },
+    {
+      "gate_id": "Gate 2",
+      "criterion": "Disjoint exhaustive unread partition cover validation",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_envelopes.py & certificate_validation.json"
+    },
+    {
+      "gate_id": "Gate 3",
+      "criterion": "Documented validated forward arithmetic error bounds (delta_num)",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_arithmetic_error.py & arithmetic_error_model.json"
+    },
+    {
+      "gate_id": "Gate 4",
+      "criterion": "Stopping certified only when E_A + delta_num <= epsilon",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_enclosure.py & policy.py"
+    },
+    {
+      "gate_id": "Gate 5",
+      "criterion": "Dense fp64 reference outputs strictly enclosed in returned bounds (ratio >= 1.0)",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_enclosure.py & retrieval_policy_benchmark.json"
+    },
+    {
+      "gate_id": "Gate 6",
+      "criterion": "Non-monotone candidate tracking (best valid candidate preserved)",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_retrieval_policy.py & policy.py"
+    },
+    {
+      "gate_id": "Gate 7",
+      "criterion": "Paper \u00a76.2 priority heuristic and cost accounting",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_retrieval_policy.py & policy.py"
+    },
+    {
+      "gate_id": "Gate 8",
+      "criterion": "Distinct statuses: certified, full_read, budget_exhausted, invalid_interval, invalid_state, archive_unavailable, archive_error",
+      "status": "PASS",
+      "evidence": "Verified in types.py, policy.py & stress_pathology_results.json"
+    },
+    {
+      "gate_id": "Gate 9",
+      "criterion": "Stress suite: underflow, overflow, cancellation, zero unread, negative coords, partial pages",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_stress_and_pathologies.py & stress_pathology_results.json"
+    },
+    {
+      "gate_id": "Gate 10",
+      "criterion": "Deliberate corrupt bounds injection detected and rejected from certification",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_stress_and_pathologies.py & stress_pathology_results.json"
+    },
+    {
+      "gate_id": "Gate 11",
+      "criterion": "Missing pages, NaNs, and I/O timeouts return explicit non-certified failure statuses",
+      "status": "PASS",
+      "evidence": "Verified in test_phase3_stress_and_pathologies.py & stress_pathology_results.json"
+    }
+  ],
+  "all_passed": true
+}

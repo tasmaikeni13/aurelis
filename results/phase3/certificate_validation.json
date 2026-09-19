@@ -1,0 +1,51 @@
+{
+  "cover_valid": true,
+  "total_pages": 6,
+  "total_entries": 24,
+  "page_summary_audits": [
+    {
+      "page_id": 0,
+      "count": 4,
+      "radius": 8.277852712764272,
+      "is_valid": true,
+      "reason": "valid"
+    },
+    {
+      "page_id": 1,
+      "count": 4,
+      "radius": 10.718935228974402,
+      "is_valid": true,
+      "reason": "valid"
+    },
+    {
+      "page_id": 2,
+      "count": 4,
+      "radius": 6.4854029276939125,
+      "is_valid": true,
+      "reason": "valid"
+    },
+    {
+      "page_id": 3,
+      "count": 4,
+      "radius": 8.136445189920384,
+      "is_valid": true,
+      "reason": "valid"
+    },
+    {
+      "page_id": 4,
+      "count": 4,
+      "radius": 7.914188514825016,
+      "is_valid": true,
+      "reason": "valid"
+    },
+    {
+      "page_id": 5,
+      "count": 4,
+      "radius": 7.6648166493848695,
+      "is_valid": true,
+      "reason": "valid"
+    }
+  ],
+  "corrupt_detection_verified": true,
+  "partition_mismatch_detected": true
+}

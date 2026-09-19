@@ -1,0 +1,17 @@
+{
+  "error_model_spec": "Higham Forward Error Bounds with Outward Enclosure",
+  "evaluations": [
+    {
+      "dtype": "float64",
+      "unit_roundoff": 1.1102230246251565e-16,
+      "delta_dot": 2.3364783589195507e-14,
+      "delta_num": 4.90864933483299e-15
+    },
+    {
+      "dtype": "float32",
+      "unit_roundoff": 5.960464477539063e-08,
+      "delta_dot": 1.3399829010342267e-05,
+      "delta_num": 2.8779614360490255e-06
+    }
+  ]
+}
