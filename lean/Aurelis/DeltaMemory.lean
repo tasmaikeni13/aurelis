@@ -11,7 +11,7 @@ theorem concerns differences of two states receiving the SAME key/value/gates.
 It does not prove bounded driven states or learned-model quality.
 -/
 
-namespace Aurelis.V2
+namespace Aurelis
 
 variable {X Y : Type*} [NormedAddCommGroup X] [InnerProductSpace ℝ X]
 variable [AddCommGroup Y] [Module ℝ Y]
@@ -64,4 +64,4 @@ theorem decayed_delta_nonexpansive (key error : X) (decay rate : ℝ)
   exact mul_le_mul_of_nonneg_left
     (deltaTransition_nonexpansive key error rate hrate hstep) hdecay
 
-end Aurelis.V2
+end Aurelis

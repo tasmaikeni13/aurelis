@@ -1,176 +1,72 @@
 {
-  "command": ".venv/bin/python scripts/audit_environment.py",
-  "compatibility": {
-    "accessed_utc_date": "2026-09-16",
-    "assessment": "The environment operates on Google Cloud TPU v4 Pod substrate (v4-32 slice, 16 v4 TPUs / 32 TensorCores arranged in a 2x2x4 3D torus interconnect). JAX with libtpu serves as the primary high-performance accelerated backend, executing fused HLO graph loops on the TPU vector and matrix units. All health checks and verification criteria pass.",
-    "official_sources": [
-      {
-        "decision": "TPU v4 pod slice architecture (2x2x4 3D torus interconnect, 16 chips / 32 TensorCores per v4-32 slice).",
-        "title": "Google Cloud TPU v4 Architecture and Pod Slices",
-        "url": "https://cloud.google.com/tpu/docs/v4"
-      },
-      {
-        "decision": "Leverage libtpu and XLA for native TPU execution, automatic fusion, and multi-chip scaling.",
-        "title": "JAX on Cloud TPU documentation",
-        "url": "https://docs.jax.dev/en/latest/tpu/index.html"
-      },
-      {
-        "decision": "Compile tensor graphs into fused HLO loops targeting TPU Matrix Multiply Units (MXU) and Vector Processing Units (VPU).",
-        "title": "OpenXLA HLO Compilation and Optimizations",
-        "url": "https://openxla.org/xla"
-      },
-      {
-        "decision": "Use positive-definite Cholesky factorization and solves for the Bayesian reference path on TPU.",
-        "title": "JAX Scientific Linear Algebra",
-        "url": "https://docs.jax.dev/en/latest/jax.scipy.linalg.html"
-      }
-    ]
+  "enumeration_integrity": {
+    "accelerator_present": false,
+    "active_devices": [
+      "JAX:cpu(cpu)"
+    ],
+    "execution_substrate": "CPU",
+    "status": "PASS"
   },
-  "dependency_policy": {
-    "forbidden_accelerator_packages": [],
-    "passes": true
-  },
-  "environment": {
-    "cpu": {
-      "available": true,
-      "command": [
-        "lscpu"
-      ],
-      "returncode": 0,
-      "stderr": "",
-      "stdout": "Architecture:                    x86_64\nCPU op-mode(s):                  32-bit, 64-bit\nAddress sizes:                   48 bits physical, 48 bits virtual\nByte Order:                      Little Endian\nCPU(s):                          240\nOn-line CPU(s) list:             0-239\nVendor ID:                       CloudHostCPU\nModel name:                      Cloud Host EPYC 7B12\nCPU family:                      23\nModel:                           49\nThread(s) per core:              2\nCore(s) per socket:              60\nSocket(s):                       2\nStepping:                        0\nBogoMIPS:                        4500.00\nFlags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nHypervisor vendor:               KVM\nVirtualization type:             full\nL1d cache:                       3.8 MiB (120 instances)\nL1i cache:                       3.8 MiB (120 instances)\nL2 cache:                        60 MiB (120 instances)\nL3 cache:                        480 MiB (30 instances)\nNUMA node(s):                    2\nNUMA node0 CPU(s):               0-59,120-179\nNUMA node1 CPU(s):               60-119,180-239\nVulnerability Itlb multihit:     Not affected\nVulnerability L1tf:              Not affected\nVulnerability Mds:               Not affected\nVulnerability Meltdown:          Not affected\nVulnerability Mmio stale data:   Not affected\nVulnerability Retbleed:          Mitigation; untrained return thunk; SMT enabled with STIBP protection\nVulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:        Mitigation; Retpolines, IBPB conditional, STIBP always-on, RSB filling, PBRSB-eIBRS Not affected\nVulnerability Srbds:             Not affected\nVulnerability Tsx async abort:   Not affected"
-    },
-    "executable": "/usr/bin/python3",
-    "git_commit": "a178c5d74493f98347b3235d48785a5c96b29795",
-    "git_dirty_state": {
-      "dirty": true,
-      "path_count": 64,
-      "status_sha256": "7f0f9221288c12b9c23cb38ae57a769598e40c4b8d918e2f06d505740a8db0ec"
-    },
-    "kernel": "5.19.0-1022-gcp",
-    "machine": "x86_64",
-    "memory": {
-      "available": true,
-      "command": [
-        "free",
-        "-b"
-      ],
-      "returncode": 0,
-      "stderr": "",
-      "stdout": "total        used        free      shared  buff/cache   available\nMem:     430004359168  9207783424 384325640192     2908160 36470935552 417944567808\nSwap:              0           0           0"
-    },
-    "platform": "Linux-5.19.0-1022-gcp-x86_64-with-glibc2.35",
-    "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
-    "tpu_devices": {
-      "available": true,
-      "command": [
-        "ls",
-        "-la",
-        "/dev/accel0",
-        "/dev/accel1",
-        "/dev/accel2",
-        "/dev/accel3"
-      ],
-      "returncode": 0,
-      "stderr": "",
-      "stdout": "crw-rw-rw- 1 root root 121, 0 Sep 12 11:20 /dev/accel0\ncrw-rw-rw- 1 root root 121, 1 Sep 12 11:20 /dev/accel1\ncrw-rw-rw- 1 root root 121, 2 Sep 12 11:20 /dev/accel2\ncrw-rw-rw- 1 root root 121, 3 Sep 12 11:20 /dev/accel3"
-    },
-    "tpu_env": "ACCELERATOR_TYPE: 'v4-32'\nAGENT_BOOTSTRAP_IMAGE: 'gcr.io/cloud-tpu-v2-images/instance_agent:stable'\nALT: 'false'\nCHIPS_PER_HOST_BOUNDS: '2,2,1'\nCOLLECTD_DOCKER_URL: 'gcr.io/cloud-tpu-v2-images/collectd-agent:cl_225018473'\nCONSUMER_PROJECT_ID: 'projectalgebraicai'\nCONSUMER_PROJECT_NUMBER: '5918425225'\nENABLE_ICI_RESILIENCY: 'false'\nENABLE_IMPROVED_REROUTE_ALLREDUCE_STRATEGY: 'false'\nENABLE_MEMCACHED: 'false'\nFLUENTD_DOCKER_URL: 'gcr.io/cloud-tpu-v2-images/fluentd-agent:cl_547826204'\nFORWARD_LIBTPU_LOGS: 'true'\nHEALTH_AGENT_DOCKER_URL: 'gcr.io/cloud-tpu-v2-images/tpu_agents:cl_695344571'\nHOST_BOUNDS: '1,1,4'\nINFERENCE_MODE: 'false'\nINJECT_SLICE_BUILDER_FAULT: ''\nINTERNAL: 'false'\nMAINTENANCE_ACTION_FLAG: 'unhealthy-maintenance'\nMEMCACHED_DOCKER_URL: ''\nMONITORING_AGENT_DOCKER_URL: 'gcr.io/cloud-tpu-v2-images/monitoring_agent:cloud_tpu.monitoringagent.1vm_20260501_RC00'\nNODE_ID: 'my-tpu-v4'\nPREEMPTIBLE: 'false'\nREGION: 'us-central2'\nREGIONAL_HEALTH_AGENT_DOCKER_URL: 'us-central2-docker.pkg.dev/cloud-tpu-v2-images/prod-agents/health_ar:latest'\nREGIONAL_MONITORING_AGENT_DOCKER_URL: 'us-central2-docker.pkg.dev/cloud-tpu-v2-images/prod-agents/monitoring_ar:latest'\nRUNTIME_MONITOR_DOCKER_URL: 'gcr.io/cloud-tpu-v2-images/runtime_monitor:cl_534554121'\nRUNTIME_VERSION: 'gcr.io/cloud-tpu-v2-images/fake_tensorflow:latest'\nRUNTIME_VERSION_CHANGER_DOCKER_URL: 'gcr.io/cloud-tpu-v2-images/tf_version_changer:cl_302107686'\nSERVICE_NAME: 'tpu.googleapis.com'\nSOURCE: 'TFRC'\nTOPOLOGY: '2x2x4'\nTPU_CHIPS_PER_PROCESS_BOUNDS: '2,2,1'\nTPU_PROCESS_BOUNDS: '1,1,4'\nTPU_RUNTIME_METRICS_PORTS: '8431,8432,8433,8434'\nTPU_TOPOLOGY_ALT: 'false'\nTPU_TOPOLOGY_WRAP: 'false,false,false'\nTYPE: 'V4'\nUID: '9004630411786726121'\nUSE_DIRECT_PATH: 'false'\nVBARCONTROL_AGENT_DOCKER_URL: ''\nWORKER_ID: '0'\nWRAP: 'false,false,false'\nZONE: 'us-central2-b'"
-  },
-  "gemm_health": {
-    "bf16": {
-      "finite": true,
-      "matrix_size": 2048,
-      "median_ms": 0.2500800183042884,
-      "median_tflops": 68.69748850984229,
-      "output_dtype": "bfloat16",
-      "repetitions": 5,
-      "samples_ms": [
-        0.2555899554863572,
-        0.23023999528959394,
-        0.2500800183042884,
-        0.26458996580913663,
-        0.24272000882774591
-      ],
-      "supported": true
-    },
-    "fp32": {
-      "finite": true,
-      "matrix_size": 2048,
-      "median_ms": 0.23348000831902027,
-      "median_tflops": 73.5817567751922,
-      "output_dtype": "float32",
-      "repetitions": 5,
-      "samples_ms": [
-        0.23733999114483595,
-        0.22683001589030027,
-        0.22894999710842967,
-        0.24502997985109687,
-        0.23348000831902027
-      ],
-      "supported": true
+  "formal_verification": {
+    "lake_version": "Lake version 5.0.0-6caaee8 (Lean version 4.19.0)",
+    "lean_toolchain": "leanprover/lean4:v4.19.0",
+    "mathlib_package": {
+      "name": "mathlib",
+      "rev": "c44e0c8ee63ca166450922a373c7409c5d26b00b",
+      "type": "git",
+      "url": "https://github.com/leanprover-community/mathlib4.git"
     }
   },
-  "jax": {
-    "device": {
-      "accelerator_type": "v4-32",
+  "frameworks": {
+    "jax": {
+      "available": true,
+      "default_backend": "cpu",
+      "device_count": 1,
       "devices": [
-        "TPU_0(process=0,(0,0,0,0))",
-        "TPU_1(process=0,(1,0,0,0))",
-        "TPU_2(process=0,(0,1,0,0))",
-        "TPU_3(process=0,(1,1,0,0))"
+        {
+          "client_type": "cpu",
+          "device_kind": "cpu",
+          "id": 0,
+          "platform": "cpu"
+        }
       ],
-      "endpoints": [
-        "unknown:unknown:10.130.0.10",
-        "unknown:unknown:10.130.0.13",
-        "unknown:unknown:10.130.0.12",
-        "unknown:unknown:10.130.0.11"
-      ],
-      "hosts_in_slice": 4,
-      "local_device_count": 4,
-      "platform": "tpu",
-      "tensor_cores": 32,
-      "topology": "2x2x4",
-      "total_chips_in_pod": 16,
-      "tpu_available": true
+      "version": "0.6.2"
     },
-    "devices": [
-      "TPU_0(process=0,(0,0,0,0))",
-      "TPU_1(process=0,(1,0,0,0))",
-      "TPU_2(process=0,(0,1,0,0))",
-      "TPU_3(process=0,(1,1,0,0))"
-    ],
-    "packages": [
-      "jax==0.6.2",
-      "jaxlib==0.6.2",
-      "libtpu==0.0.17",
-      "torch==2.14.0+cpu",
-      "torchvision==0.29.0+cpu"
-    ],
-    "process_count": 1,
-    "profiler": {
+    "pytorch": {
       "available": true,
-      "profiler": "jax.profiler"
-    },
-    "version": "0.6.2",
-    "xla_compile": {
-      "available": true,
-      "compile_and_first_run_seconds": 0.04250463895732537,
-      "max_absolute_error": 0.0,
-      "usable": true
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "cuda_devices": [],
+      "default_device": "cpu",
+      "mps_available": false,
+      "version": "2.14.0+cpu"
     }
   },
-  "libraries": {
-    "cholesky_solve_health": {
-      "available": true,
-      "finite": true,
-      "max_residual": 0.28231897950172424
-    },
-    "libtpu": [
-      "libtpu==0.0.17"
-    ]
+  "git": {
+    "dirty": true,
+    "dirty_files_count": 233,
+    "head": "684c0fe24dffb2aa1c550a7ab051f36d9ed1a389",
+    "status_summary": "M CLAIMS.md\n M EXPERIMENT_LOG.md\n M README.md\n M RESEARCH_PLAN.md\nD  analysis/README.md\nD  analysis/audit_artifacts.py\nD  analysis/aurelis_numerical.py\nD  analysis/plots/bias_variance_sweep.png\nD  analysis/plots/exception_recall.png\nD  analysis/plots/uncertainty_calibration.png\nD  analysis/requirements.txt\nD  analysis/results/NUMERICAL_REPORT.md\nD  analysis/results/THEORY_AUDIT.md\nD  analysis/results/bias_variance_sweep.csv\nD  analysis/results/conditioning_sweep.csv\nD  analysis/results/exception_recall.csv\nD  analysis/results/summary.json\n M aurelis.md\nD  benchmarks/phase0_components.py\nD  configs/phase0_benchmark.json\nD  configs/phase0_reference.json\nD  configs/phase1_oracle.json\nD  configs/phase2_baselines.json\nD  configs/phase3_learned.json\nD  configs/phase4_suites.json\nD  configs/phase6_models.json\nD  experiments/phase0_reference.py\nD  experiments/phase1_oracle.py\nD  experiments/phase2_baselines.py\nD  experiments/phase3_learned.py\nD  experiments/phase4_suites.py\nD  experiments/phase6_benchmarks.py\n M lean/Aurelis/Capacity.lean\n M lean/Aurelis/CertifiedRead.lean\n M lean/Aurelis/DeltaMemory.lean\n M lean/Aurelis/PageEnvelope.lean\n M lean/PROOF_COVERAGE.md\n M lean/README.md\n M phases/AUTONOMY_PROTOCOL.md\n M phases/CHANGE_IMPACT_PROTOCOL.md\n M phases/IMPLEMENTATION_CONTRACT.md\n M phases/README.md\n M phases/phase0.md\n M phases/phase1.md\n M phases/phase2.md\n M phases/phase4.md\n M phases/phase5.md\n M phases/phase6.md\n M phases/phase9.md\nD  plots/phase0/reference_agreement.png\nD  plots/phase1/conditional_calibration.png\nD  plots/phase1/conditioning_precision.png\nD  plots/phase2/capacity_limits.png\nD  plots/phase2/covariance_advantage.png\nD  plots/phase2/mechanism_separation.png\nD  plots/phase2/state_latency_pareto.png\nD  plots/phase3/cache_boundary_continuity.png\nD  plots/phase3/episodic_cue_calibration.png\nD  plots/phase3/shared_vs_independent_spectra.png\nD  plots/phase3/task_family_performance.png\nD  plots/phase4/capacity_limits.png\nD  plots/phase4/context_extrapolation.png\nD  plots/phase4/drift_adaptation.png\nD  plots/phase4/heterogeneous_precision.png\nD  plots/phase4/mixed_chain_error_propagation.png\nD  plots/phase4/multihop_composition.png\nD  plots/phase6/comparative_tradeoffs.png\nD  plots/phase6/decode_memory_scaling.png\nD  plots/phase6/diagnostic_retrieval.png\n M research/LITERATURE_REVIEW.md\nD  research/V1_AUDIT.md\nD  results/phase0/PASS.md\nD  results/phase0/benchmark_metrics.json\nD  results/phase0/benchmark_report.md\nD  results/phase0/environment.json\nD  results/phase0/failures/bootstrap_ensurepip_20260829.md\nD  results/phase0/failures/environment_missing_python_headers_20260829.md\nD  results/phase0/failures/environment_missing_python_headers_20260829.txt\nD  results/phase0/failures/lean_toolchain_missing_20260829.md\nD  results/phase0/failures/lean_toolchain_missing_20260829.txt\nD  results/phase0/failures/reference_dtype_20260829.md\nD  results/phase0/failures/vectorized_inductor_cumsum_20260829.md\nD  results/phase0/migration_audit.txt\nD  results/phase0/raw/benchmark.log\nD  results/phase0/raw/component_timings.jsonl\nD  results/phase0/raw/environment_audit.log\nD  results/phase0/raw/lean_build.log\nD  results/phase0/raw/pytest.log\nD  results/phase0/raw/reference_cases.jsonl\nD  results/phase0/raw/reference_experiment.log\nD  results/phase0/reference_metrics.json\nD  results/phase0/reference_report.md\nD  results/phase1/FORMAL_AUDIT.md\nD  results/phase1/PASS.md\nD  results/phase1/RESEARCH_LOG.md\nD  results/phase1/failures/cancellation_conditioning_evaluator_20260829.md\nD  results/phase1/failures/completion_audit_cuda_device_label_20260829.md\nD  results/phase1/failures/environment_missing_python_headers_20260829.md\nD  results/phase1/failures/lean_gated_endpoint_normalization_20260829.md\nD  results/phase1/failures/lean_toolchain_absent_20260829.md\nD  results/phase1/failures/missing_pinned_venv_20260829.md\nD  results/phase1/failures/relative_config_path_20260829.md\nD  results/phase1/failures/torch_geomspace_api_20260829.md\nD  results/phase1/metrics.json\nD  results/phase1/raw/conditioning_rows.jsonl\nD  results/phase1/raw/deterministic_rows.jsonl\nD  results/phase1/raw/experiment.log\nD  results/phase1/raw/inherited_phase0.log\nD  results/phase1/raw/lean_build.log\nD  results/phase1/raw/pytest.log\nD  results/phase1/raw/streaming_rows.jsonl\nD  results/phase1/report.md\nD  results/phase2/FORMAL_AUDIT.md\nD  results/phase2/PASS.md\nD  results/phase2/RESEARCH_LOG.md\nD  results/phase2/failures/linear_reproduction_prior_shrinkage_20260904.md\nD  results/phase2/failures/report_md_generation_order_20260904.md\nD  results/phase2/failures/softmax_temperature_one_hot_precision_20260904.md\nD  results/phase2/failures/torch_randn_like_generator_api_20260904.md\nD  results/phase2/metrics.json\nD  results/phase2/raw/baselines_rows.jsonl\nD  results/phase2/raw/context_sweep_rows.jsonl\nD  results/phase2/raw/correlated_rows.jsonl\nD  results/phase2/raw/experiment.log\nD  results/phase2/raw/falsification_rows.jsonl\nD  results/phase2/raw/inherited_phase0.log\nD  results/phase2/raw/inherited_phase1.log\nD  results/phase2/raw/lean_build.log\nD  results/phase2/raw/pytest.log\nD  results/phase2/report.md\nD  results/phase3/FORMAL_AUDIT.md\nD  results/phase3/PASS.md\nD  results/phase3/RESEARCH_LOG.md\nD  results/phase3/metrics.json\nD  results/phase3/raw/evaluation_rows.jsonl\nD  results/phase3/raw/experiment.log\nD  results/phase3/raw/inherited_phase0.log\nD  results/phase3/raw/inherited_phase1.log\nD  results/phase3/raw/inherited_phase2.log\nD  results/phase3/raw/lean_build.log\nD  results/phase3/raw/models_training.jsonl\nD  results/phase3/raw/pytest.log\nD  results/phase3/report.md\nD  results/phase4/FORMAL_AUDIT.md\nD  results/phase4/PASS.md\nD  results/phase4/RESEARCH_LOG.md\nD  results/phase4/metrics.json\nD  results/phase4/raw/evaluation_rows.jsonl\nD  results/phase4/raw/experiment.log\nD  results/phase4/raw/inherited_phase0.log\nD  results/phase4/raw/inherited_phase1.log\nD  results/phase4/raw/inherited_phase2.log\nD  results/phase4/raw/inherited_phase3.log\nD  results/phase4/raw/lean_build.log\nD  results/phase4/raw/pytest.log\nD  results/phase4/report.md\nD  results/phase6/FORMAL_AUDIT.md\nD  results/phase6/PASS.md\nD  results/phase6/RESEARCH_LOG.md\nD  results/phase6/metrics.json\nD  results/phase6/raw/evaluation_rows.jsonl\nD  results/phase6/raw/experiment.log\nD  results/phase6/raw/systems_rows.jsonl\nD  results/phase6/report.md\nD  results/v2/REVISION_MANIFEST.yaml\nD  results/v2/phase0/PASS.md\nD  results/v2/phase0/environment.json\nD  results/v2/phase0/environment_inventory.md\nD  results/v2/phase0/formal_build_report.md\nD  results/v2/phase0/implementation_gap_map.json\nD  results/v2/phase0/implementation_gap_map.md\nD  results/v2/phase0/legacy_claims_audit.json\nD  results/v2/phase0/legacy_claims_audit.md\nD  results/v2/phase0/preregistration.json\nD  results/v2/phase0/preregistration.md\nD  results/v2/phase0/raw/environment_audit.log\nD  results/v2/phase0/raw/lean_build.log\nD  results/v2/phase0/raw/lean_theorems.log\nD  results/v2/phase0/raw/phase0_verification.log\nD  results/v2/phase0/report.md\nD  results/v2/phase0/resource_budget.json\nD  results/v2/phase0/resource_budget.md\nD  scripts/audit_environment.py\n M scripts/bootstrap.sh\nD  scripts/run_aurelis_theory.sh\nD  scripts/run_phase0.sh\nD  scripts/run_phase0_v2.py\nD  scripts/run_phase0_v2.sh\nD  scripts/run_phase1.sh\nD  scripts/run_phase2.sh\nD  scripts/run_phase3.sh\nD  scripts/run_phase4.sh\nD  scripts/run_phase6.sh\nD  scripts/verify_phase0.py\nD  scripts/verify_phase1.py\nD  scripts/verify_phase2.py\nD  scripts/verify_phase3.py\nD  scripts/verify_phase4.py\nD  scripts/verify_phase6.py\n M src/aurelis/__init__.py\nD  src/aurelis/baselines.py\nD  src/aurelis/curriculum.py\n M src/aurelis/functional.py\nD  src/aurelis/models/__init__.py\nD  src/aurelis/models/aurelis_lm.py\nD  src/aurelis/models/config.py\nD  src/aurelis/models/hybrid_ssm.py\nD  src/aurelis/models/jax_aurelis.py\nD  src/aurelis/models/tpu_kernels.py\nD  src/aurelis/models/transformer.py\nD  src/aurelis/nn.py\nD  src/aurelis/nn_phase3.py\nD  src/aurelis/nn_phase4.py\nD  src/aurelis/oracle.py\nD  src/aurelis/phase4_suites.py\n M src/aurelis/streaming.py\nD  src/aurelis/training.py\n M src/aurelis/types.py\nD  tests/test_autograd.py\nD  tests/test_compile.py\nD  tests/test_oracles.py\nD  tests/test_partition.py\nD  tests/test_phase1_identities.py\nD  tests/test_phase2_baselines.py\nD  tests/test_phase3.py\nD  tests/test_phase4.py\nD  tests/test_phase6.py\nD  tests/test_routing.py\nD  tests/test_solvers.py\n?? results/\n?? scripts/run_phase0.py\n?? scripts/run_phase0.sh\n?? tests/test_aurelis.py"
   },
-  "schema_version": 1,
-  "status": "PASS",
-  "timestamp_utc": "2026-09-16T08:46:28.109324+00:00"
+  "host_hardware": {
+    "cpu_logical_cores": 240,
+    "cpu_model": "AMD EPYC 7B12",
+    "free_summary": "total        used        free      shared  buff/cache   available\nMem:           400Gi       5.5Gi       320Gi       2.0Mi        74Gi       392Gi\nSwap:             0B          0B          0B",
+    "lscpu_summary": "Architecture:                    x86_64\nCPU op-mode(s):                  32-bit, 64-bit\nAddress sizes:                   48 bits physical, 48 bits virtual\nByte Order:                      Little Endian\nCPU(s):                          240\nOn-line CPU(s) list:             0-239\nVendor ID:                       AuthenticAMD\nModel name:                      AMD EPYC 7B12\nCPU family:                      23\nModel:                           49\nThread(s) per core:              2\nCore(s) per socket:              60\nSocket(s):                       2\nStepping:                        0\nBogoMIPS:                        4500.00\nFlags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat umip rdpid\nHypervisor vendor:               KVM\nVirtualization type:             full\nL1d cache:                       3.8 MiB (120 instances)\nL1i cache:                       3.8 MiB (120 instances)\nL2 cache:                        60 MiB (120 instances)\nL3 cache:                        480 MiB (30 instances)\nNUMA node(s):                    2\nNUMA node0 CPU(s):               0-59,120-179\nNUMA node1 CPU(s):               60-119,180-239\nVulnerability Itlb multihit:     Not affected\nVulnerability L1tf:              Not affected\nVulnerability Mds:               Not affected\nVulnerability Meltdown:          Not affected\nVulnerability Mmio stale data:   Not affected\nVulnerability Retbleed:          Mitigation; untrained return thunk; SMT enabled with STIBP protection\nVulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:        Mitigation; Retpolines, IBPB conditional, STIBP always-on, RSB filling, PBRSB-eIBRS Not affected\nVulnerability Srbds:             Not affected\nVulnerability Tsx async abort:   Not affected",
+    "lspci_summary": "00:00.0 Host bridge: Intel Corporation 440FX - 82441FX PMC [Natoma] (rev 02)\n00:01.0 ISA bridge: Intel Corporation 82371AB/EB/MB PIIX4 ISA (rev 03)\n00:01.3 Bridge: Intel Corporation 82371AB/EB/MB PIIX4 ACPI (rev 03)\n00:03.0 Non-VGA unclassified device: Red Hat, Inc. Virtio SCSI\n00:04.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:05.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:06.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:07.0 Unassigned class [ff00]: Google, Inc. Device 005e (rev 10)\n00:08.0 Ethernet controller: Red Hat, Inc. Virtio network device\n00:09.0 Unclassified device [00ff]: Red Hat, Inc. Virtio RNG",
+    "total_ram_bytes": 430004359168,
+    "total_ram_human": "400Gi"
+  },
+  "os": {
+    "machine": "x86_64",
+    "release": "5.19.0-1022-gcp",
+    "system": "Linux",
+    "uname": "Linux t1v-n-49ba2866-w-0 5.19.0-1022-gcp #24~22.04.1-Ubuntu SMP Sun Apr 23 09:51:08 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux",
+    "version": "#24~22.04.1-Ubuntu SMP Sun Apr 23 09:51:08 UTC 2023"
+  },
+  "python": {
+    "executable": "/usr/bin/python3",
+    "version": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]"
+  },
+  "timestamp_utc": "2026-09-19T07:02:04.040729+00:00"
 }

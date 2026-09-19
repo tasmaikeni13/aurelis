@@ -1,1 +1,3 @@
-[W904 17:54:50.132785888 collection.cpp:1116] Warning: ROCTracer produced duplicate flow start: 3 (function operator())
+Environment audit executed at 2026-09-19T07:02:04.040729+00:00
+Git HEAD: 684c0fe24dffb2aa1c550a7ab051f36d9ed1a389
+Active Devices: ['JAX:cpu(cpu)']

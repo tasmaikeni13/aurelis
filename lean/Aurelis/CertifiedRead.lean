@@ -10,7 +10,7 @@ All statements are over exact reals. The implementation must establish the
 page envelopes and account for rounding before using the word certified.
 -/
 
-namespace Aurelis.V2
+namespace Aurelis
 
 open scoped BigOperators
 
@@ -104,4 +104,4 @@ theorem completedRead_certificate (zs zo lo hi : ℝ) (ns no prior : V) (radius 
     (completion_error_identity zs zo ((lo + hi) / 2) ns no prior ht ha)
     hres (midpoint_error lo zo hi hl hu)
 
-end Aurelis.V2
+end Aurelis

@@ -16,8 +16,8 @@ matrix after the repair.
 Use identical Q/K/V, archive pages, encoding, epsilon, and accounting for:
 local-value completion; zero completion; summary-based global completion;
 per-page center completion (13); recurrence with simple additive/gated fusion;
-sparse attention with no completion; value-blind mass selection; and AURELIS-R.
-Retain full softmax and historical ridge as references. Compare at equal total
+sparse attention with no completion; value-blind mass selection; and AURELIS.
+Retain full softmax as an exact reference. Compare at equal total
 state/index budgets as well as equal fetched-KV budgets.
 
 ## Experiments

@@ -10,7 +10,7 @@ independently reproduced.
 
 ## Sources and design consequences
 
-| Primary source | What it contributes | Consequence for AURELIS-R |
+| Primary source | What it contributes | Consequence for AURELIS |
 |---|---|---|
 | [Based, 2402.18668](https://arxiv.org/abs/2402.18668) | Linear/local attention and recall–throughput tradeoffs | Fixed memory is a capacity choice, not unlimited exact recall |
 | [Mamba-2 / SSD, 2405.21060](https://arxiv.org/abs/2405.21060) | Structured recurrence and hardware-efficient computation | Use structured kernels; generic associative algebra alone is insufficient |
@@ -58,9 +58,10 @@ of semantic memory.
 prefix reuse, speculative rollback, batching, transfer, and long-tail retrieval
 all matter. A successful architecture can still be badly implemented.
 
-**AURELIS v1:** dense ridge operations and quadratic masked-local prefill are
-specific removable costs. Their removal is the clearest engineering improvement
-in v2; whether the new predictor preserves useful quality remains open.
+**AURELIS:** dense key-space matrix factorizations and quadratic masked-local
+prefill are avoided by adopting solve-free gated delta updates and true local
+window attention; whether the recurrent predictor preserves useful quality
+remains the empirical question to evaluate.
 
 ## Closest comparisons for novelty
 

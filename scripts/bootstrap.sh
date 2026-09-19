@@ -17,4 +17,4 @@ if ! command -v lake >/dev/null 2>&1 && [ ! -x "${HOME}/.elan/bin/lake" ]; then
   echo "Lean/Lake is absent. Install elan from https://github.com/leanprover/elan before running Phase 0." >&2
 fi
 
-echo "Bootstrap complete for Cloud TPU v4 pod substrate."
+echo "Bootstrap complete."

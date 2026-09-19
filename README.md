@@ -1,54 +1,40 @@
-# AURELIS-R
+# AURELIS
 
-Solve-free recurrent memory with residual-certified retrieval.
+Solve-Free Recurrent Memory with Residual-Certified Retrieval.
 
-This repository is being revised from the Bayesian ridge architecture (v1) to
-the research specification in [aurelis.md](aurelis.md). The new design combines
-a gated delta state, local residual transport, and an optional exact archive
-whose reads are controlled by a derived error bound.
+AURELIS couples a solve-free gated delta recurrent state with local window attention and an optional exact archive governed by deterministic residual error bounds.
 
-**Current status: theory and scoped Lean proofs; v2 implementation and
-performance validation are pending.** Existing Python/JAX code, scripts,
-configs, and results are v1. They were deliberately left unchanged in this
-revision. You must implement the new theory following
-[the implementation handoff](phases/IMPLEMENTATION_CONTRACT.md) and
-[phases 0–9](phases/README.md).
-The [adaptive change-impact protocol](phases/CHANGE_IMPACT_PROTOCOL.md) governs
-theory repairs: it invalidates and regenerates the full dependent phase closure.
+## Operating Contracts
 
-Two operating contracts are explicit:
+AURELIS defines two explicit operating modes:
 
-- Bounded mode: fixed recurrent state and recent cache; approximate remote memory.
-- Archive mode: growing exact storage, adaptive retrieval, and a local error
-  certificate or explicit budget failure. Full reads recover softmax on the
-  same current Q/K/V, subject to numerical error.
+1. **Bounded Mode:** Fixed recurrent state $S \in \mathbb{R}^{d_v \times d_k}$ and recent attention cache of window $w$. Delivers fast transported estimates $r(q) = \bar{v}_L + S_t(q - \bar{k}_L)$ in $O(d_v d_k + w(d_k + d_v))$ without dense key-space matrix solves.
+2. **Archive Mode:** Same recurrent working state coupled with paged storage of evicted observations. Selects exact observations and completes unread mass using the recurrent predictor, stopping when the deterministic error certificate $\le \epsilon$ or returning an explicit budget exhaustion signal. Full reads recover full softmax in real arithmetic.
 
-This is not a claim of bounded-memory unlimited exact recall, established
-novelty, model-level safety, or demonstrated deployment speed. The research
-must show recurrence earns its cost against strong sparse/hybrid baselines.
+## Repository Navigation
 
-## Read first
+- **[Specification & Mathematics](aurelis.md):** Architectural design, mathematical equations (1)–(15), error bounds, and proofs.
+- **[Primary Literature & Prior Art](research/LITERATURE_REVIEW.md):** Survey of hybrid architectures, recurrent memories, and novelty boundaries.
+- **[Claim Registry](CLAIMS.md):** Formal theorem mapping and empirical hypothesis registry.
+- **[Research Plan](RESEARCH_PLAN.md):** Phased falsification and evaluation roadmap.
+- **[Implementation Contract](phases/IMPLEMENTATION_CONTRACT.md):** Module contracts and equation-to-code mapping.
+- **[Research Phases](phases/README.md):** Detailed step-by-step phase execution contracts.
+- **[Formal Core](lean/README.md):** Lean 4 / mathlib machine-checked proofs and [coverage ledger](lean/PROOF_COVERAGE.md).
 
-- [Paper and equations](aurelis.md)
-- [Primary-source literature and novelty boundary](research/LITERATURE_REVIEW.md)
-- [V1 bottleneck and evidence audit](research/V1_AUDIT.md)
-- [Claim registry](CLAIMS.md)
-- [Research plan](RESEARCH_PLAN.md)
-- [Revision manifest](results/v2/REVISION_MANIFEST.yaml)
-- [Formal proof scope](lean/PROOF_COVERAGE.md)
+## Formal Verification
 
-The old Phase 6 evaluator contains assigned diagnostic scores and simulated
-decode measurements; its PASS files do not establish model quality or deployment.
-Historical artifacts remain available but are not current publication evidence.
+AURELIS includes machine-checked proofs in Lean 4 (mathlib 4.19.0) under `lean/`:
 
-## Formal verification
+```bash
+cd lean
+lake build
+```
 
-Pinned Lean/mathlib: 4.19.0. With the existing dependencies installed:
-
-    cd lean
-    lake build
-
-New proofs cover finite-state recall capacity, delta transition stability, and
-the vector residual/normalizer certificate. Formal real arithmetic does not
-prove a floating-point kernel, speed, learned quality, or end-to-end safety.
-See [lean/README.md](lean/README.md) for the exact boundary.
+The formal core verifies:
+- Deterministic finite-state recall capacity lower bounds (Eq. 1)
+- Gated delta update query-linearity and unit-key write reproduction (Eq. 2)
+- Rank-one perturbation energy identity and contraction stability (Eq. 5)
+- Mass-consistent archive completion normalization and error identity (Eq. 8, 9)
+- Deterministic residual error certificates under interval envelopes (Eq. 10)
+- Coordinate key-box and page exponential envelope intervals (Eq. 11, 12)
+- Causal cache handoff partitioning

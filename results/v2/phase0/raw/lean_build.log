@@ -1,6 +1,0 @@
-=== Lean 4 Lake Build Log ===
-⚠ [2251/2253] Replayed Aurelis.PageEnvelope
-warning: ././././Aurelis/PageEnvelope.lean:61:80: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
-note: this linter can be disabled with `set_option linter.unnecessarySeqFocus false`
-Build completed successfully.
-

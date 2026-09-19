@@ -3,77 +3,69 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal, Optional
 
 from torch import Tensor
 
-
-@dataclass(frozen=True)
-class ReadDiagnostics:
-    """Quantities needed to audit one AURELIS read."""
-
-    attention: Tensor
-    kbar: Tensor
-    vbar: Tensor
-    innovation: Tensor
-    h: Tensor
-    V_R: Tensor
-    V_H: Tensor
-    K_RH: Tensor
-    g_raw: Tensor
-    g_B: Tensor
-    g_E: Tensor
-    solve_residual_q: Tensor
-    solve_residual_kbar: Tensor
+ReadStatus = Literal[
+    "approximate",
+    "certified",
+    "full_read",
+    "budget_exhausted",
+    "invalid_state",
+    "archive_error",
+]
 
 
 @dataclass(frozen=True)
-class ReadOutput:
-    """The four manuscript endpoints and their diagnostics."""
+class CertificateBound:
+    """Quantitative evaluation of retrieval approximation error."""
 
-    remote: Tensor
-    full_residual: Tensor
-    bayes: Tensor
-    episodic: Tensor
-    diagnostics: ReadDiagnostics
+    bound: float
+    selected_mass: float
+    estimated_unread_mass: float
+    unread_mass_lower: float
+    unread_mass_upper: float
+    residual_bound: float
+    denominator_floor: float
 
 
 @dataclass(frozen=True)
-class StreamingState:
-    """Immutable fixed-capacity decode state.
+class ReadResult:
+    """The outcome of an AURELIS read operation."""
 
-    Cache tensors are physical ring buffers. ``cache_start`` points at the
-    oldest live slot and ``cache_size`` records the live prefix. Occurrence IDs
-    are metadata used to verify exact delayed handoff.
-    """
+    output: Tensor
+    mode: Literal["bounded", "archive"]
+    status: ReadStatus
+    certificate: Optional[CertificateBound]
+    pages_read: int
+    bytes_read: int
 
-    precision: Tensor
-    cross: Tensor
-    factor: Tensor
+
+@dataclass(frozen=True)
+class PageDescriptor:
+    """Bounding metadata for a paged chunk of remote key-value associations."""
+
+    page_id: int
+    count: int
+    key_min: Tensor
+    key_max: Tensor
+    value_center: Tensor
+    value_radius: float
+
+
+@dataclass(frozen=True)
+class DeltaState:
+    """Fixed-capacity solve-free recurrent state with local cache ring buffer."""
+
+    S: Tensor
     cache_keys: Tensor
     cache_values: Tensor
-    cache_evidence: Tensor
-    cache_ids: Tensor
+    cache_alphas: Tensor
+    cache_betas: Tensor
+    cache_ids: tuple[int, ...]
     cache_start: int
     cache_size: int
-    remote_ids: tuple[int, ...]
+    window: int
+    evicted_ids: tuple[int, ...]
     next_id: int
-
-
-@dataclass(frozen=True)
-class SequenceOutput:
-    """Vectorized exact-training outputs at every causal boundary."""
-
-    remote: Tensor
-    full_residual: Tensor
-    bayes: Tensor
-    episodic: Tensor
-    attention: Tensor
-    precision: Tensor
-    cross: Tensor
-    h: Tensor
-    V_R: Tensor
-    V_H: Tensor
-    K_RH: Tensor
-    g_raw: Tensor
-    g_B: Tensor
-    g_E: Tensor

@@ -1,35 +1,25 @@
-# AURELIS-R adaptive change-impact protocol
+# AURELIS Adaptive Change-Impact Protocol
 
 This protocol is part of the phase contract. It applies whenever a phase
 discovers a failed premise, unsound bound, invalid evaluator, implementation
 bug that changes semantics, new theory, revised equation, changed Lean theorem,
 changed metric, changed baseline, changed data, or changed hardware assumption.
-The example of a Phase 3 repair is not special; the same procedure applies to
-every phase.
 
 ## Revision identity
 
-Every theory and implementation generation has a monotonically increasing
-revision identifier, for example v2.0, v2.1, and v3.0.
+Every theory and implementation generation has a semantic version identifier (e.g., 1.0, 1.1, 2.0).
 
-- Increment the patch number (v2.1) for a local clarification or a repair
-  that preserves all semantic contracts and equations.
-- Increment the minor number (v2.0 to v2.1) for a changed equation,
-  invariant, theorem premise/conclusion, state transition, certificate,
-  evaluator, metric, baseline, or acceptance gate.
-- Increment the major number (v2.x to v3.0) when the research object or
-  operating contract changes enough that prior results cannot reasonably be
-  compared as the same architecture.
+- Increment the patch number for a local clarification or a repair that preserves all semantic contracts and equations.
+- Increment the minor number for a changed equation, invariant, theorem premise/conclusion, state transition, certificate, evaluator, metric, baseline, or acceptance gate.
+- Increment the major number when the research object or operating contract changes fundamentally.
 
-The revision identifier is recorded in aurelis.md, the claim registry,
-lean/PROOF_COVERAGE.md, every phase report, every checkpoint, every config,
-and every result directory. A result is complete only relative to its exact
-revision.
+The revision identifier is recorded in the specification, the claim registry,
+Lean proof coverage, every phase report, and every result directory.
 
 ## Dependency manifest
 
-Maintain results/v2/REVISION_MANIFEST.yaml (or an equivalent machine-readable
-file) with one record per revision:
+Maintain `results/CHANGE_MANIFEST.yaml` (or an equivalent machine-readable
+record) tracking modifications:
 
 - revision ID and parent revision;
 - changed files/equations/theorems/contracts;

@@ -35,7 +35,7 @@ Report prefill, forward/backward, decode, launches, state traffic, index travers
 page transfer, compile time, peak HBM, host memory, and storage separately.
 Archive mode gets end-to-end measurements including unfavorable access patterns.
 
-PASS requires numerical/gradient contracts, structural elimination of v1's
-bottlenecks, and preregistered speed/memory thresholds in a stated workload
+PASS requires numerical/gradient contracts, solve-free complexity
+verification, and preregistered speed/memory thresholds in a stated workload
 region. If removal of solves does not translate to useful end-to-end gain,
 preserve the profile and stop that design's scaling.

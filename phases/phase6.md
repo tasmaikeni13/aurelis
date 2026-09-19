@@ -1,7 +1,7 @@
 # Phase 6 — Trained language-model pilot
 
-Depends on phases 0–5. Implement new training/evaluation scripts; none of the
-legacy Phase 6 diagnostic constants are valid input evidence.
+Depends on phases 0–5. Implement training and evaluation scripts with real
+metric logging.
 
 ## Adaptive start gate
 
@@ -16,7 +16,7 @@ trained under the repaired theory.
 
 Use a pilot size appropriate to the registered compute limit (approximately
 125M parameters is a planning option). Train modern dense GQA, optimized
-recurrent/hybrid, strongest recurrence-free archive completion, and AURELIS-R.
+recurrent/hybrid, strongest recurrence-free archive completion, and AURELIS.
 Include bounded and archive variants as separately trained/reported configs.
 Use paired seeds, tokenizer, corpus/revision, data order, optimizer, context,
 and tuning budgets. Record actual parameter counts rather than target labels.

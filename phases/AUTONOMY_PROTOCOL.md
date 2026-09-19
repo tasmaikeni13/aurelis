@@ -1,17 +1,14 @@
-# AURELIS-R v2 research and implementation protocol
+# AURELIS Research and Implementation Protocol
 
-This protocol supersedes v1's requirement to preserve its ridge solver and
-Bayes router. The user's authorized redesign explicitly changes those choices.
-This file instructs future phase implementation; it does not authorize running
-large training jobs during a theory/documentation revision.
+This protocol defines the research rules, evidence standards, and execution
+workflow for AURELIS.
 
 ## Authority and source of truth
 
-Use aurelis.md v2, IMPLEMENTATION_CONTRACT.md, CHANGE_IMPACT_PROTOCOL.md, and
-the numbered phase together.
-Resolve equation inconsistencies before implementation. Preserve historical
-code/results. New executable work implements the new theory; it cannot inherit
-old PASS files, trained quality claims, or TPU claims.
+Use `aurelis.md`, `IMPLEMENTATION_CONTRACT.md`, `CHANGE_IMPACT_PROTOCOL.md`, and
+the numbered phase documents together. Resolve equation inconsistencies before
+implementation. New executable work implements the specification; it cannot
+inherit unvalidated quality or accelerator performance claims without measurement.
 
 The project is a hypothesis, not a requirement that experiments must succeed.
 Status is one of NOT_STARTED, RUNNING, PASS, FAILED_HYPOTHESIS, or BLOCKED_RESOURCE.
@@ -19,17 +16,13 @@ A Lean build supports only its theorem statements. It is not a model benchmark.
 
 ## Adaptive dependency rule
 
-Every phase result is valid only for its recorded theory revision. Before
-starting work, read [CHANGE_IMPACT_PROTOCOL.md](CHANGE_IMPACT_PROTOCOL.md) and
-the current `results/v2/REVISION_MANIFEST.yaml`. If any input, equation,
-theorem premise, state transition, certificate, evaluator, metric, baseline,
-data revision, dtype, device, or service assumption changed, compute the
-invalidation closure before doing new work. Mark the earliest affected phase
-and every dependent descendant `STALE`; mark old results `SUPERSEDED` for
-comparison; preserve their raw artifacts; increment the revision; and rerun
-from the earliest affected phase. A repaired phase passing does not make stale
-descendants valid. Earlier phases may be `RETAINED` only after their direct
-inputs and claims are checked to be independent.
+Every phase result is valid for its recorded theory specification. Before
+starting work, consult [CHANGE_IMPACT_PROTOCOL.md](CHANGE_IMPACT_PROTOCOL.md).
+If any input, equation, theorem premise, state transition, certificate,
+evaluator, metric, baseline, data revision, dtype, device, or service assumption
+changed, compute the invalidation closure before doing new work. Mark the earliest
+affected phase and every dependent descendant `STALE`; rerun from the earliest
+affected phase. A repaired phase passing does not make stale descendants valid.
 
 ## Required workflow
 
@@ -84,9 +77,8 @@ and invalid data return explicit statuses. Do not silently downgrade strict mode
 
 ## Required phase record
 
-Write results/v2/phaseN/report.md with equation-to-code mapping, raw evidence
+Write `results/phaseN/report.md` with equation-to-code mapping, raw evidence
 paths, hypotheses and outcomes, reproduction commands, failures/dispositions,
-resource usage, and next decision. Generate PASS.md only when every registered
-gate passes. Otherwise generate FAILED_HYPOTHESIS.md or BLOCKED_RESOURCE.md.
-Include artifact hashes and tested revision. Earlier v2 correctness gates
-remain dependencies, but old v1 empirical gates are retired.
+resource usage, and next decision. Generate `PASS.md` only when every registered
+gate passes. Otherwise generate `FAILED_HYPOTHESIS.md` or `BLOCKED_RESOURCE.md`.
+Include artifact hashes and verified criteria. Earlier correctness gates remain dependencies.

@@ -1,7 +1,7 @@
 # Phase 2 — Streaming semantics and exact archive reference
 
-Depends on phases 0–1. Implement state/types/model interfaces in the migration
-map, plus new scripts/tests/configs. This is correctness-first implementation.
+Depends on phases 0–1. Implement state, types, and model interfaces from
+the module specification contract. This is a correctness-first implementation.
 
 ## Adaptive start gate
 

@@ -1,21 +1,16 @@
-# AURELIS formal core
+# AURELIS Formal Core
 
-Pinned Lean 4.19.0 and mathlib v4.19.0. With dependencies available:
+Pinned Lean 4.19.0 and mathlib v4.19.0.
 
-    cd lean
-    lake build
+To build the machine-checked proofs:
 
-Aurelis.lean imports the v2 modules Capacity, DeltaMemory, and CertifiedRead,
-as well as the preserved v1 modules. The new proofs establish finite-state
-recall capacity, the known delta update's row perturbation energy, and a vector
-completion error bound with uncertain normalizer. The handoff and transport
-algebra is reused independently of any ridge solver.
+```bash
+cd lean
+lake build
+```
 
-Real-valued definitions may be noncomputable in Lean. These are machine-checked
-mathematical specifications, not executable accelerator kernels. Standard Lean
-foundations remain; there are no project axioms or admitted proofs. See
-[PROOF_COVERAGE.md](PROOF_COVERAGE.md) for premises and exclusions.
+`Aurelis.lean` imports the formal modules specifying finite-state recall capacity, solve-free delta memory perturbation stability, residual completion with uncertain normalizer, page envelope bounds, and causal handoff partitioning.
 
-The build does not prove sound floating-point intervals, chunk-kernel equivalence,
-trained quality, novelty, runtime, serving correctness, or answer safety.
-Do not revive v1 empirical claims because legacy theorems still compile.
+Real-valued definitions may be noncomputable in Lean. These are machine-checked mathematical specifications, not executable accelerator kernels. Standard Lean foundations remain; there are no project axioms or admitted proofs (`sorry`). See [PROOF_COVERAGE.md](PROOF_COVERAGE.md) for exact theorem premises and scope boundaries.
+
+The formal verification covers algebraic and analytic properties under stated premises. It does not by itself establish hardware kernel speeds, trained sequence quality, novelty, or serving latency.

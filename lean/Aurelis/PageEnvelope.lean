@@ -7,7 +7,7 @@ residual bounds. They do not verify how a mutable implementation builds or
 rounds the summaries, nor that an index covers every unread occurrence.
 -/
 
-namespace Aurelis.V2
+namespace Aurelis
 
 open scoped BigOperators
 
@@ -58,7 +58,7 @@ theorem page_residual_ball {I : Type*} (page : Finset I) (score : I → ℝ)
   have hb : ∀ i ∈ page, ‖value i - prior‖ ≤ ‖center - prior‖ + radius := by
     intro i hi
     calc
-      ‖value i - prior‖ = ‖(value i - center) + (center - prior)‖ := by congr 1 <;> abel
+      ‖value i - prior‖ = ‖(value i - center) + (center - prior)‖ := by (congr 1; abel)
       _ ≤ ‖value i - center‖ + ‖center - prior‖ := norm_add_le _ _
       _ ≤ ‖center - prior‖ + radius := by linarith [hr i hi]
   have h := weighted_residual_bound page (fun i => Real.exp (score i))
@@ -67,4 +67,4 @@ theorem page_residual_ball {I : Type*} (page : Finset I) (score : I → ℝ)
     (fun i hi => Real.exp_le_exp.mpr (hu i hi)) hb
   simpa [mul_assoc] using h
 
-end Aurelis.V2
+end Aurelis

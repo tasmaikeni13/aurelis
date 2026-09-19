@@ -1,15 +1,14 @@
 # Phase 1 — Independent mathematics and formal correspondence
 
 Depends on phase 0. Read the common protocol and implementation contract.
-Implement new v2 CPU oracles and tests; current v1 scripts are insufficient.
+Implement independent CPU oracles and verification tests for equations (2)–(12).
 
 ## Adaptive start gate
 
-Read the current revision manifest and change-impact closure before using any
-equation. If a later repair changes the state, read, target, certificate, or a
-Lean premise used here, this phase is STALE even if its old oracle passed.
-Update the independent oracle and theorem ledger for the new revision, then
-rerun Phase 1 before any streaming or benchmark descendant.
+Verify prerequisites and contracts before executing mathematics validation.
+If any equation, state definition, read function, certificate bound, or Lean
+premise changes, update the independent reference oracle and theorem ledger,
+then verify Phase 1 before running streaming or benchmark descendants.
 
 ## Deliver
 

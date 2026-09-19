@@ -24,8 +24,8 @@ If another method subsumes the contribution, narrow or withdraw priority claims.
 
 Rewrite the final manuscript around what survived, including negative results,
 hardware scope, total resource use, failure rates, arithmetic-proof coverage,
-and local versus trajectory-level guarantee boundaries. Keep historical v1
-evidence quarantined and retain the audit explaining why it was not reused.
+and local versus trajectory-level guarantee boundaries. Maintain strict
+provenance across all reported measurements.
 
 ## Release gates
 

@@ -1,0 +1,60 @@
+{
+  "global_guardrails": {
+    "nonfinite_value_action": "fail immediately on NaN/Inf with tensor dump",
+    "process_timeout_action": "terminate job and log BLOCKED_RESOURCE",
+    "rss_cap_action": "terminate job and log OOM failure"
+  },
+  "phases": {
+    "phase0": {
+      "max_wallclock_seconds": 600,
+      "memory_cap_gib": 16.0,
+      "target_device": "CPU"
+    },
+    "phase1": {
+      "max_wallclock_seconds": 1200,
+      "memory_cap_gib": 16.0,
+      "target_device": "CPU"
+    },
+    "phase2": {
+      "max_wallclock_seconds": 1800,
+      "memory_cap_gib": 16.0,
+      "target_device": "CPU"
+    },
+    "phase3": {
+      "max_wallclock_seconds": 2400,
+      "memory_cap_gib": 24.0,
+      "target_device": "CPU"
+    },
+    "phase4": {
+      "max_wallclock_seconds": 3600,
+      "memory_cap_gib": 32.0,
+      "target_device": "CPU"
+    },
+    "phase5": {
+      "max_wallclock_seconds": 7200,
+      "memory_cap_gib": 32.0,
+      "target_device": "CPU/Accelerator"
+    },
+    "phase6": {
+      "max_wallclock_seconds": 14400,
+      "memory_cap_gib": 64.0,
+      "target_device": "CPU/Accelerator"
+    },
+    "phase7": {
+      "max_wallclock_seconds": 7200,
+      "memory_cap_gib": 32.0,
+      "target_device": "CPU/Accelerator"
+    },
+    "phase8": {
+      "max_wallclock_seconds": 14400,
+      "memory_cap_gib": 64.0,
+      "target_device": "CPU/Accelerator"
+    },
+    "phase9": {
+      "max_wallclock_seconds": 3600,
+      "memory_cap_gib": 16.0,
+      "target_device": "CPU"
+    }
+  },
+  "timestamp_utc": "2026-09-19T07:02:05.357014+00:00"
+}

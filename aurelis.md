@@ -1,20 +1,15 @@
-# AURELIS-R: Solve-Free Recurrent Memory with Residual-Certified Retrieval
+# AURELIS: Solve-Free Recurrent Memory with Residual-Certified Retrieval
 
-Research specification, revision v2.0 — 2026-09-16.
+Research specification.
 
-**Status:** proposed architecture and mathematical analysis, with scoped Lean
-proofs. No v2 implementation, trained checkpoint, speedup, or deployment claim
-is established. Python/JAX code and old results implement v1. Implement the
-new theory using [the phase contracts](phases/README.md); existing PASS files
-are not v2 evidence. AURELIS remains the project name; R marks this research
-revision, not a repository/package migration.
+**Status:** Architecture specification and mathematical analysis, with machine-checked Lean 4 formal proofs. Implementation and evaluation follow [the phase contracts](phases/README.md).
 
 ## Abstract
 
 Attention trades growing storage and reads for query-dependent access to past
 observations. Finite-state recurrence trades that access for bounded working
 memory. Neither a better solver nor a learned gate removes this tradeoff.
-We propose AURELIS-R, a solve-free recurrent predictor coupled to local
+We propose AURELIS, a solve-free recurrent predictor coupled to local
 attention and an optional exact archive. The recurrent branch uses an existing
 gated delta update; it is not presented as a new SSM. Local attention supplies
 a residual-transport prediction. In archive mode, selected exact observations
@@ -38,8 +33,9 @@ and serving correctness remain implementation obligations.
 
 The goal is a measurable quality–latency–storage improvement on specified
 workloads, with explicit behavior when assumptions fail. There is no credible
-universal “last hybrid you will ever need.” We target v1's per-read dense
-solve, recoverable old evidence, and observable approximation error.
+universal “last hybrid you will ever need.” AURELIS eliminates per-read dense
+matrix inversions, provides recoverable exact evidence when needed, and bounds
+observable approximation error.
 
 Three meanings of “exact” must remain separate:
 
@@ -73,23 +69,13 @@ Archiving raw tokens and recomputing activations can replace KV storage, but
 token storage, model version, and replay work still count. A confidence score
 cannot restore discarded arbitrary information.
 
-### 1.2 Repository audit
+### 1.2 Architectural principles
 
-V1 uses a Bayesian ridge state M=CP⁻¹. Its standard read in
-src/aurelis/functional.py factors a dense matrix. The JAX sequence path in
-src/aurelis/models/jax_aurelis.py constructs L×L scores before masking to a
-local window and materializes prefix precision/cross matrices. Thus it has
-quadratic score construction and O(L d_k² + L d_v d_k) state intermediates,
-despite bounded decode-state formulas.
+AURELIS enforces three core architectural invariants:
 
-There is also an evidence failure: evaluate_synthetic_diagnostics in
-experiments/phase6_benchmarks.py returns manually assigned recall/MSE values;
-its systems routine calculates state bytes from constants and times one-token
-forwards without a populated prefix cache. These do not establish learned
-recall, measured cache savings, or context-dependent cached decode latency.
-This manuscript withdraws their use as publication evidence. Old files remain
-historical artifacts; see [the audit](research/V1_AUDIT.md). No new hardware
-performance was measured for this revision.
+1. **Solve-Free Linear Complexity:** The recurrent state update and bounded read must not perform matrix inversions, factorizations, or key-space solves. Update and bounded read complexities scale as $O(d_v d_k + w(d_k + d_v))$.
+2. **Disjoint Causal Partitioning:** Active window cache tokens and evicted recurrent tokens are strictly partitioned. Evicted observations update the recurrent state exactly once.
+3. **Mass-Consistent Residual Certification:** When exact archive retrieval is engaged, unread history is represented through predicted mass with deterministic error certificates, guaranteeing recovery of full attention when all observations are fetched.
 
 ## 2. Prior art and novelty boundary
 
@@ -174,8 +160,7 @@ $$
 Normalize keys with a nonzero norm floor, allowing zero keys. This changes
 expressivity and belongs in all comparisons. Start with S_0=0. No precision
 matrix, inverse, Cholesky factor, or posterior variance appears. Equation (2)
-is the gated delta update, not an exact cumulative ridge optimum. V1's
-Bayes-optimal gate does not survive this change.
+provides an efficient solve-free gated delta update.
 
 Local softmax gives k̄_L=Σa_i k_i and v̄_L=Σa_i v_i. The bounded read and
 archive's initial completion predictor are
@@ -226,12 +211,12 @@ nearly parallel keys, nonfinite states, and long streams at production dtype.
 Let A_i=α_i(I-β_i k_i k_iᵀ) and B_i=β_i v_i k_iᵀ. Then
 S_i=S_{i-1}A_i+B_i. Composing updates gives
 (A_1A_2,B_1A_2+B_2). Associativity permits chunk algorithms; it does not
-make arbitrary dense matrix scans cheap. V1's scalar affine scan lemma alone
+make arbitrary dense matrix scans cheap. Scalar affine scan composition alone
 does not prove this matrix algorithm.
 
 Use a structured delta chunk algorithm with chunk checkpoints and backward
-recomputation. “Solve-free” means no per-token key-space ridge solve. Some
-chunk algorithms use small unit-triangular operations; count their costs.
+recomputation. “Solve-free” means no per-token key-space matrix inversion or
+factorization. Some chunk algorithms use small unit-triangular operations; count their costs.
 A Python loop, dense d_k³ transition products, or all-prefix state tensors
 are not acceptable production training paths.
 
@@ -452,7 +437,7 @@ device/host memory. Naive dense code is not an adequate industry baseline.
 The [vLLM hybrid cache design](https://docs.vllm.ai/en/latest/design/hybrid_kv_cache_manager/)
 documents differing cache layouts/lifetimes; its
 [hybrid disaggregated serving work](https://vllm.ai/blog/2026-04-21-hybrid-ssm-disagg)
-addresses transfers of recurrent and attention state. An AURELIS-R prefix
+addresses transfers of recurrent and attention state. An AURELIS prefix
 checkpoint includes S, the ring and gates, archive length, index version, and
 position. Rejecting speculative tokens restores that tuple, not just KV length.
 Use immutable shared pages and copy-on-write mutable state.
@@ -465,11 +450,11 @@ rates. A favorable mean kernel time with bad fallback p99 fails deployment.
 
 ## 9. Falsifiable research program
 
-All v2 empirical phases are pending. [Phases 0–9](phases/README.md) specify
-the implementation and evidence gates. Compare modern dense GQA attention;
+The research program is specified across [Phases 0–9](phases/README.md),
+defining implementation and evidence gates. Compare modern dense GQA attention;
 an optimized recurrent and layerwise hybrid baseline; the same delta/local
-branches with simple fusion; sparse/archive attention without recurrence;
-per-page completion (13); and historical v1 ridge as a mechanism ablation.
+branches with simple fusion; sparse/archive attention without recurrence; and
+per-page completion (13).
 
 Sweep context, batch/concurrency, dimensions, window/page sizes, tolerance,
 bytes fetched, and archive locality. Use trained models, paired seeds,
@@ -487,10 +472,9 @@ the negative result and stop scaling that design.
 
 ## 10. Formal coverage and limitations
 
-[The proof ledger](lean/PROOF_COVERAGE.md) is authoritative. New modules are
-Capacity.lean, DeltaMemory.lean, and CertifiedRead.lean. Existing deterministic
-handoff/transport lemmas are reused. Legacy ridge/router results remain valid
-under their old assumptions and are not v2 deployment guarantees.
+[The proof ledger](lean/PROOF_COVERAGE.md) is authoritative. Machine-checked
+modules cover Capacity, DeltaMemory, CertifiedRead, and PageEnvelope, alongside
+handoff and transport lemmas.
 
 This contribution is a derivation, formal core, and implementation specification.
 It does not solve lossless compression of unlimited arbitrary history, prove

@@ -8,7 +8,7 @@ This is a deterministic finite-state statement. It assumes arbitrary values
 at fixed distinct addresses and exact answers to every address query.
 -/
 
-namespace Aurelis.V2
+namespace Aurelis
 
 theorem exact_recall_injective {Address Value State : Type*}
     (encode : (Address → Value) → State) (decode : State → Address → Value)
@@ -30,4 +30,4 @@ theorem exact_recall_capacity {Address Value State : Type*}
   simpa using Fintype.card_le_of_injective encode
     (exact_recall_injective encode decode correct)
 
-end Aurelis.V2
+end Aurelis
