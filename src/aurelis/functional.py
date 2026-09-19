@@ -179,3 +179,55 @@ def pointwise_envelope(
     dot_lower = torch.min(scores, dim=-1).values
     dot_upper = torch.max(scores, dim=-1).values
     return dot_lower, dot_upper
+
+
+def compute_page_envelope(
+    key_min: Tensor,
+    key_max: Tensor,
+    count: int,
+    value_center: Tensor,
+    value_radius: float,
+    query: Tensor,
+    prior: Tensor,
+    kappa: float = 1.0,
+) -> tuple[float, float, float, float, float]:
+    """Compute score intervals and residual bounds for a page (Eqs. 11, 12).
+
+    Returns:
+        (ell, u, L, U, b)
+    """
+    qk_min = query * key_min
+    qk_max = query * key_max
+    coord_min = torch.minimum(qk_min, qk_max)
+    coord_max = torch.maximum(qk_min, qk_max)
+
+    ell = float((kappa * torch.sum(coord_min)).item())
+    u = float((kappa * torch.sum(coord_max)).item())
+
+    L = float(count) * math.exp(ell)
+    U = float(count) * math.exp(u)
+
+    diff_r = float(torch.linalg.vector_norm(value_center - prior).item())
+    b = U * (diff_r + value_radius)
+
+    return ell, u, L, U, b
+
+
+def full_history_softmax(
+    keys: Tensor,
+    values: Tensor,
+    query: Tensor,
+    kappa: float = 1.0,
+) -> Tensor:
+    """Explicit full-history softmax attention reference (Eq. 7).
+
+    y_* = sum_{i <= t} e^{s_i} v_i / sum_{i <= t} e^{s_i}
+    """
+    if keys.shape[0] == 0:
+        batch_shape = query.shape[:-1]
+        return values.new_zeros((*batch_shape, values.shape[-1]))
+
+    scores = kappa * torch.einsum("...d,...kd->...k", query, keys)
+    weights = torch.softmax(scores, dim=-1)
+    return torch.einsum("...k,...kv->...v", weights, values)
+
