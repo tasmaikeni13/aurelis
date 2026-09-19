@@ -1,0 +1,28 @@
+{
+  "counterexamples": [
+    {
+      "case_id": "Counterexample 1: Incompressible Associations (Capacity Lower Bound)",
+      "mechanism": "Random Gaussian keys and values with independent coordinates",
+      "observation": "Recurrent state S cannot linearly compress uncorrelated vectors (Thm 1.1). Both AURELIS and per-page center read all pages. AURELIS incurs extra S-compute FLOPs without saving fetches.",
+      "empirical_finding": "Recurrent predictor provides 0% page reduction."
+    },
+    {
+      "case_id": "Counterexample 2: Metadata-Dominant Contexts (Overhead Exceeds Dense Attention)",
+      "mechanism": "Short context lengths (t <= 24) or tiny page sizes (p = 2)",
+      "observation": "The FLOP cost of scanning page envelopes, calculating bounds, and sorting unread nodes exceeds 100% of dense FlashAttention/GEMM FLOPs.",
+      "empirical_finding": "Total FLOPs for certified archive read exceeds dense causal attention baseline."
+    },
+    {
+      "case_id": "Counterexample 3: Abrupt Drift Before Adaptation",
+      "mechanism": "Generating matrix switches from W1 to W2 halfway through context",
+      "observation": "Queries targeting pre-drift tokens suffer larger residuals under S (which decayed and adapted to W2) than static page envelopes.",
+      "empirical_finding": "Recurrent prediction increases residual bound b_j(r) over static page center c_j."
+    },
+    {
+      "case_id": "Counterexample 4: Loose Page Envelopes",
+      "mechanism": "Coordinate bounding boxes inflated by 2.0x",
+      "observation": "Score intervals widen, causing mass uncertainty eta to dominate denominator floor. Certified stopping cannot fire, forcing full reads.",
+      "empirical_finding": "100% full read fallback rate under loose bounding boxes."
+    }
+  ]
+}

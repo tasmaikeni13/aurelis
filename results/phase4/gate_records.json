@@ -1,0 +1,49 @@
+{
+  "gates": [
+    {
+      "gate_id": "Gate 1",
+      "criterion": "Identical Q/K/V, archive pages, encoding, epsilon, and accounting across all 8 comparators",
+      "status": "PASS",
+      "evidence": "Verified in test_phase4_comparators.py & comparator_benchmark.json"
+    },
+    {
+      "gate_id": "Gate 2",
+      "criterion": "Equal total state/index budgets and equal fetched-KV budgets comparison",
+      "status": "PASS",
+      "evidence": "Verified in test_phase4_comparators.py & comparator_benchmark.json"
+    },
+    {
+      "gate_id": "Gate 3",
+      "criterion": "Workload sweep across all 11 registered regimes (including metadata-dominant)",
+      "status": "PASS",
+      "evidence": "Verified in test_phase4_workloads.py & workload_sweep_results.json"
+    },
+    {
+      "gate_id": "Gate 4",
+      "criterion": "All 6 required ablations with comprehensive arithmetic and systems cost accounting",
+      "status": "PASS",
+      "evidence": "Verified in test_phase4_ablations.py & ablation_results.json"
+    },
+    {
+      "gate_id": "Gate 5",
+      "criterion": "Statistical evaluation of H2 with paired uncertainty estimates and confidence intervals",
+      "status": "FAILED_HYPOTHESIS",
+      "evidence": "H2 falsified: mean cost improvement < 10% (-0.41%) and CI [-52.80, -52.80] does not demonstrate required superiority over per_page_center (Eq. 13)."
+    },
+    {
+      "gate_id": "Gate 6",
+      "criterion": "Reproducible counterexamples documented outside useful regime",
+      "status": "PASS",
+      "evidence": "Verified in test_phase4_counterexamples.py & counterexamples.json"
+    },
+    {
+      "gate_id": "Gate 7",
+      "criterion": "Updated novelty comparison against ResKV, Quest, certified quantized attention, and hybrid memory",
+      "status": "PASS",
+      "evidence": "Documented in novelty_comparison.json & novelty_comparison.md"
+    }
+  ],
+  "phase_status": "FAILED_HYPOTHESIS",
+  "h2_status": "FAILED_HYPOTHESIS",
+  "h4_bounded_mode_status": "PRESERVED_AS_INDEPENDENT"
+}

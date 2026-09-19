@@ -1,0 +1,28 @@
+{
+  "novelty_comparisons": [
+    {
+      "baseline": "ResKV (arXiv 2607.29591)",
+      "shared_concepts": "Restores omitted numerator and denominator statistics within a cache budget.",
+      "difference_in_aurelis": "AURELIS introduces a delayed solve-free recurrent state S to predict unread observations and derives a deterministic normalizer error bound Eq. (10).",
+      "empirical_verdict": "ResKV's intuition that unread mass can be compensated is valid, but using a recurrent matrix S to predict unread values does not outperform per-page static center statistics (Eq. 13)."
+    },
+    {
+      "baseline": "Quest (arXiv 2406.10774)",
+      "shared_concepts": "Query-dependent page key coordinate bounds [k^-, k^+] for sparse page selection.",
+      "difference_in_aurelis": "Quest selects top-K pages based solely on max key score without error bounds. AURELIS introduces residual-sensitive priority heuristic and deterministic certification.",
+      "empirical_verdict": "Value-sensitive selection prevents catastrophic errors when low-mass pages contain huge value outliers, but Quest's simple key-bounding remains a cheaper page filter."
+    },
+    {
+      "baseline": "Certified Quantized Attention (arXiv 2605.20868)",
+      "shared_concepts": "Runtime error certification with fallback to exact data.",
+      "difference_in_aurelis": "Quantized attention certifies quantization noise in stored keys/values. AURELIS certifies complete structural omission of unread remote pages.",
+      "empirical_verdict": "Quantization error certification is tightly bounded and useful; structural omission certification requires conservative exponential intervals that often force full reads unless tolerance is loose."
+    },
+    {
+      "baseline": "Hybrid Recurrent Architectures (Based, Infini-attention, NHA, Nemotron-H)",
+      "shared_concepts": "Couples recurrent state with recent attention window cache.",
+      "difference_in_aurelis": "Hybrids use heuristic linear or learned fusion. AURELIS investigated mass-consistent archive completion to guarantee full softmax recovery in real arithmetic.",
+      "empirical_verdict": "The solve-free recurrent state S is efficient in bounded mode (O(d_v d_k + w(d_k + d_v))), but coupling it to an exact archive for certified retrieval adds overhead without beating static page summaries."
+    }
+  ]
+}
