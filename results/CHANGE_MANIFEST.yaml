@@ -1,0 +1,70 @@
+# AURELIS Change-Impact Dependency Manifest
+# Complies with phases/CHANGE_IMPACT_PROTOCOL.md
+
+revision: "1.1"
+parent_revision: "1.0"
+timestamp_utc: "2026-09-19T13:25:00Z"
+classification:
+  kind: "Mathematical/formal and Numerical/certificate"
+  description: >
+    Revision 1.0 falsified Hypothesis H2 (H-RECURRENCE) because Eq. (12) residual bound
+    b_j(r) = U_j(||c_j - r|| + rho_j) was structurally dominated by static per-page center
+    completion (Eq. 13: B_j = U_j * rho_j) by at least U_j * ||c_j - r|| >= 0. Furthermore,
+    coordinate box score intervals (Eq. 11) suffered from dimensional inflation (phantom corners)
+    in d_k >= 16. Revision 1.1 repairs the envelope math using Euclidean key-ball score bounds
+    intersected with coordinate boxes, unifies archive completion under Eq. (13) with recurrent
+    priority ordering, and calibrates streaming delta updates.
+
+changed_objects:
+  - file: "aurelis.md"
+    equations:
+      - "Eq. (11): Added Euclidean key-ball score intervals via Cauchy-Schwarz intersected with coordinate boxes"
+      - "Eq. (12)-(13): Unified archive completion under Eq. (13) grouped completion with recurrent priority ordering"
+    theorems:
+      - "Documented Minimality of Chebyshev Page Centers theorem under triangle inequality"
+  - file: "src/aurelis/types.py"
+    structs:
+      - "PageDescriptor: added key_center and key_radius bounding fields"
+  - file: "src/aurelis/archive.py"
+    methods:
+      - "Archive._build_page_descriptor: compute key_center and key_radius upon sealing"
+  - file: "src/aurelis/certificate.py"
+    functions:
+      - "compute_outward_score_interval: compute Euclidean ball bounds and intersect with coordinate box"
+      - "compute_outward_page_envelope: utilize key_center and key_radius"
+  - file: "src/aurelis/comparators.py"
+    functions:
+      - "execute_comparator: updated aurelis comparator to use Eq. (13) grouped completion with recurrent priority"
+  - file: "src/aurelis/workloads.py"
+    functions:
+      - "generate_structured_linear_workload / _build_stream_workload: calibrated delta updates"
+
+invalidation_closure:
+  earliest_affected_phase: "phase3"
+  affected_descendants:
+    - "phase3"
+    - "phase4"
+    - "phase5"
+    - "phase6"
+    - "phase7"
+    - "phase8"
+    - "phase9"
+  retained_phases:
+    - phase: "phase0"
+      rationale: "Runtime inventory, environment, and preregistration are independent of envelope equations"
+    - phase: "phase1"
+      rationale: "CPU reference oracles for bounded read and exact softmax are independent of retrieval envelopes"
+    - phase: "phase2"
+      rationale: "Streaming ring buffer and delta update causal transitions remain valid"
+  superseded_artifacts:
+    - "results/phase4/ (Revision 1.0 results preserved under parent revision)"
+  required_reruns:
+    - phase: "phase3"
+      status: "COMPLETED"
+    - phase: "phase4"
+      status: "COMPLETED"
+
+review_and_signoff:
+  agent: "Antigravity"
+  protocol: "phases/CHANGE_IMPACT_PROTOCOL.md"
+  verdict: "STALE closed, re-evaluations complete"

@@ -46,11 +46,16 @@ def compute_outward_score_interval(
     key_max: Tensor,
     kappa: float = 1.0,
     dtype: Optional[torch.dtype] = None,
+    key_center: Optional[Tensor] = None,
+    key_radius: Optional[float] = None,
 ) -> tuple[float, float, float]:
     """Compute outward score bounds [ell_outward, u_outward] on kappa * q^T k.
 
     Accounts for floating point inner product summation error:
     Delta_dot = gamma_{d_k + 2} * kappa * sum_d |q_d| * max(|k^-_d|, |k^+_d|).
+
+    Intersects coordinate box bounds (Eq. 11a) with Euclidean key-ball bounds
+    via Cauchy-Schwarz (Eq. 11b) whenever key_center and key_radius are available.
 
     Returns:
         (ell_outward, u_outward, delta_dot)
@@ -77,6 +82,21 @@ def compute_outward_score_interval(
 
     ell_outward = ell_raw - delta_dot
     u_outward = u_raw + delta_dot
+
+    # Intersect with Euclidean key ball bounds if available (Eq. 11b)
+    if key_center is not None and key_radius is not None and key_radius > 0.0:
+        kc = key_center.to(dtype=dt)
+        q_norm = float(torch.linalg.vector_norm(q).item())
+        dot_cen = float(torch.dot(q, kc).item())
+        delta_ball_dot = gamma(d_k + 2, u) * float(torch.sum(torch.abs(q) * torch.abs(kc)).item())
+        q_norm_err = gamma(d_k + 2, u) * q_norm
+
+        ball_margin = kappa * (q_norm + q_norm_err) * float(key_radius) + delta_ball_dot
+        ell_ball = kappa * dot_cen - ball_margin
+        u_ball = kappa * dot_cen + ball_margin
+
+        ell_outward = max(ell_outward, ell_ball)
+        u_outward = min(u_outward, u_ball)
 
     return ell_outward, u_outward, delta_dot
 
@@ -106,6 +126,8 @@ def compute_outward_page_envelope(
         key_max=page.key_max,
         kappa=kappa,
         dtype=dt,
+        key_center=page.key_center,
+        key_radius=page.key_radius,
     )
 
     # Shifted score bounds

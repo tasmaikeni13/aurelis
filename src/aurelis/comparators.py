@@ -270,7 +270,7 @@ def execute_comparator(
     cost_getter = cost_fn or (lambda p: max(1.0, float(p.count)))
 
     # Initial candidate output and certificate evaluation
-    if comparator_name == "per_page_center":
+    if comparator_name in ("aurelis", "per_page_center"):
         # Grouped completion (Eq. 13)
         Z_hat_j = [(env["Lj"] + env["Uj"]) / 2.0 for env in unread_envelopes]
         sum_zh = sum(Z_hat_j)
@@ -383,6 +383,15 @@ def execute_comparator(
 
             unread_envelopes.sort(key=eval_grouped_prio, reverse=True)
             selection_ops += len(unread_envelopes) * (d_v + 10) + int(math.log2(max(2, len(unread_envelopes))))
+        elif comparator_name == "aurelis":
+            # Revision 1.1: Recurrence-guided value-residual priority: (U_j * rho_j + eta_j * ||c_j - prior||) / cost_j
+            def eval_aur_prio(env: dict[str, Any]) -> float:
+                eta_j = (env["Uj"] - env["Lj"]) / 2.0
+                diff_j = float(torch.linalg.vector_norm(env["page"].value_center.to(dtype=dt) - prior).item())
+                return (env["Uj"] * env["radius"] + eta_j * diff_j) / cost_getter(env["page"])
+
+            unread_envelopes.sort(key=eval_aur_prio, reverse=True)
+            selection_ops += len(unread_envelopes) * (d_v + 10) + int(math.log2(max(2, len(unread_envelopes))))
         else:
             # Paper §6.2 residual-sensitive priority: [b_j + eta_j * ||prior - y_hat||] / cost_j
             prior_diff = float(torch.linalg.vector_norm(prior - y_hat).item())
@@ -433,7 +442,7 @@ def execute_comparator(
             break
 
         # Recompute candidate completion and certificate bound
-        if comparator_name == "per_page_center":
+        if comparator_name in ("aurelis", "per_page_center"):
             Z_hat_j = [(env["Lj"] + env["Uj"]) / 2.0 for env in unread_envelopes]
             sum_zh = sum(Z_hat_j)
             pred_sum = torch.sum(

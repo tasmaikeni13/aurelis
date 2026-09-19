@@ -1,7 +1,7 @@
 # AURELIS Phase 3 Report: Certificate Implementation & Retrieval Policy
 
-**Date UTC:** `2026-09-19T13:01:50.699428+00:00`  
-**Git Commit:** `0d7144962b4a1d85c59495b2f4a783b68ae5c057`  
+**Date UTC:** `2026-09-19T13:25:46.314855+00:00`  
+**Git Commit:** `c48dac340334a1428195f46c432eefb39d6b7698`  
 **Phase Status:** **PASS**
 
 ---
@@ -32,7 +32,7 @@ Phase 3 implements and verifies the complete deterministic certificate, conserva
 | `stress_pathology_results.json` / `.md` | 11 registered stress cases, failure injection, timeout | Gates §Phase 3 |
 | `gate_records.json` | Complete audit of all 11 Phase 3 gate criteria | phase3.md |
 | `raw/lean_build.log` | Lean 4 formal compiler build trace | Formal integrity |
-| `raw/pytest_run.log` | Full Pytest suite execution trace (116 passed tests) | Test verification |
+| `raw/pytest_run.log` | Full Pytest suite execution trace (149 passed tests) | Test verification |
 
 ---
 
@@ -68,10 +68,10 @@ Phase 3 is complete with status **PASS**. The deterministic residual certificate
 | `certificate_validation.md` | `68330cf065e8ecd7eae5104a272f643d1beb51c03bc34ee4ce8d4b9cb6d51e96` |
 | `arithmetic_error_model.json` | `e8a2496d0702e319f160a4edc44b2a9067ffc16a3ce39436488160b808ce732b` |
 | `arithmetic_error_model.md` | `097b74f0babb9cefd152a7b68d7760442e5c2e5c51fb8ca945000fc246c1c73e` |
-| `retrieval_policy_benchmark.json` | `2ff682eb15f1f9aad163aee47518b92f53181433ef01d7436ccdb37d101b68b7` |
-| `retrieval_policy_benchmark.md` | `f62ea416ef0528c7bed7babb1e108a5e9552d17df862e3e4e22d9cf4b4a1738f` |
+| `retrieval_policy_benchmark.json` | `3d73db50c07d2af9f5904274163a85da3dcbb0ff1bb096c878acdb731188a81b` |
+| `retrieval_policy_benchmark.md` | `318f8521bb80d674c82093fe9dc5a571d807a4f7a200adb3f0851dce9e28d989` |
 | `stress_pathology_results.json` | `091d4faf71a871d4d0d4d5322550659a966aab684e137190f8ec3ae5493dabeb` |
 | `stress_pathology_results.md` | `b3312ff18318726c912c574f9528d4ae82e2554320e6cc6216f2d2533cac8f5e` |
 | `gate_records.json` | `8d9c6204925f0d1b10b1e81afc1bbc456037140e06eea767bbc68a2418c8db95` |
-| `PASS.md` | `d8f8c075f3edf7949b3f0a71598d6f1bc95e6acc9e8d23f7a871558da98fa230` |
+| `PASS.md` | `0d88df5f7488d848baf9e2096df1999085c4f234ef63a2afa5b95a9eabe9bfda` |
 

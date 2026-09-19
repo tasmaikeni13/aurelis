@@ -17,7 +17,7 @@ This registry tracks the formal claims and empirical research hypotheses of the 
 | R-GROUPED | Per-page predictor comparator has bound (13) | `groupedCompletedRead_balance`, `grouped_residual_certificate` (namespace `Aurelis`); Eq. (13) | Lean-checked |
 | R-COST | Bounded mode eliminates per-token matrix inversions | Equations (2)–(3), cost model (15) | Design accounting |
 | R-ARCHIVE | Exact archive and metadata grow with history; worst-case full read is linear per query | State definition and cost model | Analytic |
-| H-RECURRENCE | Recurrent completion improves cost at fixed error vs strongest cheap completion | Phases 4–8 | Falsified (Phase 4: Eq. 13 per-page center comparator strictly dominates recurrent completion in tightness, error, and cost) |
+| H-RECURRENCE | Recurrent completion improves cost at fixed error vs strongest cheap completion | Phases 4–8 | Falsified (Phase 4, Rev 1.0 & 1.1: Minimality of Chebyshev Page Centers Theorem proves Eq. 13 static per-page center comparator mathematically minimizes worst-case bound; recurrence lacks retrieval advantage) |
 | H-LM | Architecture preserves competitive trained LM/recall quality | Phases 6–8 | Hypothesis |
 | H-DEPLOY | Meets registered quality/SLO/cost and failure-handling criteria | Phases 7–8 | Hypothesis |
 | H-NOVELTY | The precise coupling is a distinct useful contribution beyond prior art | Literature review and ablations | Ablated (Phase 4: recurrent completion lacks novelty advantage over static page completion; bounded mode H4 retained) |

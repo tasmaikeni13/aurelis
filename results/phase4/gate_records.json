@@ -28,7 +28,7 @@
       "gate_id": "Gate 5",
       "criterion": "Statistical evaluation of H2 with paired uncertainty estimates and confidence intervals",
       "status": "FAILED_HYPOTHESIS",
-      "evidence": "H2 falsified: mean cost improvement < 10% (-0.41%) and CI [-52.80, -52.80] does not demonstrate required superiority over per_page_center (Eq. 13)."
+      "evidence": "H2 falsified: mean cost improvement < 10% (-0.66%) and CI [-86.40, -86.40] does not demonstrate required superiority over per_page_center (Eq. 13)."
     },
     {
       "gate_id": "Gate 6",

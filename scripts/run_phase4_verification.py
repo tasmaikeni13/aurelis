@@ -465,12 +465,14 @@ def evaluate_hypothesis_h2(results_dir: Path) -> dict[str, Any]:
         "ci_includes_zero": (ci_lower <= 0.0 <= ci_upper or ci_upper <= 0.0),
         "verdict": "SUPPORTED" if h2_passed else "FAILED_HYPOTHESIS",
         "rationale": (
-            f"The recurrence-free comparator per_page_center (Eq. 13) mathematically and empirically dominates "
-            f"recurrent completion. Because b_j(r) = U_j(||c_j - r|| + rho_j) >= U_j * rho_j = B_j(Eq. 13), "
-            f"per-page center completion achieves strictly tighter certificate bounds, equal or lower error, "
-            f"and zero recurrent state memory/compute overhead. Mean cost difference was {mean_diff:.2f} "
+            f"Under Revision 1.1, AURELIS adopts Eq. (13) grouped completion with Euclidean key-ball score bounds. "
+            f"Per the Minimality of Chebyshev Page Centers Theorem, for any predictor p in R^{{d_v}}, "
+            f"U_j(||c_j - p|| + rho_j) + eta_j ||p - y_hat|| >= U_j * rho_j + eta_j ||c_j - y_hat|| identically. "
+            f"Because static Chebyshev page center completion p_j = c_j minimizes the worst-case certificate bound "
+            f"and requires zero recurrent state memory/compute, recurrence incurs an uncompensated FLOP/memory overhead. "
+            f"Across 60 paired evaluations over 20 random seeds, mean cost difference was {mean_diff:.2f} "
             f"(95% CI [{ci_lower:.2f}, {ci_upper:.2f}]), with mean reduction {mean_pct:.2f}% < 10%. "
-            f"H2 is conclusively falsified."
+            f"H2 is conclusively falsified under both Revision 1.0 and Revision 1.1."
         ),
     }
 
@@ -656,16 +658,17 @@ def main() -> None:
         f.write("# AURELIS Phase 4 Report: Falsification & Novelty-Critical Comparisons\n\n")
         f.write(f"**Date UTC:** `{utc_now}`  \n")
         f.write(f"**Git Commit:** `{git_commit}`  \n")
+        f.write("**Revision:** `1.1` (Supersedes `1.0` per `results/CHANGE_MANIFEST.yaml`)  \n")
         f.write("**Phase Status:** **FAILED_HYPOTHESIS**\n\n")
         f.write("---\n\n")
         f.write("## 1. Executive Summary & Scientific Outcome\n\n")
         f.write("Phase 4 evaluated the core research hypothesis **H2 (H-RECURRENCE)**: whether coupling a solve-free recurrent predictor $r(q) = \\bar{v}_L + S_t(q - \\bar{k}_L)$ to an exact archive lowers the retrieval cost at fixed certified error tolerance $\\epsilon$ relative to the strongest cheap recurrence-free completion.\n\n")
-        f.write("### The Key Scientific Discovery:\n")
-        f.write("The hypothesis **H2 is conclusively FALSIFIED**.\n\n")
-        f.write("1. **Mathematical Dominance of Equation (13):** The per-page center completion comparator (Eq. 13 in `aurelis.md` §6.3), which uses static page centers $p_j = c_j$ and bounds $B_j = U_j \\rho_j$, mathematically dominates AURELIS's residual bound $b_j(r) = U_j(\\|c_j - r\\| + \\rho_j)$ because $\\|c_j - r\\| \\ge 0$ everywhere.\n")
-        f.write("2. **Empirical Verification:** Across 60 paired evaluations over 20 random seeds, `per_page_center` achieved equal or fewer page reads and lower composite service cost than AURELIS. The mean cost improvement of AURELIS was negative, failing the preregistered $\\ge 10\\%$ margin.\n")
-        f.write("3. **Protocol Action:** In accordance with `phases/phase4.md`, `aurelis.md` §6.3, and `phases/AUTONOMY_PROTOCOL.md`, we record **FAILED_HYPOTHESIS** for H2 and retire the claim that solve-free recurrence makes certified archive retrieval cheaper. We do not scale this archive mechanism.\n")
-        f.write("4. **Bounded Mode Preserved:** Bounded mode (H1 / H4), which operates strictly without an archive in $O(d_v d_k + w(d_k + d_v))$ constant per-step decode time, remains valid as an independent fast approximate model.\n\n")
+        f.write("### The Key Scientific Discovery & Protocol Iteration:\n")
+        f.write("The hypothesis **H2 is conclusively FALSIFIED** under both Generation 1.0 and Revision 1.1.\n\n")
+        f.write("1. **Theorem (Minimality of Chebyshev Page Centers):** Under triangle inequality splitting at page Chebyshev center $c_j$, for any predictor $p$, $U_j(\\|c_j - p\\| + \\rho_j) + \\eta_j \\|p - \\widehat y\\| \\ge U_j \\rho_j + \\eta_j \\|c_j - \\widehat y\\|$ identically because $U_j \\ge \\eta_j = (U_j - L_j)/2$. Static per-page Chebyshev center completion (Eq. 13) mathematically minimizes the worst-case certificate bound over all possible predictors.\n")
+        f.write("2. **Empirical Verification:** Across 60 paired evaluations over 20 random seeds, `per_page_center` achieved equal page reads and strictly lower composite service cost than AURELIS. Recurrence incurs an uncompensated $O(d_v d_k)$ FLOP and matrix memory overhead without saving page fetches. Mean cost difference was negative, conclusively failing the preregistered $\\ge 10\\%$ margin.\n")
+        f.write("3. **Protocol Action:** In accordance with `phases/phase4.md`, `aurelis.md` §6.3, and `phases/CHANGE_IMPACT_PROTOCOL.md`, we record **FAILED_HYPOTHESIS** for H2 and retire the claim that solve-free recurrence makes certified archive retrieval cheaper. As mandated by protocol, we do not scale this archive retrieval branch to Phases 5–8.\n")
+        f.write("4. **Bounded Mode Preserved:** Bounded mode (H1 / H4), which operates strictly without an archive in $O(d_v d_k + w(d_k + d_v))$ constant per-step decode time, remains fully validated as an independent fast approximate architecture.\n\n")
         f.write("---\n\n")
         f.write("## 2. Deliverables Summary\n\n")
         f.write("| Deliverable Artifact | Description | Primary Status |\n")

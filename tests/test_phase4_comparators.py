@@ -138,3 +138,44 @@ def test_full_read_fallback_recovers_ground_truth(structured_setup):
 
     assert res.status == "full_read"
     assert res.actual_error < 1e-12
+
+
+def test_revision_1_1_grouped_completion(structured_setup):
+    """Verify that under Revision 1.1, AURELIS uses grouped completion (Eq. 13) and valid bounds."""
+    workload = structured_setup
+    q = workload.queries[0]
+
+    res_aur = execute_comparator(
+        comparator_name="aurelis",
+        query=q,
+        recent_keys=workload.recent_keys,
+        recent_values=workload.recent_values,
+        S=workload.S,
+        archive_entries=workload.archive_entries,
+        page_descriptors=workload.page_descriptors,
+        get_page_entries_fn=workload.get_page_entries,
+        epsilon=0.5,
+        dtype=torch.float64,
+    )
+
+    res_ppc = execute_comparator(
+        comparator_name="per_page_center",
+        query=q,
+        recent_keys=workload.recent_keys,
+        recent_values=workload.recent_values,
+        S=workload.S,
+        archive_entries=workload.archive_entries,
+        page_descriptors=workload.page_descriptors,
+        get_page_entries_fn=workload.get_page_entries,
+        epsilon=0.5,
+        dtype=torch.float64,
+    )
+
+    assert res_aur.certified_bound is not None
+    assert res_ppc.certified_bound is not None
+    # Both methods produce valid bounds bounding actual error
+    if res_aur.status == "certified":
+        assert res_aur.actual_error <= res_aur.certified_bound + 1e-12
+    if res_ppc.status == "certified":
+        assert res_ppc.actual_error <= res_ppc.certified_bound + 1e-12
+

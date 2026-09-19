@@ -69,6 +69,8 @@ class PageDescriptor:
     start_pos: int = 0
     end_pos: int = 0
     sealed: bool = True
+    key_center: Optional[Tensor] = None
+    key_radius: float = 0.0
 
 
 @dataclass(frozen=True)

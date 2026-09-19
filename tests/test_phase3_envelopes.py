@@ -233,3 +233,38 @@ def test_unread_cover_disjoint_and_complete():
     is_valid, reason = validate_unread_cover(duplicate_pages, expected_ids)
     assert not is_valid
     assert "Duplicate occurrence ID" in reason
+
+
+def test_key_ball_containment_and_tightness():
+    """Verify Revision 1.1 key ball score bounds contain true scores and tighten box intervals."""
+    torch.manual_seed(3005)
+    d_k = 16
+    keys = torch.randn(8, d_k, dtype=torch.float64)
+    q = torch.randn(d_k, dtype=torch.float64)
+
+    k_min = torch.min(keys, dim=0).values
+    k_max = torch.max(keys, dim=0).values
+    k_cen = torch.mean(keys, dim=0)
+    k_rad = float(torch.max(torch.linalg.vector_norm(keys - k_cen, dim=-1)).item())
+
+    # Box-only interval
+    ell_box, u_box, _ = compute_outward_score_interval(q, k_min, k_max, dtype=torch.float64)
+
+    # Combined box + ball interval
+    ell_comb, u_comb, _ = compute_outward_score_interval(
+        q, k_min, k_max, dtype=torch.float64, key_center=k_cen, key_radius=k_rad
+    )
+
+    # True inner products
+    true_scores = [float(torch.dot(q, k).item()) for k in keys]
+    min_s, max_s = min(true_scores), max(true_scores)
+
+    # 1. Containment holds for both
+    assert ell_box <= min_s + 1e-12 and u_box >= max_s - 1e-12
+    assert ell_comb <= min_s + 1e-12 and u_comb >= max_s - 1e-12
+
+    # 2. Combined is at least as tight as box
+    assert ell_comb >= ell_box - 1e-12
+    assert u_comb <= u_box + 1e-12
+    assert (u_comb - ell_comb) <= (u_box - ell_box) + 1e-12
+

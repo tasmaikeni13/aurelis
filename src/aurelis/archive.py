@@ -87,6 +87,12 @@ class Archive:
         k_min = torch.min(keys, dim=0).values
         k_max = torch.max(keys, dim=0).values
 
+        key_center = torch.mean(keys.to(dtype=torch.float64), dim=0).to(dtype=keys.dtype)
+        key_diffs = torch.linalg.vector_norm(
+            keys.to(dtype=torch.float64) - key_center.to(dtype=torch.float64), dim=-1
+        )
+        key_radius = float(torch.max(key_diffs).item())
+
         center = torch.mean(values.to(dtype=torch.float64), dim=0).to(dtype=values.dtype)
         diffs = torch.linalg.vector_norm(
             values.to(dtype=torch.float64) - center.to(dtype=torch.float64), dim=-1
@@ -108,6 +114,8 @@ class Archive:
             start_pos=start_pos,
             end_pos=end_pos,
             sealed=sealed,
+            key_center=key_center,
+            key_radius=key_radius,
         )
 
     def get_entries(self, causal_cutoff: Optional[int] = None) -> list[ArchiveEntry]:

@@ -7,7 +7,7 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
         "error": 1.9699616336213962e-16
       },
@@ -37,7 +37,7 @@
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 1.8097747405888788e-16
+        "error": 1.788364452201523e-16
       }
     },
     {
@@ -47,7 +47,7 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
         "error": 2.0434619630153217e-16
       },
@@ -87,37 +87,37 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
-        "error": 2.509300143851074e-16
+        "error": 1.7507820758489076e-16
       },
       "per_page_center": {
         "status": "full_read",
         "pages": 6,
         "cost": 13065.9,
         "bound": 0.0,
-        "error": 3.0175214440328804e-16
+        "error": 2.223425606130996e-16
       },
       "local_barycenter": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 2.509300143851074e-16
+        "error": 2.5676251558357494e-16
       },
       "zero": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 2.557526065092035e-16
+        "error": 2.278769100315801e-16
       },
       "sparse_no_completion": {
         "status": "full_read",
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 2.5213237493917615e-16
+        "error": 2.1825137846681503e-16
       }
     },
     {
@@ -127,37 +127,37 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
-        "error": 3.64856516669287e-15
+        "error": 3.675492212195508e-15
       },
       "per_page_center": {
         "status": "full_read",
         "pages": 6,
         "cost": 13065.9,
         "bound": 0.0,
-        "error": 3.64856516669287e-15
+        "error": 3.675492212195508e-15
       },
       "local_barycenter": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 3.64856516669287e-15
+        "error": 3.675492212195508e-15
       },
       "zero": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 3.64856516669287e-15
+        "error": 3.675492212195508e-15
       },
       "sparse_no_completion": {
         "status": "full_read",
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 3.64856516669287e-15
+        "error": 3.5596458096434965e-15
       }
     },
     {
@@ -167,37 +167,37 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
-        "error": 2.3611364500793736e-16
+        "error": 2.2862181245748777e-16
       },
       "per_page_center": {
         "status": "full_read",
         "pages": 6,
         "cost": 13065.9,
         "bound": 0.0,
-        "error": 2.455633432831828e-16
+        "error": 2.2862181245748777e-16
       },
       "local_barycenter": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 2.455633432831828e-16
+        "error": 2.2862181245748777e-16
       },
       "zero": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 2.455633432831828e-16
+        "error": 2.2862181245748777e-16
       },
       "sparse_no_completion": {
         "status": "full_read",
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 2.329249844617276e-16
+        "error": 2.0985538972467343e-16
       }
     },
     {
@@ -207,16 +207,16 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
-        "error": 2.285934031521642e-16
+        "error": 2.231590858535846e-16
       },
       "per_page_center": {
         "status": "full_read",
         "pages": 6,
         "cost": 13065.9,
         "bound": 0.0,
-        "error": 2.285934031521642e-16
+        "error": 2.231590858535846e-16
       },
       "local_barycenter": {
         "status": "full_read",
@@ -237,7 +237,7 @@
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 2.5008332648785685e-16
+        "error": 2.223749373919878e-16
       }
     },
     {
@@ -247,9 +247,9 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
-        "error": 1.1455743979190591e-16
+        "error": 1.192299056529371e-16
       },
       "per_page_center": {
         "status": "full_read",
@@ -287,37 +287,37 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
-        "error": 8.079510671157253e-17
+        "error": 7.090781675446759e-17
       },
       "per_page_center": {
         "status": "full_read",
         "pages": 6,
         "cost": 13065.9,
         "bound": 0.0,
-        "error": 8.079510671157253e-17
+        "error": 6.562925704675463e-17
       },
       "local_barycenter": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 8.168526240062871e-17
+        "error": 5.782935593896387e-17
       },
       "zero": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 8.079510671157253e-17
+        "error": 5.782935593896387e-17
       },
       "sparse_no_completion": {
         "status": "full_read",
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 7.271885496097357e-17
+        "error": 7.905967747050536e-17
       }
     },
     {
@@ -327,37 +327,37 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
-        "error": 3.2635054502941876e-16
+        "error": 3.1680439426699847e-16
       },
       "per_page_center": {
         "status": "full_read",
         "pages": 6,
         "cost": 13065.9,
         "bound": 0.0,
-        "error": 3.201410907914923e-16
+        "error": 3.1680439426699847e-16
       },
       "local_barycenter": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 3.1334695782357897e-16
+        "error": 3.1716988771526516e-16
       },
       "zero": {
         "status": "full_read",
         "pages": 6,
         "cost": 13032.3,
         "bound": 0.0,
-        "error": 3.201410907914923e-16
+        "error": 3.1716988771526516e-16
       },
       "sparse_no_completion": {
         "status": "full_read",
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 3.7856738103898383e-16
+        "error": 3.393546564845433e-16
       }
     },
     {
@@ -367,7 +367,7 @@
       "aurelis": {
         "status": "full_read",
         "pages": 6,
-        "cost": 13085.1,
+        "cost": 13118.7,
         "bound": 0.0,
         "error": 4.3093827271146296e-16
       },
@@ -397,7 +397,7 @@
         "pages": 6,
         "cost": 13021.8,
         "bound": 0.0,
-        "error": 4.228172738757786e-16
+        "error": 4.3093827271146296e-16
       }
     },
     {
@@ -407,9 +407,9 @@
       "aurelis": {
         "status": "full_read",
         "pages": 8,
-        "cost": 4922.2,
+        "cost": 4979.8,
         "bound": 0.0,
-        "error": 3.086833069645304e-16
+        "error": 2.5076206388575456e-16
       },
       "per_page_center": {
         "status": "full_read",

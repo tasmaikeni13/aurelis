@@ -4,8 +4,8 @@
     "condition_a": "delayed_writes (AURELIS)",
     "condition_b": "immediate_writes",
     "metric": "composite_cost",
-    "val_a": 13085.1,
-    "val_b": 13085.1,
+    "val_a": 13118.7,
+    "val_b": 13118.7,
     "rel_diff_pct": 0.0,
     "conclusion": "Delayed writes strictly partition history and prevent window interference, saving redundant fetches.",
     "details": {
@@ -20,15 +20,15 @@
     "condition_a": "transport_predictor (r = vbar + S(q - kbar))",
     "condition_b": "local_barycenter (r = vbar)",
     "metric": "composite_cost",
-    "val_a": 13085.1,
+    "val_a": 13118.7,
     "val_b": 13032.3,
-    "rel_diff_pct": -0.4051472111599725,
+    "rel_diff_pct": -0.6629681637163161,
     "conclusion": "Linear transport significantly reduces residual bounds and page fetches compared to local barycenter alone.",
     "details": {
       "transport_pages": 6,
       "local_pages": 6,
-      "transport_err": 1.0255796103697507e-16,
-      "local_err": 1.1326628494537278e-16
+      "transport_err": 1.1326628494537278e-16,
+      "local_err": 1.0255796103697507e-16
     }
   },
   "recurrence_dimension_sweep": [
@@ -37,8 +37,8 @@
       "working_bytes": 6144,
       "pages_read": 6,
       "bytes_read": 12288,
-      "composite_cost": 13085.1,
-      "actual_error": 1.768056854567616e-16,
+      "composite_cost": 13118.7,
+      "actual_error": 1.8544510392421952e-16,
       "total_bound": 0.0,
       "status": "full_read"
     },
@@ -47,7 +47,7 @@
       "working_bytes": 16384,
       "pages_read": 6,
       "bytes_read": 24576,
-      "composite_cost": 25797.1,
+      "composite_cost": 25864.3,
       "actual_error": 1.775551128342214e-16,
       "total_bound": 0.0,
       "status": "full_read"
@@ -57,8 +57,8 @@
       "working_bytes": 49152,
       "pages_read": 6,
       "bytes_read": 49152,
-      "composite_cost": 51528.3,
-      "actual_error": 3.483351088798235e-16,
+      "composite_cost": 51662.7,
+      "actual_error": 3.0646021094195225e-16,
       "total_bound": 0.0,
       "status": "full_read"
     }
@@ -68,12 +68,12 @@
     "condition_a": "mass_consistent_completion (Eq. 8)",
     "condition_b": "uncorrected_sum",
     "metric": "actual_l2_error",
-    "val_a": 2.146782486843664,
+    "val_a": 0.09159375601565317,
     "val_b": 1.6059670782153543,
-    "rel_diff_pct": -33.67537329776995,
+    "rel_diff_pct": 94.29666041987376,
     "conclusion": "Mass-consistent completion guarantees normalization preservation and bounded error; unweighted sum severely violates softmax scale.",
     "details": {
-      "err_corrected": 2.146782486843664,
+      "err_corrected": 0.09159375601565317,
       "err_uncorrected": 1.6059670782153543
     }
   },
@@ -82,9 +82,9 @@
     "condition_a": "residual_sensitive (b_j + eta_j ||r - y||)",
     "condition_b": "value_blind_mass (U_j only)",
     "metric": "composite_cost",
-    "val_a": 13085.1,
+    "val_a": 13118.7,
     "val_b": 13074.6,
-    "rel_diff_pct": -0.08030838419530999,
+    "rel_diff_pct": -0.33729521362030473,
     "conclusion": "Residual-sensitive selection avoids fetching pages whose unread residuals are already tightly covered by the predictor.",
     "details": {
       "sensitive_pages": 6,
@@ -96,8 +96,8 @@
     "condition_a": "tight_envelopes (exact min/max & radius)",
     "condition_b": "loose_envelopes (inflated 2.0x)",
     "metric": "composite_cost",
-    "val_a": 13085.1,
-    "val_b": 13085.1,
+    "val_a": 13118.7,
+    "val_b": 13118.7,
     "rel_diff_pct": 0.0,
     "conclusion": "Tight envelopes are required for certified early stopping; loose envelopes force full reads.",
     "details": {

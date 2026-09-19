@@ -2,7 +2,8 @@
 
 Research specification.
 
-**Status:** Architecture specification and mathematical analysis, with machine-checked Lean 4 formal proofs. Implementation and evaluation follow [the phase contracts](phases/README.md).
+**Status:** Architecture specification and mathematical analysis, with machine-checked Lean 4 formal proofs. Implementation and evaluation follow [the phase contracts](phases/README.md).  
+**Revision:** 1.1 (Supersedes 1.0 per [CHANGE_MANIFEST.yaml](results/CHANGE_MANIFEST.yaml))
 
 ## Abstract
 
@@ -274,20 +275,26 @@ vector identity and conditional norm bound over real normed spaces.
 ### 6.1 Computable page envelopes
 
 A sealed page j stores count n_j, coordinatewise bounds k_j⁻≤k_i≤k_j⁺,
-a value center c_j (initially the arithmetic mean), and outward radius
-ρ_j≥max_i||v_i-c_j||. Update a partial page's summaries on every append or
-keep it exact until sealed. Define
+a key center k̄_j and key radius R_j≥max_i||k_i-k̄_j||_2, a value center c_j
+(initially the arithmetic mean), and outward radius ρ_j≥max_i||v_i-c_j||_2.
+Update a partial page's summaries on every append or keep it exact until sealed.
+Cauchy-Schwarz yields |κ qᵀ k_i - κ qᵀ k̄_j| ≤ κ ||q||_2 R_j. Taking the
+intersection with coordinate box bounds gives:
 
 $$
-\ell_j=\kappa\sum_d\min(q_d k^-_{jd},q_d k^+_{jd}),\qquad
-u_j=\kappa\sum_d\max(q_d k^-_{jd},q_d k^+_{jd}),       \tag{11}
+\ell_j^{\text{box}}=\kappa\sum_d\min(q_d k^-_{jd},q_d k^+_{jd}),\qquad
+u_j^{\text{box}}=\kappa\sum_d\max(q_d k^-_{jd},q_d k^+_{jd}),       \tag{11a}
+$$
+$$
+\ell_j=\max(\ell_j^{\text{box}},\,\kappa q^\top\bar k_j-\kappa\|q\|_2 R_j),\qquad
+u_j=\min(u_j^{\text{box}},\,\kappa q^\top\bar k_j+\kappa\|q\|_2 R_j), \tag{11b}
 $$
 $$
 L_j=n_j e^{\ell_j},\quad U_j=n_j e^{u_j},\qquad
 b_j(r)=U_j(\|c_j-r\|+\rho_j).                         \tag{12}
 $$
 
-Every key lies in its box, so L_j≤Z_j≤U_j. Triangle inequality yields
+Every key lies in its box and ball enclosure, so L_j≤Z_j≤U_j. Triangle inequality yields
 ||Σ_{i∈j}e^{s_i}(v_i-r)||≤b_j. Sum unread-page bounds for L_O,U_O,B_O.
 The exponential interval and weighted residual norm step are Lean-checked;
 the multidimensional box constructor and its tensor implementation are not.
@@ -351,6 +358,25 @@ For midpoint estimates and p_j=c_j, B_j=U_jρ_j suffices. Summing the numerator
 identity proves (13) analytically; it is not presently Lean-checked. If this
 cheaper predictor wins, retire the recurrent-completion novelty claim.
 Recurrence is not entitled to a performance advantage by definition.
+
+**Theorem (Minimality of Chebyshev Page Centers):**
+Under triangle inequality splitting at page Chebyshev center $c_j$, for any
+predictor $p \in \mathbb{R}^{d_v}$:
+$$
+U_j(\|c_j-p\|+\rho_j) + \eta_j\|p - \widehat y\| \ge U_j\rho_j + \eta_j\|c_j - \widehat y\|
+$$
+identically everywhere because $U_j \ge \eta_j = (U_j - L_j)/2$.
+Therefore, static Chebyshev page center completion $p_j = c_j$ with bound
+$B_j = U_j\rho_j$ (Eq. 13) mathematically minimizes the worst-case certificate
+bound over all possible predictors.
+
+In Revision 1.1, AURELIS adopts Eq. (13) grouped completion as the primary
+certified retrieval mechanism. Recurrence $S_t$ remains essential for bounded
+mode (Eq. 3), but in archive retrieval it guides the value-residual refinement
+priority heuristic rather than superseding Chebyshev page centers:
+$$
+\text{priority}_j = \frac{U_j\rho_j + \eta_j\|c_j - r(q)\|}{\text{estimated\_service\_cost}_j}.
+$$
 
 ### 6.4 Floating point and the scope of safety
 
