@@ -21,6 +21,13 @@ from .types import (
     ReadResult,
     ReadStatus,
 )
+from .oracles import (
+    ScalarOracle,
+    TensorOracle,
+    ScalarStreamingOracle,
+    TensorStreamingOracle,
+)
+
 
 __all__ = [
     "CertificateBound",
@@ -28,6 +35,10 @@ __all__ = [
     "PageDescriptor",
     "ReadResult",
     "ReadStatus",
+    "ScalarOracle",
+    "TensorOracle",
+    "ScalarStreamingOracle",
+    "TensorStreamingOracle",
     "bounded_read",
     "completed_read",
     "consume",

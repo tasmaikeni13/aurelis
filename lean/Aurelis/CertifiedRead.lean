@@ -1,5 +1,6 @@
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Module
 
@@ -103,5 +104,44 @@ theorem completedRead_certificate (zs zo lo hi : ℝ) (ns no prior : V) (radius 
   exact residual_certificate _ _ _ _ _ _ _ _ _ (by linarith) (by linarith)
     (completion_error_identity zs zo ((lo + hi) / 2) ns no prior ht ha)
     hres (midpoint_error lo zo hi hl hu)
+
+/-- Mass-consistent grouped completion (Eq. 13). -/
+noncomputable def groupedCompletedRead {ι : Type*} (indices : Finset ι)
+    (zs : ℝ) (zh : ι → ℝ) (ns : V) (p : ι → V) : V :=
+  (zs + ∑ i ∈ indices, zh i)⁻¹ • (ns + ∑ i ∈ indices, zh i • p i)
+
+theorem groupedCompletedRead_balance {ι : Type*} (indices : Finset ι)
+    (zs : ℝ) (zh : ι → ℝ) (ns : V) (p : ι → V)
+    (h : zs + ∑ i ∈ indices, zh i ≠ 0) :
+    (zs + ∑ i ∈ indices, zh i) • groupedCompletedRead indices zs zh ns p =
+      ns + ∑ i ∈ indices, zh i • p i := by
+  simp [groupedCompletedRead, smul_smul, h]
+
+theorem groupedCompletedRead_full {ι : Type*}
+    (zs : ℝ) (ns : V) (p : ι → V) :
+    groupedCompletedRead ∅ zs (fun _ => 0) ns p = zs⁻¹ • ns := by
+  simp [groupedCompletedRead]
+
+/-- Grouped completion certificate (Eq. 13) over arbitrary finite index collections. -/
+theorem grouped_residual_certificate {ι : Type*} (indices : Finset ι)
+    (truth approx : V) (term : ι → V)
+    (mass floor : ℝ) (bound : ι → ℝ)
+    (hfloor : 0 < floor) (hmass : floor ≤ mass)
+    (hid : mass • (truth - approx) = ∑ i ∈ indices, term i)
+    (hterm : ∀ i ∈ indices, ‖term i‖ ≤ bound i) :
+    ‖truth - approx‖ ≤ (∑ i ∈ indices, bound i) / floor := by
+  have hpos : 0 < mass := lt_of_lt_of_le hfloor hmass
+  have hbound : mass * ‖truth - approx‖ ≤ ∑ i ∈ indices, bound i := by
+    calc
+      mass * ‖truth - approx‖ = ‖mass • (truth - approx)‖ := by
+        rw [norm_smul, Real.norm_eq_abs, abs_of_pos hpos]
+      _ = ‖∑ i ∈ indices, term i‖ := congrArg norm hid
+      _ ≤ ∑ i ∈ indices, ‖term i‖ := norm_sum_le _ _
+      _ ≤ ∑ i ∈ indices, bound i := Finset.sum_le_sum hterm
+  apply (le_div_iff₀ hfloor).mpr
+  calc
+    ‖truth - approx‖ * floor ≤ ‖truth - approx‖ * mass :=
+      mul_le_mul_of_nonneg_left hmass (norm_nonneg _)
+    _ ≤ ∑ i ∈ indices, bound i := by simpa [mul_comm] using hbound
 
 end Aurelis

@@ -14,7 +14,7 @@ This registry tracks the formal claims and empirical research hypotheses of the 
 | R-CERT | Midpoint completion error obeys Eq. (10) | `completedRead_certificate`, `residual_certificate`, `midpoint_error` | Lean-checked conditional on valid envelopes |
 | R-ENVELOPE | Score intervals and weighted residual bounds support page envelopes | `exp_score_interval`, `weighted_residual_bound`, `coordinate_product_interval`, `dot_box_interval`, `page_mass_interval`, `page_residual_ball`; Eqs. (11)–(12) | Lean-checked arithmetic |
 | R-FULL | Zero unread mass reduces completion to full selected attention | `completedRead_full` | Lean-checked algebra; real arithmetic |
-| R-GROUPED | Per-page predictor comparator has bound (13) | Specification §6.3 | Analytic |
+| R-GROUPED | Per-page predictor comparator has bound (13) | `groupedCompletedRead_balance`, `grouped_residual_certificate` (namespace `Aurelis`); Eq. (13) | Lean-checked |
 | R-COST | Bounded mode eliminates per-token matrix inversions | Equations (2)–(3), cost model (15) | Design accounting |
 | R-ARCHIVE | Exact archive and metadata grow with history; worst-case full read is linear per query | State definition and cost model | Analytic |
 | H-RECURRENCE | Recurrent completion improves cost at fixed error vs strongest cheap completion | Phases 4–8 | Hypothesis |

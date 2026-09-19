@@ -1,0 +1,168 @@
+[
+  {
+    "equation": "Eq. (2)",
+    "operation": "Gated delta recurrent update",
+    "tested_shapes": [
+      "[2, 2]",
+      "[4, 4]",
+      "[6, 8]",
+      "[12, 16]",
+      "[16, 32]"
+    ],
+    "max_abs_err": 1.4757613878159529e-15,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (2) Corollary",
+    "operation": "Unit-key exact write (beta=1, alpha=1)",
+    "tested_shapes": [
+      "[2, 2]",
+      "[4, 4]",
+      "[6, 8]",
+      "[12, 16]",
+      "[16, 32]"
+    ],
+    "max_abs_err": 1.2548467326853124e-15,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (3)",
+    "operation": "Bounded read with local attention & transport",
+    "tested_shapes": [
+      "[2, 2]",
+      "[4, 4]",
+      "[6, 8]",
+      "[12, 16]",
+      "[16, 32]"
+    ],
+    "max_abs_err": 1.4052546790165069e-14,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (4)",
+    "operation": "Transport error identity & linear reproduction",
+    "tested_shapes": [
+      "[2, 2]",
+      "[4, 4]",
+      "[6, 8]",
+      "[12, 16]",
+      "[16, 32]"
+    ],
+    "max_abs_err": 1.2410684580006155e-14,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (5)",
+    "operation": "Rank-one perturbation energy identity & nonexpansion",
+    "tested_shapes": [
+      "d_k=2",
+      "d_k=4",
+      "d_k=8",
+      "d_k=16",
+      "d_k=32"
+    ],
+    "max_abs_err": 3.552713678800501e-15,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (7)",
+    "operation": "Explicit full softmax reference y_*",
+    "tested_shapes": [
+      "[2, 2]",
+      "[4, 4]",
+      "[6, 8]",
+      "[12, 16]",
+      "[16, 32]"
+    ],
+    "max_abs_err": 8.578729393091802e-16,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (8)",
+    "operation": "Mass-consistent normalized archive completion",
+    "tested_shapes": [
+      "d_v=2",
+      "d_v=4",
+      "d_v=6",
+      "d_v=12",
+      "d_v=16"
+    ],
+    "max_abs_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (9)",
+    "operation": "Two-term vector error decomposition",
+    "tested_shapes": [
+      "d_v=2",
+      "d_v=4",
+      "d_v=6",
+      "d_v=12",
+      "d_v=16"
+    ],
+    "max_abs_err": 7.274285267199323e-16,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (10)",
+    "operation": "Deterministic residual certificate bound E_A",
+    "tested_shapes": [
+      "d_v=2",
+      "d_v=4",
+      "d_v=6",
+      "d_v=12",
+      "d_v=16"
+    ],
+    "max_abs_err": 4.440892098500626e-16,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eqs. (11, 12)",
+    "operation": "Page coordinate score and value residual envelopes",
+    "tested_shapes": [
+      "[2, 2]",
+      "[4, 4]",
+      "[6, 8]",
+      "[12, 16]",
+      "[16, 32]"
+    ],
+    "max_abs_err": 2.000888343900442e-11,
+    "max_rel_err": 2.1380940702400895e-15,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  },
+  {
+    "equation": "Eq. (13)",
+    "operation": "Per-page grouped comparator formula & certificate",
+    "tested_shapes": [
+      "d_v=2",
+      "d_v=4",
+      "d_v=6",
+      "d_v=12",
+      "d_v=16"
+    ],
+    "max_abs_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS"
+  }
+]

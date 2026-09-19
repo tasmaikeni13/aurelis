@@ -1,0 +1,122 @@
+{
+  "empty_remote_sets": {
+    "pathology": "empty_remote_sets",
+    "value_scale": 2.4288500317485013,
+    "max_abs_err": 1.6653345369377348e-16,
+    "max_rel_err": 8.22271395798204e-17,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Unread set empty; completed read equals full softmax exactly; certificate bound is 0."
+  },
+  "singleton_pages": {
+    "pathology": "singleton_pages",
+    "value_scale": 1.762756200486952,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Page radius is 0; mass upper and lower bounds coincide with exact single-item exponential."
+  },
+  "partial_pages": {
+    "pathology": "partial_pages",
+    "value_scale": 2.4806648788610595,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Correctly scales mass and bounds by actual count n=3 rather than nominal page capacity."
+  },
+  "negative_query_coordinates": {
+    "pathology": "negative_query_coordinates",
+    "value_scale": 5.89427688525064,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Coordinate box min(q*k-, q*k+) correctly inverts coordinate orientation when q_d < 0."
+  },
+  "zero_keys": {
+    "pathology": "zero_keys",
+    "value_scale": 0.0,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Key norm floor handles k=0 with zero division avoided; S^+ simplifies to alpha * S exactly."
+  },
+  "beta_endpoints": {
+    "pathology": "beta_endpoints",
+    "value_scale": 1.0,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Tested beta=0 (identity), beta=1 (full unit write), and beta=2 (isometry reflection)."
+  },
+  "alpha_endpoints": {
+    "pathology": "alpha_endpoints",
+    "value_scale": 1.981438802460538,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "alpha=0 completely resets prior state; alpha=1 preserves conservative recurrence."
+  },
+  "repeated_keys": {
+    "pathology": "repeated_keys",
+    "value_scale": 13.19090595827292,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Successive writes at identical key overwrite the linear association cleanly with S^+ k = v_new."
+  },
+  "huge_value_outliers": {
+    "pathology": "huge_value_outliers",
+    "value_scale": 1000000.0,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Stable under 10^6 value scaling; certificate bound scales linearly without overflow or cancellation."
+  },
+  "uniform_scores": {
+    "pathology": "uniform_scores",
+    "value_scale": 1.6151813775232868,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Completely diffuse attention weights equal 1/t; barycenter is arithmetic mean."
+  },
+  "concentrated_scores": {
+    "pathology": "concentrated_scores",
+    "value_scale": 1.6422270722629184,
+    "max_abs_err": 0.0,
+    "max_rel_err": 0.0,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Numerical stability under large score difference (kappa*q^T k = 50); no exp overflow via max subtraction."
+  },
+  "stale_state_residuals": {
+    "pathology": "stale_state_residuals",
+    "value_scale": 3.872983346207417,
+    "max_abs_err": 3.131650009511674,
+    "max_rel_err": 0.7523672561644869,
+    "atol_threshold": 1e-10,
+    "rtol_threshold": 1e-09,
+    "status": "PASS",
+    "notes": "Proves stored residuals v - S_write k are invalid under evolved S_t; dynamic envelope ||c - r_t|| is required."
+  }
+}

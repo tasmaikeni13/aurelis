@@ -30,6 +30,9 @@ Pinned Lean/mathlib 4.19.0. All theorems are checked under namespace `Aurelis`. 
 | `corrected_error_identity` | Linear transport error decomposition | Applies to any linear memory map |
 | `corrected_reproduces_linear` | Exact reproduction of linear ground truth | When memory equals target map and local values are consistent |
 | `corrected_exact_hit` | One-hot local hit reproduces value | Query matches local key exactly |
+| `groupedCompletedRead_balance` | Eq. (13) grouped completion balance | Nonzero total mass across groups |
+| `groupedCompletedRead_full` | Eq. (13) empty unread group recovery | Algebraic selected normalized sum |
+| `grouped_residual_certificate` | Eq. (13) grouped certificate bound | Finite index collection, positive denominator floor, valid envelope bounds |
 
 The certificate is derived directly from the defined normalized output; the norm theorem consumes explicit envelope premises. Proving those premises for an actual page/kernel remains an implementation obligation.
 
@@ -41,7 +44,7 @@ The certificate is derived directly from the defined normalized output; the norm
 ## Explicitly Outside Current Formal Coverage
 
 - Full page key-box construction and aggregate page-cover correspondence.
-- Per-page predictor formula (13), matrix chunk algorithm, driven-state (6).
+- Matrix chunk algorithm, driven-state (6).
 - Floating-point rounding/underflow/overflow, quantization, interval kernels.
 - Training gradients, learned representation, probabilistic calibration.
 - Complexity on real hardware, measured latency/memory, index efficiency.

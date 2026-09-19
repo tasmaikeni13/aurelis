@@ -7,8 +7,8 @@ Read [AUTONOMY_PROTOCOL.md](AUTONOMY_PROTOCOL.md) and [IMPLEMENTATION_CONTRACT.m
 | Phase | Deliverable | Status |
 |---|---|---|
 | [0](phase0.md) | Runtime inventory, formal verification, module mapping, and preregistration | **PASS** |
-| [1](phase1.md) | Independent math oracles and formal correspondence | Ready for execution |
-| [2](phase2.md) | Streaming state, bounded read, exact archive reference | Pending |
+| [1](phase1.md) | Independent math oracles and formal correspondence | **PASS** |
+| [2](phase2.md) | Streaming state, bounded read, exact archive reference | Ready for execution |
 | [3](phase3.md) | Validated certificate, refinement, failure semantics | Pending |
 | [4](phase4.md) | Falsification and novelty-critical ablations | Pending |
 | [5](phase5.md) | Chunk training and accelerator kernels | Pending |
