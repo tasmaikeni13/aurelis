@@ -1,0 +1,77 @@
+[
+  {
+    "gate_id": "Gate 1",
+    "criterion": "Exercise t < w, t = w, and t > w",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 2",
+    "criterion": "Empty remote state behavior",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 3",
+    "criterion": "Multiple page boundaries crossed cleanly",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 4",
+    "criterion": "Duplicate content with distinct IDs preserved",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 5",
+    "criterion": "Packed examples with document boundary resets",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 6",
+    "criterion": "Variable lengths and interleaved requests without contamination",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 7",
+    "criterion": "Reading pages never writes recurrent state S",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 8",
+    "criterion": "Retrying read never duplicates an observation",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 9",
+    "criterion": "Prefix snapshots restore complete state tuple",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 10",
+    "criterion": "Rejected speculative tokens rolled back cleanly",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 11",
+    "criterion": "Bounded state live tensor memory strictly plateaus after window fills",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 12",
+    "criterion": "Archive bytes grow as predicted and labeled by tier",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 13",
+    "criterion": "Wrong archive length or index version fails with invalid_state",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 14",
+    "criterion": "Token-by-token, prefill, and continuation agree for bounded and archive modes",
+    "status": "PASS"
+  },
+  {
+    "gate_id": "Gate 15",
+    "criterion": "Full history softmax recovered when all pages read",
+    "status": "PASS"
+  }
+]

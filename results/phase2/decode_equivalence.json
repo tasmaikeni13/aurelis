@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "bounded_mode": {
+    "token_vs_prefill_max_abs_err": 0.0,
+    "token_vs_continuation_max_abs_err": 0.0,
+    "status": "PASS"
+  },
+  "archive_mode": {
+    "token_vs_prefill_max_abs_err": 0.0,
+    "token_vs_continuation_max_abs_err": 0.0,
+    "status": "PASS"
+  },
+  "history_reference_agreement": {
+    "max_abs_err": 1.6050308076832566e-15,
+    "status": "PASS"
+  }
+}

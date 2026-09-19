@@ -1,0 +1,119 @@
+{
+  "status": "PASS",
+  "window_size": 8,
+  "page_size": 4,
+  "is_bounded_plateau": true,
+  "plateau_bytes": 2112,
+  "trajectory": [
+    {
+      "context_length": 1,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 0,
+      "archive_index_bytes": 0,
+      "archive_total_bytes": 2112,
+      "archive_sealed_pages": 0
+    },
+    {
+      "context_length": 4,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 0,
+      "archive_index_bytes": 0,
+      "archive_total_bytes": 2112,
+      "archive_sealed_pages": 0
+    },
+    {
+      "context_length": 8,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 0,
+      "archive_index_bytes": 0,
+      "archive_total_bytes": 2112,
+      "archive_sealed_pages": 0
+    },
+    {
+      "context_length": 12,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 640,
+      "archive_index_bytes": 208,
+      "archive_total_bytes": 2960,
+      "archive_sealed_pages": 1
+    },
+    {
+      "context_length": 16,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 1280,
+      "archive_index_bytes": 416,
+      "archive_total_bytes": 3808,
+      "archive_sealed_pages": 2
+    },
+    {
+      "context_length": 24,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 2560,
+      "archive_index_bytes": 832,
+      "archive_total_bytes": 5504,
+      "archive_sealed_pages": 4
+    },
+    {
+      "context_length": 32,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 3840,
+      "archive_index_bytes": 1248,
+      "archive_total_bytes": 7200,
+      "archive_sealed_pages": 6
+    },
+    {
+      "context_length": 48,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 6400,
+      "archive_index_bytes": 2080,
+      "archive_total_bytes": 10592,
+      "archive_sealed_pages": 10
+    },
+    {
+      "context_length": 64,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 8960,
+      "archive_index_bytes": 2912,
+      "archive_total_bytes": 13984,
+      "archive_sealed_pages": 14
+    },
+    {
+      "context_length": 96,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 14080,
+      "archive_index_bytes": 4576,
+      "archive_total_bytes": 20768,
+      "archive_sealed_pages": 22
+    },
+    {
+      "context_length": 128,
+      "bounded_working_bytes": 2112,
+      "bounded_total_bytes": 2112,
+      "archive_working_bytes": 2112,
+      "archive_raw_kv_bytes": 19200,
+      "archive_index_bytes": 6240,
+      "archive_total_bytes": 27552,
+      "archive_sealed_pages": 30
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "status": "PASS",
+  "t_transitions": [
+    {
+      "step": 0,
+      "evicted_count": 0,
+      "recent_count": 1,
+      "evicted_ids": [],
+      "recent_ids": [
+        0
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 1,
+      "evicted_count": 0,
+      "recent_count": 2,
+      "evicted_ids": [],
+      "recent_ids": [
+        0,
+        1
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 2,
+      "evicted_count": 0,
+      "recent_count": 3,
+      "evicted_ids": [],
+      "recent_ids": [
+        0,
+        1,
+        2
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 3,
+      "evicted_count": 0,
+      "recent_count": 4,
+      "evicted_ids": [],
+      "recent_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 4,
+      "evicted_count": 1,
+      "recent_count": 4,
+      "evicted_ids": [
+        0
+      ],
+      "recent_ids": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 5,
+      "evicted_count": 2,
+      "recent_count": 4,
+      "evicted_ids": [
+        0,
+        1
+      ],
+      "recent_ids": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 6,
+      "evicted_count": 3,
+      "recent_count": 4,
+      "evicted_ids": [
+        0,
+        1,
+        2
+      ],
+      "recent_ids": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 7,
+      "evicted_count": 4,
+      "recent_count": 4,
+      "evicted_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "recent_ids": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 8,
+      "evicted_count": 5,
+      "recent_count": 4,
+      "evicted_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "recent_ids": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "disjoint": true,
+      "covers_history": true
+    },
+    {
+      "step": 9,
+      "evicted_count": 6,
+      "recent_count": 4,
+      "evicted_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "recent_ids": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "disjoint": true,
+      "covers_history": true
+    }
+  ],
+  "duplicate_content": {
+    "total_seen": 6,
+    "all_ids_preserved": true,
+    "evicted": [
+      100,
+      101
+    ],
+    "recent": [
+      102,
+      103,
+      104,
+      105
+    ]
+  },
+  "interleaved_isolation": {
+    "session_a_len": 8,
+    "session_b_len": 12,
+    "max_abs_diff_S": 0.0,
+    "status": "PASS"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "full_softmax_recovery": {
+    "max_abs_err": 4.878984946956307e-16,
+    "status": "PASS",
+    "pages_read": 4,
+    "bytes_read": 1664
+  },
+  "reading_pages_never_writes_S": {
+    "max_abs_diff_S": 0.0,
+    "status": "PASS"
+  },
+  "retrying_read_idempotence": {
+    "max_abs_diff": 0.0,
+    "status": "PASS"
+  },
+  "integrity_failure_injection": {
+    "wrong_length_status": "invalid_state",
+    "wrong_length_certificate": null,
+    "wrong_version_status": "invalid_state",
+    "wrong_version_certificate": null,
+    "status": "PASS"
+  }
+}
